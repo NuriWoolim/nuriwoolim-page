@@ -1,5 +1,10 @@
-package com.nuriwoolim.pagebackend.entity;
+package com.nuriwoolim.pagebackend.user;
 
+import com.nuriwoolim.pagebackend.entity.Comment;
+import com.nuriwoolim.pagebackend.entity.Post;
+import com.nuriwoolim.pagebackend.entity.Schedule;
+import com.nuriwoolim.pagebackend.entity.TimeTable;
+import com.nuriwoolim.pagebackend.entity.WeekSchedule;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
