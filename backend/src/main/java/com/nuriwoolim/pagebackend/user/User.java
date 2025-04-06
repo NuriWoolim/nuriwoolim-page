@@ -5,6 +5,7 @@ import com.nuriwoolim.pagebackend.entity.Post;
 import com.nuriwoolim.pagebackend.entity.Schedule;
 import com.nuriwoolim.pagebackend.entity.TimeTable;
 import com.nuriwoolim.pagebackend.entity.WeekSchedule;
+import com.nuriwoolim.pagebackend.user.dto.UserCreateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -73,4 +74,14 @@ public class User {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Schedule> scheduleList;
+
+    public static User of(UserCreateRequest userCreateRequest) {
+        User user = new User();
+        user.setUsername(userCreateRequest.getUsername());
+        user.setEmail(userCreateRequest.getEmail());
+        user.setPassword(userCreateRequest.getPassword());
+        user.setNickname(userCreateRequest.getNickname());
+
+        return user;
+    }
 }

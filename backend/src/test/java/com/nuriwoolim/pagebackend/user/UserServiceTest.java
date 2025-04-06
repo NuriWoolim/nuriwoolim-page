@@ -1,5 +1,6 @@
 package com.nuriwoolim.pagebackend.user;
 
+import com.nuriwoolim.pagebackend.user.dto.UserCreateRequest;
 import com.nuriwoolim.pagebackend.util.exception.CustomException;
 import com.nuriwoolim.pagebackend.util.exception.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +14,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,16 +54,18 @@ class UserServiceTest {
 
     @Test
     @DisplayName("유저 Create -> 성공")
-    public void saveUser() {
-        User user = new User();
-        user.setId(1L);
-        user.setUsername("username");
+    public void createUser() {
+        UserCreateRequest userCreateRequest = new UserCreateRequest();
+        userCreateRequest.setUsername("username");
+        userCreateRequest.setPassword("password");
+        userCreateRequest.setEmail("email@email.com");
+        userCreateRequest.setNickname("nickname");
 
-        when(userRepository.save(user)).thenReturn(user);
-        User savedUser = userService.save(user);
+        User user = User.of(userCreateRequest);
 
-        assertThat(savedUser).isEqualTo(user);
-        assertThat(savedUser.getUsername()).isEqualTo("username");
-        assertThat(savedUser.getId()).isEqualTo(1L);
+        when(userRepository.save(any())).thenAnswer(i -> i.getArgument(0));
+        User savedUser = userService.create(userCreateRequest);
+
+        assertThat(savedUser).usingRecursiveComparison().isEqualTo(user);
     }
 }
