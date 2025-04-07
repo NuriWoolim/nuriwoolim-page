@@ -1,5 +1,6 @@
 package com.nuriwoolim.pagebackend.entity;
 
+import com.nuriwoolim.pagebackend.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
