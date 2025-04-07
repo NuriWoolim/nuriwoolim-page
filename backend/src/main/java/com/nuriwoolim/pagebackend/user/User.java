@@ -6,6 +6,7 @@ import com.nuriwoolim.pagebackend.entity.Schedule;
 import com.nuriwoolim.pagebackend.entity.TimeTable;
 import com.nuriwoolim.pagebackend.entity.WeekSchedule;
 import com.nuriwoolim.pagebackend.user.dto.UserCreateRequest;
+import com.nuriwoolim.pagebackend.user.dto.UserUpdateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -18,15 +19,23 @@ import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Setter
 @Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
     @Id
@@ -51,13 +60,16 @@ public class User {
 
     @NotBlank
     @Enumerated(EnumType.ORDINAL)
+    @Builder.Default
     private UserType type = UserType.NONMEMBER;
 
     @NotNull
+    @Builder.Default
     private LocalDate createdDate = LocalDate.now();
 
     private Integer year;
 
+    @Builder.Default
     private boolean email_verified = false;
 
     @OneToMany(mappedBy = "writer", fetch = FetchType.LAZY)
@@ -83,5 +95,13 @@ public class User {
         user.setNickname(userCreateRequest.getNickname());
 
         return user;
+    }
+
+    public void update(UserUpdateRequest userUpdateRequest) {
+        Optional.ofNullable(userUpdateRequest.getEmail()).ifPresent(this::setEmail);
+        Optional.ofNullable(userUpdateRequest.getPassword()).ifPresent(this::setPassword);
+        Optional.ofNullable(userUpdateRequest.getNickname()).ifPresent(this::setNickname);
+        Optional.ofNullable(userUpdateRequest.getType()).ifPresent(this::setType);
+        Optional.ofNullable(userUpdateRequest.getYear()).ifPresent(this::setYear);
     }
 }
