@@ -25,7 +25,7 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 256)
+    @Column(length = 65_535)
     @Lob
     private String content;
 

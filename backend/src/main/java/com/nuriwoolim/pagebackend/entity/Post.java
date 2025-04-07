@@ -32,7 +32,7 @@ public class Post {
     @Column(unique = true, length = 20)
     private String title;
 
-    @Column(length = 256)
+    @Column(length = 65_535)
     @Lob
     private String content;
 
