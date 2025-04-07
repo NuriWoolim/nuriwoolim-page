@@ -24,14 +24,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 @Getter
-@Setter
 @Entity
 @Builder
 @AllArgsConstructor
@@ -70,7 +68,7 @@ public class User {
     private Integer year;
 
     @Builder.Default
-    private boolean email_verified = false;
+    private boolean emailVerified = false;
 
     @OneToMany(mappedBy = "writer", fetch = FetchType.LAZY)
     private List<Post> postList;
@@ -87,21 +85,34 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Schedule> scheduleList;
 
-    public static User of(UserCreateRequest userCreateRequest) {
-        User user = new User();
-        user.setUsername(userCreateRequest.getUsername());
-        user.setEmail(userCreateRequest.getEmail());
-        user.setPassword(userCreateRequest.getPassword());
-        user.setNickname(userCreateRequest.getNickname());
+    @Builder
+    private User(boolean emailVerified, Integer year, LocalDate createdDate, UserType type, String nickname, String password, String email, String username, Long id) {
+        this.emailVerified = emailVerified;
+        this.year = year;
+        this.createdDate = createdDate;
+        this.type = type;
+        this.nickname = nickname;
+        this.password = password;
+        this.email = email;
+        this.username = username;
+        this.id = id;
+    }
 
+    public static User of(UserCreateRequest userCreateRequest) {
+        User user = User.builder()
+                .username(userCreateRequest.getUsername())
+                .email(userCreateRequest.getEmail())
+                .password(userCreateRequest.getPassword())
+                .nickname(userCreateRequest.getNickname())
+                .build();
         return user;
     }
 
     public void update(UserUpdateRequest userUpdateRequest) {
-        Optional.ofNullable(userUpdateRequest.getEmail()).ifPresent(this::setEmail);
-        Optional.ofNullable(userUpdateRequest.getPassword()).ifPresent(this::setPassword);
-        Optional.ofNullable(userUpdateRequest.getNickname()).ifPresent(this::setNickname);
-        Optional.ofNullable(userUpdateRequest.getType()).ifPresent(this::setType);
-        Optional.ofNullable(userUpdateRequest.getYear()).ifPresent(this::setYear);
+        Optional.ofNullable(userUpdateRequest.getEmail()).ifPresent(i -> this.email = i);
+        Optional.ofNullable(userUpdateRequest.getPassword()).ifPresent(i -> this.password = i);
+        Optional.ofNullable(userUpdateRequest.getNickname()).ifPresent(i -> this.nickname = i);
+        Optional.ofNullable(userUpdateRequest.getType()).ifPresent(i -> this.type = i);
+        Optional.ofNullable(userUpdateRequest.getYear()).ifPresent(i -> this.year = i);
     }
 }

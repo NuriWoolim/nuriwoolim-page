@@ -3,19 +3,13 @@ package com.nuriwoolim.pagebackend.user.dto;
 import com.nuriwoolim.pagebackend.user.UserType;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 public class UserUpdateRequest {
-    @NotBlank
-    @Positive
-    private Long id;
-
     @Email
     @Column(unique = true, length = 30)
     private String email;

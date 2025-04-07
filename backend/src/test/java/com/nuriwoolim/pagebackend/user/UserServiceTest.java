@@ -83,7 +83,6 @@ class UserServiceTest {
         // given
         User existing = User.builder().id(1L).nickname("nick").year(0).password("password").email("email@email.com").build();
         UserUpdateRequest userUpdateRequest = new UserUpdateRequest();
-        userUpdateRequest.setId(1L);
         userUpdateRequest.setNickname("nick2");
         userUpdateRequest.setType(UserType.MEMBER);
         userUpdateRequest.setYear(1);
@@ -96,7 +95,7 @@ class UserServiceTest {
         when(userRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 
         // when
-        User result = userService.update(userUpdateRequest);
+        User result = userService.update(1L, userUpdateRequest);
 
         // then
         assertThat(result).usingRecursiveComparison().isEqualTo(updated);
