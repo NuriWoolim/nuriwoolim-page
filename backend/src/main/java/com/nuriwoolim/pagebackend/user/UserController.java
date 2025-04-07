@@ -1,6 +1,7 @@
 package com.nuriwoolim.pagebackend.user;
 
 import com.nuriwoolim.pagebackend.user.dto.UserCreateRequest;
+import com.nuriwoolim.pagebackend.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.user.dto.UserUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,21 +23,21 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/users/{userId}")
-    public ResponseEntity<User> getUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(userService.findById(userId));
+    public ResponseEntity<UserResponse> getUser(@PathVariable Long userId) {
+        return ResponseEntity.ok(UserResponse.of(userService.findById(userId)));
     }
 
     @PostMapping("/users")
-    public ResponseEntity<User> createUser(@RequestBody UserCreateRequest userCreateRequest) {
+    public ResponseEntity<UserResponse> createUser(@RequestBody UserCreateRequest userCreateRequest) {
         User createdUser = userService.create(userCreateRequest);
         URI location = URI.create("/api/users/" + createdUser.getId());
         return ResponseEntity.created(location)
-                .body(createdUser);
+                .body(UserResponse.of(createdUser));
     }
 
     @PatchMapping("/users/{userId}")
-    public ResponseEntity<User> updateUser(@PathVariable Long userId, @RequestBody UserUpdateRequest userUpdateRequest) {
-        return ResponseEntity.ok(userService.update(userId, userUpdateRequest));
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long userId, @RequestBody UserUpdateRequest userUpdateRequest) {
+        return ResponseEntity.ok(UserResponse.of(userService.update(userId, userUpdateRequest)));
     }
 
     @DeleteMapping("/users/{userId}")

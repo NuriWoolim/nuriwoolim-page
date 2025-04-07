@@ -62,19 +62,6 @@ public class User {
     @Builder.Default
     private boolean emailVerified = false;
 
-    @Builder
-    private User(boolean emailVerified, Integer year, LocalDate createdDate, UserType type, String nickname, String password, String email, String username, Long id) {
-        this.emailVerified = emailVerified;
-        this.year = year;
-        this.createdDate = createdDate;
-        this.type = type;
-        this.nickname = nickname;
-        this.password = password;
-        this.email = email;
-        this.username = username;
-        this.id = id;
-    }
-
     public static User of(UserCreateRequest userCreateRequest) {
         User user = User.builder()
                 .username(userCreateRequest.getUsername())
