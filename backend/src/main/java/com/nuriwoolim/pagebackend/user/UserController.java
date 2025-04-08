@@ -3,6 +3,7 @@ package com.nuriwoolim.pagebackend.user;
 import com.nuriwoolim.pagebackend.user.dto.UserCreateRequest;
 import com.nuriwoolim.pagebackend.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.user.dto.UserUpdateRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,7 +29,7 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<UserResponse> createUser(@RequestBody UserCreateRequest userCreateRequest) {
+    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserCreateRequest userCreateRequest) {
         User createdUser = userService.create(userCreateRequest);
         URI location = URI.create("/api/users/" + createdUser.getId());
         return ResponseEntity.created(location)
@@ -36,7 +37,7 @@ public class UserController {
     }
 
     @PatchMapping("/users/{userId}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable Long userId, @RequestBody UserUpdateRequest userUpdateRequest) {
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long userId, @Valid @RequestBody UserUpdateRequest userUpdateRequest) {
         return ResponseEntity.ok(UserResponse.of(userService.update(userId, userUpdateRequest)));
     }
 
