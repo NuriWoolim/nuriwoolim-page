@@ -12,8 +12,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,19 +26,19 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Column(unique = true, length = 20)
+
+    @Column(nullable = false, unique = true, length = 20)
     private String title;
 
     @Column(length = 65_535)
     @Lob
     private String content;
 
-    @NotBlank
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private PostType type = PostType.GENERAL;
 
-    @NotNull
+    @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     private LocalDateTime updatedAt;

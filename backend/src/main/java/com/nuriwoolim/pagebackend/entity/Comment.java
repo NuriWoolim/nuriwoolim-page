@@ -10,8 +10,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,11 +27,11 @@ public class Comment {
     @Lob
     private String content;
 
-    @NotBlank
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private PostType type = PostType.GENERAL;
 
-    @NotNull
+    @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     private LocalDateTime updatedAt;
