@@ -1,7 +1,7 @@
 package com.nuriwoolim.pagebackend.user.dto;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
@@ -16,7 +16,7 @@ public class UserCreateRequest {
 
     @Email
     @NotBlank
-    @Column(unique = true, length = 30)
+    @Max(50)
     private String email;
 
     @NotBlank
