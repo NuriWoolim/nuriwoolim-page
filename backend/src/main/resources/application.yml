@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: backend
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${HOST}:3306/${DB_NAME}?serverTimezone=Asia/Seoul
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+
+logging:
+  level:
+    root: INFO
+#    org.springframework: INFO
+#    org.springframework.web: DEBUG
