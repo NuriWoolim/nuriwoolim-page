@@ -2,8 +2,8 @@ package com.nuriwoolim.pagebackend.user.dto;
 
 import com.nuriwoolim.pagebackend.user.UserType;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 public class UserUpdateRequest {
     @Email
-    @Max(50)
+    @Size(max = 50)
     private String email;
 
     @Pattern(regexp = "^(?=.*[A-Z])(?=.*[0-9])(?=.*[a-z])(?=.*[!@#$%^&*()\\-+=]).{8,20}$"
