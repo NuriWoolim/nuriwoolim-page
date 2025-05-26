@@ -1,55 +1,70 @@
 package com.nuriwoolim.pagebackend.entity;
 
+import com.nuriwoolim.pagebackend.global.BaseEntity;
 import com.nuriwoolim.pagebackend.user.User;
 import jakarta.persistence.Column;
+import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.time.LocalDateTime;
+import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
 @Entity
-public class Post {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(
+        indexes = {
+                @Index(name = "idx_post_writer", columnList = "writer_id"),
+                @Index(name = "idx_post_board", columnList = "board_id")
+        }
+)
+@Builder
+@AllArgsConstructor
+public class Post extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Column(unique = true, length = 20)
+    @Column(unique = true, length = 20, nullable = false)
     private String title;
 
-    @Column(length = 65_535)
+    @Column(length = 65_535, nullable = false)
     @Lob
     private String content;
 
-    @NotBlank
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private PostType type = PostType.GENERAL;
 
-    @NotNull
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    private LocalDateTime updatedAt;
-
-    @ManyToOne
+    @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY, optional = false)
+    @JoinColumn(
+            nullable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User writer;
-    @ManyToOne
+
+    @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY, optional = false)
+    @JoinColumn(
+            nullable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Board board;
 
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
-    private List<Comment> commentList;
+    @Builder.Default
+    private List<Comment> commentList = new ArrayList<>();
 }

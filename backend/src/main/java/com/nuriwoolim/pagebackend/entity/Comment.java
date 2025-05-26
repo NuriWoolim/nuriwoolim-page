@@ -17,6 +17,8 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -27,17 +29,20 @@ import lombok.NoArgsConstructor;
                 @Index(name = "idx_comment_post", columnList = "post_id")
         }
 )
+@Builder
+@AllArgsConstructor
 public class Comment extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 65_535)
+    @Column(length = 65_535, nullable = false)
     @Lob
     private String content;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private PostType type = PostType.GENERAL;
 
     @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY, optional = false)
