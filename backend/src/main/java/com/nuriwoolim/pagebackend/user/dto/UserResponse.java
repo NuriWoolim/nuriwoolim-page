@@ -1,11 +1,10 @@
 package com.nuriwoolim.pagebackend.user.dto;
 
-import com.nuriwoolim.pagebackend.user.User;
-import com.nuriwoolim.pagebackend.user.UserType;
+import com.nuriwoolim.pagebackend.user.entity.User;
+import com.nuriwoolim.pagebackend.user.entity.UserType;
+import java.time.LocalDate;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.LocalDate;
 
 @Getter
 @Builder

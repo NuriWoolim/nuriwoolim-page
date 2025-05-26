@@ -1,7 +1,7 @@
 package com.nuriwoolim.pagebackend.entity;
 
 import com.nuriwoolim.pagebackend.core.BaseEntity;
-import com.nuriwoolim.pagebackend.user.User;
+import com.nuriwoolim.pagebackend.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;

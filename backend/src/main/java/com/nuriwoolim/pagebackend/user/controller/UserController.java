@@ -1,9 +1,12 @@
-package com.nuriwoolim.pagebackend.user;
+package com.nuriwoolim.pagebackend.user.controller;
 
 import com.nuriwoolim.pagebackend.user.dto.UserCreateRequest;
 import com.nuriwoolim.pagebackend.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.user.dto.UserUpdateRequest;
+import com.nuriwoolim.pagebackend.user.entity.User;
+import com.nuriwoolim.pagebackend.user.service.UserService;
 import jakarta.validation.Valid;
+import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,8 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,7 +38,8 @@ public class UserController {
     }
 
     @PatchMapping("/users/{userId}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable Long userId, @Valid @RequestBody UserUpdateRequest userUpdateRequest) {
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long userId,
+                                                   @Valid @RequestBody UserUpdateRequest userUpdateRequest) {
         return ResponseEntity.ok(UserResponse.of(userService.update(userId, userUpdateRequest)));
     }
 

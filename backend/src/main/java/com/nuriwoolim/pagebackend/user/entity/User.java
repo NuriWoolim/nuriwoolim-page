@@ -1,4 +1,4 @@
-package com.nuriwoolim.pagebackend.user;
+package com.nuriwoolim.pagebackend.user.entity;
 
 import com.nuriwoolim.pagebackend.core.BaseEntity;
 import com.nuriwoolim.pagebackend.entity.Comment;

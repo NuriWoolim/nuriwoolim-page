@@ -1,4 +1,4 @@
-package com.nuriwoolim.pagebackend.user;
+package com.nuriwoolim.pagebackend.user.entity;
 
 public enum UserType {
     ADMIN, MANAGER, MEMBER, NONMEMBER

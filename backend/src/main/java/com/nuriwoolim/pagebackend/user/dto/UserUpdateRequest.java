@@ -1,6 +1,6 @@
 package com.nuriwoolim.pagebackend.user.dto;
 
-import com.nuriwoolim.pagebackend.user.UserType;
+import com.nuriwoolim.pagebackend.user.entity.UserType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
