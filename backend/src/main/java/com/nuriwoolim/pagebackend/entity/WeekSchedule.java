@@ -1,5 +1,6 @@
 package com.nuriwoolim.pagebackend.entity;
 
+import com.nuriwoolim.pagebackend.global.BaseEntity;
 import com.nuriwoolim.pagebackend.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -29,7 +30,7 @@ import lombok.NoArgsConstructor;
 )
 @Builder
 @AllArgsConstructor
-public class WeekSchedule {
+public class WeekSchedule extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
