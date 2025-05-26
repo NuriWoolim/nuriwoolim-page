@@ -59,11 +59,12 @@ class UserServiceTest {
     @Test
     @DisplayName("유저 Create -> 성공")
     public void createUser() {
-        UserCreateRequest userCreateRequest = new UserCreateRequest();
-        userCreateRequest.setUsername("username");
-        userCreateRequest.setPassword("password");
-        userCreateRequest.setEmail("email@email.com");
-        userCreateRequest.setNickname("nickname");
+        UserCreateRequest userCreateRequest = UserCreateRequest.builder()
+                .username("username")
+                .password("password")
+                .email("email@email.com")
+                .nickname("nickname")
+                .build();
 
         User user = User.of(userCreateRequest);
 
@@ -86,12 +87,13 @@ class UserServiceTest {
         // given
         User existing = User.builder().id(1L).nickname("nick").year(0).password("password").email("email@email.com")
                 .build();
-        UserUpdateRequest userUpdateRequest = new UserUpdateRequest();
-        userUpdateRequest.setNickname("nick2");
-        userUpdateRequest.setType(UserType.MEMBER);
-        userUpdateRequest.setYear(1);
-        userUpdateRequest.setPassword("password2");
-        userUpdateRequest.setEmail("email2@email.com");
+        UserUpdateRequest userUpdateRequest = UserUpdateRequest.builder()
+                .nickname("nick2")
+                .type(UserType.MEMBER)
+                .year(1)
+                .password("password2")
+                .email("email2@email.com")
+                .build();
         User updated = User.builder().id(1L).nickname("nick2").year(1).password("password2").email("email2@email.com")
                 .type(UserType.MEMBER).build();
 
