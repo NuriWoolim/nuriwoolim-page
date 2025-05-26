@@ -9,9 +9,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,28 +29,24 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Column(unique = true, length = 20)
+    @Column(nullable = false, unique = true, length = 20)
     private String username;
 
-    @Email
-    @NotBlank
-    @Column(unique = true, length = 30)
+    @Column(nullable = false, unique = true, length = 50)
     private String email;
 
-    @NotBlank
+    @Column
     private String password;
 
-    @NotBlank
-    @Column(unique = true, length = 10)
+    @Column(nullable = false, unique = true, length = 10)
     private String nickname;
 
-    @NotBlank
+    @Column(nullable = false)
     @Enumerated(EnumType.ORDINAL)
     @Builder.Default
     private UserType type = UserType.NONMEMBER;
 
-    @NotNull
+    @Column(nullable = false)
     @Builder.Default
     private LocalDate createdDate = LocalDate.now();
 
