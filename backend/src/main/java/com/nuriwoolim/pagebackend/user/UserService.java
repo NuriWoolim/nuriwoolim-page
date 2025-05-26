@@ -1,9 +1,9 @@
 package com.nuriwoolim.pagebackend.user;
 
+import com.nuriwoolim.pagebackend.global.exception.CustomException;
+import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
 import com.nuriwoolim.pagebackend.user.dto.UserCreateRequest;
 import com.nuriwoolim.pagebackend.user.dto.UserUpdateRequest;
-import com.nuriwoolim.pagebackend.util.exception.CustomException;
-import com.nuriwoolim.pagebackend.util.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

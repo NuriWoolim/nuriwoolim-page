@@ -1,4 +1,4 @@
-package com.nuriwoolim.pagebackend.util.exception;
+package com.nuriwoolim.pagebackend.global.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

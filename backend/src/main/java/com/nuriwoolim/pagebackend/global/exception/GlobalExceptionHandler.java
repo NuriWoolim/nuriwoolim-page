@@ -1,5 +1,7 @@
-package com.nuriwoolim.pagebackend.util.exception;
+package com.nuriwoolim.pagebackend.global.exception;
 
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,9 +10,6 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestControllerAdvice
 @Slf4j
@@ -45,7 +44,8 @@ public class GlobalExceptionHandler {
      * HTTP 405 Exception
      * */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    protected ResponseEntity<ErrorResponse> handleHttpRequestMethodeNotSupportedException(final HttpRequestMethodNotSupportedException e) {
+    protected ResponseEntity<ErrorResponse> handleHttpRequestMethodeNotSupportedException(
+            final HttpRequestMethodNotSupportedException e) {
         log.error("handleHttpRequestMethodeNotSupportedException: {}", e.getMessage());
         return ResponseEntity
                 .status(ErrorCode.METHOD_NOT_ALLOWED.getStatus().value())

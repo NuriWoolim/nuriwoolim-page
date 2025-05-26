@@ -1,23 +1,22 @@
 package com.nuriwoolim.pagebackend.user;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import com.nuriwoolim.pagebackend.global.exception.CustomException;
+import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
 import com.nuriwoolim.pagebackend.user.dto.UserCreateRequest;
 import com.nuriwoolim.pagebackend.user.dto.UserUpdateRequest;
-import com.nuriwoolim.pagebackend.util.exception.CustomException;
-import com.nuriwoolim.pagebackend.util.exception.ErrorCode;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @DisplayName("UserService")
 @ExtendWith(MockitoExtension.class)
@@ -81,7 +80,8 @@ class UserServiceTest {
     @DisplayName("update")
     public void update() {
         // given
-        User existing = User.builder().id(1L).nickname("nick").year(0).password("password").email("email@email.com").build();
+        User existing = User.builder().id(1L).nickname("nick").year(0).password("password").email("email@email.com")
+                .build();
         UserUpdateRequest userUpdateRequest = new UserUpdateRequest();
         userUpdateRequest.setNickname("nick2");
         userUpdateRequest.setType(UserType.MEMBER);

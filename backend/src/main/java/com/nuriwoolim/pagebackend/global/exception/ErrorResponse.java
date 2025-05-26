@@ -1,8 +1,7 @@
-package com.nuriwoolim.pagebackend.util.exception;
-
-import lombok.Getter;
+package com.nuriwoolim.pagebackend.global.exception;
 
 import java.time.LocalDateTime;
+import lombok.Getter;
 
 @Getter
 public class ErrorResponse {

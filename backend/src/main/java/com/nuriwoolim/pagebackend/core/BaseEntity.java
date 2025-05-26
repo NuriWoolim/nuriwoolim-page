@@ -1,4 +1,4 @@
-package com.nuriwoolim.pagebackend.global;
+package com.nuriwoolim.pagebackend.core;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

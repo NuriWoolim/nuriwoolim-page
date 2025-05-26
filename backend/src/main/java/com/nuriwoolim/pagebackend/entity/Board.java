@@ -1,6 +1,6 @@
 package com.nuriwoolim.pagebackend.entity;
 
-import com.nuriwoolim.pagebackend.global.BaseEntity;
+import com.nuriwoolim.pagebackend.core.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
