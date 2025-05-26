@@ -64,7 +64,8 @@ public class Post extends BaseEntity {
             foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Board board;
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true,
+            cascade = {jakarta.persistence.CascadeType.REMOVE})
     @Builder.Default
     private List<Comment> commentList = new ArrayList<>();
 }

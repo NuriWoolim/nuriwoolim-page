@@ -5,6 +5,7 @@ import com.nuriwoolim.pagebackend.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -47,7 +48,8 @@ public class WeekSchedule extends BaseEntity {
             foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User user;
 
-    @OneToMany(mappedBy = "weekSchedule")
+    @OneToMany(mappedBy = "weekSchedule", fetch = FetchType.LAZY, orphanRemoval = true,
+            cascade = {jakarta.persistence.CascadeType.REMOVE})
     @Builder.Default
     private List<Schedule> scheduleList = new ArrayList<>();
 }
