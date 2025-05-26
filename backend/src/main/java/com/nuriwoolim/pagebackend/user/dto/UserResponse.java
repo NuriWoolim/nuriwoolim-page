@@ -2,7 +2,7 @@ package com.nuriwoolim.pagebackend.user.dto;
 
 import com.nuriwoolim.pagebackend.user.entity.User;
 import com.nuriwoolim.pagebackend.user.entity.UserType;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,7 +15,7 @@ public class UserResponse {
     private String nickname;
     private UserType type;
     private Integer year;
-    private LocalDate createdDate;
+    private LocalDateTime createdDate;
     private boolean emailVerified;
 
     public static UserResponse of(User user) {
@@ -26,7 +26,7 @@ public class UserResponse {
                 .nickname(user.getNickname())
                 .type(user.getType())
                 .year(user.getYear())
-                .createdDate(user.getCreatedDate())
+                .createdDate(user.getCreatedAt())
                 .build();
     }
 }
