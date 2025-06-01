@@ -1,5 +1,6 @@
 package com.nuriwoolim.pagebackend.entity;
 
+import com.nuriwoolim.pagebackend.global.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,29 +10,36 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import lombok.Getter;
-import lombok.Setter;
-
+import java.util.ArrayList;
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
 @Entity
-public class Board {
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Board extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 20)
+    @Column(unique = true, length = 20, nullable = false)
     private String title;
 
     @Column(length = 100)
     private String description;
 
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
     private BoardType type = BoardType.OTHER;
 
-    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
-    private List<Post> postList;
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, orphanRemoval = true,
+            cascade = {jakarta.persistence.CascadeType.REMOVE})
+    @Builder.Default
+    private List<Post> postList = new ArrayList<>();
 }
