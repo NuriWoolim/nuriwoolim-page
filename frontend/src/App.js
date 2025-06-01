@@ -3,6 +3,7 @@ import Header from "./components/Header";
 import Notice from "./components/Notice";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import NoticeDetail from "./components/NoticeDetail";
+import Footer from "./components/Footer";
 
 const App = () => {
   return (
@@ -14,6 +15,7 @@ const App = () => {
           <Route path="/notice/:id" element={<NoticeDetail />} />
         </Routes>
       </BrowserRouter>
+      <Footer />
     </div>
   );
 };

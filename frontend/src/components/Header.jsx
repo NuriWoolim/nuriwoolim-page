@@ -37,19 +37,37 @@ const Logo = styled.div`
   }
 `;
 
+const RightGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  transform: translateX(-50px);
+`;
 const NavLinks = styled.div`
   display: flex;
-  gap: 40px;
-
-  transform: translateX(-100px);
+  gap: 45px;
 
   a {
     text-decoration: none;
-    color: black;
+    color: #023349;
+    line-height: 150%;
     font-size: 16px;
-    font-weight: 400;
-    font-family: "ReciaSerifDisplay", serif;
+    font-weight: 500;
+    letter-spacing: -0.5px;
   }
+`;
+
+const LoginButton = styled.button`
+  background-color: #023349;
+  color: #fefaef;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-family: Pretendard;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  font-size: 16px;
+  text-align: center;
 `;
 
 const OverlayText = styled.div`
@@ -101,12 +119,17 @@ const Header = () => {
             </a>
           </Logo>
 
-          <NavLinks>
-            <a href="#Home">HOME</a>
-            <a href="#Notice">NOTICE</a>
-            <a href="#ARCHIVE">ARCHIVE</a>
-            <a href="#CONTACT">CONTACT</a>
-          </NavLinks>
+          <RightGroup>
+            <NavLinks>
+              <a href="#Home">Home</a>
+              <a href="#Notice">Notice</a>
+              <a href="#Archive">Archive</a>
+              <a href="#Calendar">Calendar</a>
+              <a href="#Register">Register</a>
+              <a href="#Wiki">Wiki</a>
+            </NavLinks>
+            <LoginButton>Log In</LoginButton>
+          </RightGroup>
         </NavBar>
 
         <OverlayText>
