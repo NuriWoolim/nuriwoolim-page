@@ -1,0 +1,28 @@
+package com.nuriwoolim.pagebackend.user.service;
+
+import com.nuriwoolim.pagebackend.core.security.CustomUserDetails;
+import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
+import com.nuriwoolim.pagebackend.user.entity.User;
+import com.nuriwoolim.pagebackend.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Slf4j
+@Service
+@Transactional
+@RequiredArgsConstructor
+public class CustomUserDetailsService implements UserDetailsService {
+    private final UserRepository userRepository;
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(ErrorCode.USER_NOT_FOUND::toException);
+        return CustomUserDetails.of(user);
+    }
+}
