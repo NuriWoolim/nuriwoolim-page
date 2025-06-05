@@ -1,6 +1,7 @@
 package com.nuriwoolim.pagebackend.user.entity;
 
 import com.nuriwoolim.pagebackend.core.BaseEntity;
+import com.nuriwoolim.pagebackend.core.security.RefreshToken;
 import com.nuriwoolim.pagebackend.entity.Comment;
 import com.nuriwoolim.pagebackend.entity.Post;
 import com.nuriwoolim.pagebackend.entity.Schedule;
@@ -8,6 +9,7 @@ import com.nuriwoolim.pagebackend.entity.TimeTable;
 import com.nuriwoolim.pagebackend.entity.WeekSchedule;
 import com.nuriwoolim.pagebackend.user.dto.UserCreateRequest;
 import com.nuriwoolim.pagebackend.user.dto.UserUpdateRequest;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,6 +19,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -83,6 +86,9 @@ public class User extends BaseEntity {
             cascade = {jakarta.persistence.CascadeType.REMOVE})
     @Builder.Default
     private List<WeekSchedule> weekScheduleList = new ArrayList<>();
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private RefreshToken refreshToken;
 
     public static User of(UserCreateRequest userCreateRequest) {
         User user = User.builder()
