@@ -19,7 +19,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -87,19 +86,29 @@ public class User extends BaseEntity {
 
     public static User of(UserCreateRequest userCreateRequest) {
         User user = User.builder()
-                .username(userCreateRequest.getUsername())
-                .email(userCreateRequest.getEmail())
-                .password(userCreateRequest.getPassword())
-                .nickname(userCreateRequest.getNickname())
+                .username(userCreateRequest.username())
+                .email(userCreateRequest.email())
+                .password(userCreateRequest.password())
+                .nickname(userCreateRequest.nickname())
                 .build();
         return user;
     }
 
     public void update(UserUpdateRequest userUpdateRequest) {
-        Optional.ofNullable(userUpdateRequest.getEmail()).ifPresent(i -> this.email = i);
-        Optional.ofNullable(userUpdateRequest.getPassword()).ifPresent(i -> this.password = i);
-        Optional.ofNullable(userUpdateRequest.getNickname()).ifPresent(i -> this.nickname = i);
-        Optional.ofNullable(userUpdateRequest.getType()).ifPresent(i -> this.type = i);
-        Optional.ofNullable(userUpdateRequest.getYear()).ifPresent(i -> this.year = i);
+        if (userUpdateRequest.email() != null) {
+            this.email = userUpdateRequest.email();
+        }
+        if (userUpdateRequest.password() != null) {
+            this.password = userUpdateRequest.password();
+        }
+        if (userUpdateRequest.nickname() != null) {
+            this.nickname = userUpdateRequest.nickname();
+        }
+        if (userUpdateRequest.type() != null) {
+            this.type = userUpdateRequest.type();
+        }
+        if (userUpdateRequest.year() != null) {
+            this.year = userUpdateRequest.year();
+        }
     }
 }

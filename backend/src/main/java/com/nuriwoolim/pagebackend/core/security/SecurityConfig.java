@@ -1,4 +1,4 @@
-package com.nuriwoolim.pagebackend.security;
+package com.nuriwoolim.pagebackend.core.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
