@@ -27,7 +27,4 @@ custom:
     expire:
       access: 3600_000 #1시간
       refresh: 259200_000 #3일
-
-    secrets:
-      access-key: Q04DkgiuhVJ9fTCrBGTBJL4rr26mzP1czFELe7L74xB7Z+TOIt3KjGpzH4CTax5lzlqlJcCIpKzNf/g+59AWrA==
-      refresh-key: PzzTUSUsKQNUJC3HGGVTQOmeVTWkPyo6/KzJ9cfsrwomdg1hT9jH2rniFUEovHbrcsfqCLd4o/sMmfO/SrsYLg==
+    secret-key: Q04DkgiuhVJ9fTCrBGTBJL4rr26mzP1czFELe7L74xB7Z+TOIt3KjGpzH4CTax5lzlqlJcCIpKzNf/g+59AWrA==

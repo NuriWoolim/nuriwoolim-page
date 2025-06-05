@@ -5,12 +5,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "custom.jwt")
 public record JwtConfig(
         Expire expire,
-        Secrets secrets
+        String secretKey
 ) {
     public record Expire(Long access, Long refresh) {
-    }
-
-
-    public record Secrets(String accessKey, String refreshKey) {
     }
 }
