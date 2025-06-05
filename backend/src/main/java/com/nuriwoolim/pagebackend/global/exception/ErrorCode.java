@@ -17,9 +17,14 @@ public enum ErrorCode {
     PASSWORD_BAD_REQUEST(HttpStatus.BAD_REQUEST, "비밀번호가 올바르지 않습니다."),
 
     /*
+     *  401 Unauthroized
+     */
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증 실패"),
+
+    /*
      * 403 FORBIDDEN: 승인을 거부함
      */
-    ROLE_FORBIDDEN(HttpStatus.FORBIDDEN, "권한이 없는 역할입니다."),
+    AUTHORITY_FORBIDDEN(HttpStatus.FORBIDDEN, "인가 실패"),
 
     /*
      * 404 NOT_FOUND: 리소스를 찾을 수 없음

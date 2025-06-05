@@ -5,8 +5,8 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleCustomException(final CustomException e) {
         log.error("handleCustomException: {}", e.getErrorCode());
         return ResponseEntity
-                .status(e.getErrorCode().getStatus().value())
+                .status(e.getErrorCode().getStatus())
                 .body(new ErrorResponse(e));
     }
 
@@ -32,24 +32,30 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException e) {
         Map<String, String> errors = new HashMap<>();
-        e.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
+        e.getBindingResult().getFieldErrors().forEach((error) -> {
+            String fieldName = error.getField();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 
-    /*
-     * HTTP 405 Exception
-     * */
-    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    protected ResponseEntity<ErrorResponse> handleHttpRequestMethodeNotSupportedException(
-            final HttpRequestMethodNotSupportedException e) {
-        log.error("handleHttpRequestMethodeNotSupportedException: {}", e.getMessage());
+    // 인증은 되었지만 권한이 없는 경우
+    @ExceptionHandler(AccessDeniedException.class)
+    protected ResponseEntity<ErrorResponse> handleAccessDeniedException(final AccessDeniedException e) {
+        log.error("handleAccessDeniedException: {}", e.getMessage());
         return ResponseEntity
-                .status(ErrorCode.METHOD_NOT_ALLOWED.getStatus().value())
-                .body(new ErrorResponse(new CustomException(ErrorCode.METHOD_NOT_ALLOWED)));
+                .status(ErrorCode.AUTHORITY_FORBIDDEN.getStatus())
+                .body(new ErrorResponse(new CustomException(ErrorCode.AUTHORITY_FORBIDDEN)));
+    }
+
+    // 인증 자체가 실패한 경우 (로그인 안 됨, 토큰 만료 등)
+    @ExceptionHandler(AuthenticationException.class)
+    protected ResponseEntity<ErrorResponse> handleAuthenticationException(final AuthenticationException e) {
+        log.error("handleAuthenticationException: {}", e.getMessage());
+        return ResponseEntity
+                .status(ErrorCode.UNAUTHORIZED.getStatus())
+                .body(new ErrorResponse(new CustomException(ErrorCode.UNAUTHORIZED)));
     }
 
     /*
@@ -59,7 +65,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleException(final Exception e) {
         log.error("handleException: {}", e.getMessage());
         return ResponseEntity
-                .status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus().value())
+                .status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
                 .body(new ErrorResponse(new CustomException(ErrorCode.INTERNAL_SERVER_ERROR)));
     }
 }
