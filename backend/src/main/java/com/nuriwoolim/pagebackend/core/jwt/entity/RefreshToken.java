@@ -1,4 +1,4 @@
-package com.nuriwoolim.pagebackend.core.jwt;
+package com.nuriwoolim.pagebackend.core.jwt.entity;
 
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import jakarta.persistence.Column;

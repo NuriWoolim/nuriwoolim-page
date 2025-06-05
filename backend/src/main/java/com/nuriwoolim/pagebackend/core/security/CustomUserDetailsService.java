@@ -25,4 +25,12 @@ public class CustomUserDetailsService implements UserDetailsService {
         log.debug("loadUserByUsername: {} -> {}", username, user);
         return CustomUserDetails.of(user);
     }
+
+    @Transactional(readOnly = true)
+    public UserDetails loadUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(ErrorCode.USER_NOT_FOUND::toException);
+        log.debug("loadUserById: {} -> {}", id, user);
+        return CustomUserDetails.of(user);
+    }
 }

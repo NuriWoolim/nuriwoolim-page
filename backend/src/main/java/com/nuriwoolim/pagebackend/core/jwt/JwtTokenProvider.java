@@ -1,5 +1,6 @@
 package com.nuriwoolim.pagebackend.core.jwt;
 
+import com.nuriwoolim.pagebackend.core.jwt.dto.TokenBody;
 import com.nuriwoolim.pagebackend.core.security.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;

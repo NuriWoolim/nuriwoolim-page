@@ -1,5 +1,6 @@
 package com.nuriwoolim.pagebackend.core.jwt;
 
+import com.nuriwoolim.pagebackend.core.jwt.entity.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
