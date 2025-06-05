@@ -1,7 +1,7 @@
 package com.nuriwoolim.pagebackend.core.security;
 
-import com.nuriwoolim.pagebackend.user.entity.User;
-import com.nuriwoolim.pagebackend.user.entity.UserType;
+import com.nuriwoolim.pagebackend.domain.user.entity.User;
+import com.nuriwoolim.pagebackend.domain.user.entity.UserType;
 import java.util.Collection;
 import java.util.List;
 import lombok.AllArgsConstructor;

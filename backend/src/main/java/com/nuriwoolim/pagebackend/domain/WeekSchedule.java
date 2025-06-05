@@ -1,21 +1,22 @@
-package com.nuriwoolim.pagebackend.entity;
+package com.nuriwoolim.pagebackend.domain;
 
 import com.nuriwoolim.pagebackend.core.BaseEntity;
-import com.nuriwoolim.pagebackend.user.entity.User;
+import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,34 +28,30 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
         indexes = {
-                @Index(name = "idx_comment_writer", columnList = "writer_id"),
-                @Index(name = "idx_comment_post", columnList = "post_id")
+                @Index(name = "idx_schedule_user", columnList = "user_id"),
         }
 )
 @Builder
 @AllArgsConstructor
-public class Comment extends BaseEntity {
+public class WeekSchedule extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 65_535, nullable = false)
-    @Lob
-    private String content;
+    @Column(unique = true, length = 20, nullable = false)
+    private String title;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(length = 100)
+    private String description;
+
+    @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY, optional = false)
+    @JoinColumn(
+            nullable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private User user;
+
+    @OneToMany(mappedBy = "weekSchedule", fetch = FetchType.LAZY, orphanRemoval = true,
+            cascade = {jakarta.persistence.CascadeType.REMOVE})
     @Builder.Default
-    private PostType type = PostType.GENERAL;
-
-    @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY, optional = false)
-    @JoinColumn(
-            nullable = false,
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private User writer;
-    @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY, optional = false)
-    @JoinColumn(
-            nullable = false,
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Post post;
+    private List<Schedule> scheduleList = new ArrayList<>();
 }

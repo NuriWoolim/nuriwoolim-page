@@ -1,14 +1,14 @@
-package com.nuriwoolim.pagebackend.user.entity;
+package com.nuriwoolim.pagebackend.domain.user.entity;
 
 import com.nuriwoolim.pagebackend.core.BaseEntity;
 import com.nuriwoolim.pagebackend.core.jwt.RefreshToken;
-import com.nuriwoolim.pagebackend.entity.Comment;
-import com.nuriwoolim.pagebackend.entity.Post;
-import com.nuriwoolim.pagebackend.entity.Schedule;
-import com.nuriwoolim.pagebackend.entity.TimeTable;
-import com.nuriwoolim.pagebackend.entity.WeekSchedule;
-import com.nuriwoolim.pagebackend.user.dto.UserCreateRequest;
-import com.nuriwoolim.pagebackend.user.dto.UserUpdateRequest;
+import com.nuriwoolim.pagebackend.domain.Comment;
+import com.nuriwoolim.pagebackend.domain.Post;
+import com.nuriwoolim.pagebackend.domain.Schedule;
+import com.nuriwoolim.pagebackend.domain.TimeTable;
+import com.nuriwoolim.pagebackend.domain.WeekSchedule;
+import com.nuriwoolim.pagebackend.domain.user.dto.UserCreateRequest;
+import com.nuriwoolim.pagebackend.domain.user.dto.UserUpdateRequest;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

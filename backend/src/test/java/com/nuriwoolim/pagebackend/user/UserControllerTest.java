@@ -12,12 +12,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nuriwoolim.pagebackend.user.controller.UserController;
-import com.nuriwoolim.pagebackend.user.dto.UserCreateRequest;
-import com.nuriwoolim.pagebackend.user.dto.UserUpdateRequest;
-import com.nuriwoolim.pagebackend.user.entity.User;
-import com.nuriwoolim.pagebackend.user.entity.UserType;
-import com.nuriwoolim.pagebackend.user.service.UserService;
+import com.nuriwoolim.pagebackend.domain.user.controller.UserController;
+import com.nuriwoolim.pagebackend.domain.user.dto.UserCreateRequest;
+import com.nuriwoolim.pagebackend.domain.user.dto.UserUpdateRequest;
+import com.nuriwoolim.pagebackend.domain.user.entity.User;
+import com.nuriwoolim.pagebackend.domain.user.entity.UserType;
+import com.nuriwoolim.pagebackend.domain.user.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

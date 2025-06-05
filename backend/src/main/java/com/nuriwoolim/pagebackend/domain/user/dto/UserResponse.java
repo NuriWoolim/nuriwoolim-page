@@ -1,7 +1,7 @@
-package com.nuriwoolim.pagebackend.user.dto;
+package com.nuriwoolim.pagebackend.domain.user.dto;
 
-import com.nuriwoolim.pagebackend.user.entity.User;
-import com.nuriwoolim.pagebackend.user.entity.UserType;
+import com.nuriwoolim.pagebackend.domain.user.entity.User;
+import com.nuriwoolim.pagebackend.domain.user.entity.UserType;
 import java.time.LocalDateTime;
 import lombok.Builder;
 

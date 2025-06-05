@@ -1,6 +1,6 @@
 package com.nuriwoolim.pagebackend.core.jwt;
 
-import com.nuriwoolim.pagebackend.user.entity.User;
+import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;

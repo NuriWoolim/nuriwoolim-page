@@ -1,8 +1,8 @@
 package com.nuriwoolim.pagebackend.core.security;
 
+import com.nuriwoolim.pagebackend.domain.user.entity.User;
+import com.nuriwoolim.pagebackend.domain.user.repository.UserRepository;
 import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
-import com.nuriwoolim.pagebackend.user.entity.User;
-import com.nuriwoolim.pagebackend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;

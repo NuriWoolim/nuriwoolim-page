@@ -1,6 +1,6 @@
-package com.nuriwoolim.pagebackend.user.repository;
+package com.nuriwoolim.pagebackend.domain.user.repository;
 
-import com.nuriwoolim.pagebackend.user.entity.User;
+import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

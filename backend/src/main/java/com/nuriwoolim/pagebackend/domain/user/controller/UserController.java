@@ -1,10 +1,10 @@
-package com.nuriwoolim.pagebackend.user.controller;
+package com.nuriwoolim.pagebackend.domain.user.controller;
 
-import com.nuriwoolim.pagebackend.user.dto.UserCreateRequest;
-import com.nuriwoolim.pagebackend.user.dto.UserResponse;
-import com.nuriwoolim.pagebackend.user.dto.UserUpdateRequest;
-import com.nuriwoolim.pagebackend.user.entity.User;
-import com.nuriwoolim.pagebackend.user.service.UserService;
+import com.nuriwoolim.pagebackend.domain.user.dto.UserCreateRequest;
+import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
+import com.nuriwoolim.pagebackend.domain.user.dto.UserUpdateRequest;
+import com.nuriwoolim.pagebackend.domain.user.entity.User;
+import com.nuriwoolim.pagebackend.domain.user.service.UserService;
 import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;

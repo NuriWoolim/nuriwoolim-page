@@ -1,4 +1,4 @@
-package com.nuriwoolim.pagebackend.entity;
+package com.nuriwoolim.pagebackend.domain;
 
 import com.nuriwoolim.pagebackend.core.BaseEntity;
 import jakarta.persistence.Column;

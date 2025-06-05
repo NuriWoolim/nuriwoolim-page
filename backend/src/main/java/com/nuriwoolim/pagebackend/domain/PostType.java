@@ -1,4 +1,4 @@
-package com.nuriwoolim.pagebackend.entity;
+package com.nuriwoolim.pagebackend.domain;
 
 public enum PostType {
     ANNOUNCEMENT, QUESTION, ANSWER, GENERAL
