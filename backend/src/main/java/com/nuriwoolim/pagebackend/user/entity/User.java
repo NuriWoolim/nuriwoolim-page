@@ -1,7 +1,7 @@
 package com.nuriwoolim.pagebackend.user.entity;
 
 import com.nuriwoolim.pagebackend.core.BaseEntity;
-import com.nuriwoolim.pagebackend.core.security.RefreshToken;
+import com.nuriwoolim.pagebackend.core.jwt.RefreshToken;
 import com.nuriwoolim.pagebackend.entity.Comment;
 import com.nuriwoolim.pagebackend.entity.Post;
 import com.nuriwoolim.pagebackend.entity.Schedule;

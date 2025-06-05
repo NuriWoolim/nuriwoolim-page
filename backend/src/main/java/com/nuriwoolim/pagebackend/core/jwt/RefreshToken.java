@@ -1,4 +1,4 @@
-package com.nuriwoolim.pagebackend.core.security;
+package com.nuriwoolim.pagebackend.core.jwt;
 
 import com.nuriwoolim.pagebackend.user.entity.User;
 import jakarta.persistence.Column;

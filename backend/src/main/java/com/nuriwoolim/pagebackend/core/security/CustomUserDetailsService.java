@@ -1,6 +1,5 @@
-package com.nuriwoolim.pagebackend.user.service;
+package com.nuriwoolim.pagebackend.core.security;
 
-import com.nuriwoolim.pagebackend.core.security.CustomUserDetails;
 import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
 import com.nuriwoolim.pagebackend.user.entity.User;
 import com.nuriwoolim.pagebackend.user.repository.UserRepository;
@@ -23,6 +22,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(ErrorCode.USER_NOT_FOUND::toException);
+        log.debug("loadUserByUsername: {} -> {}", username, user);
         return CustomUserDetails.of(user);
     }
 }
