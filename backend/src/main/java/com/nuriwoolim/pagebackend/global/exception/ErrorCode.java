@@ -44,4 +44,12 @@ public enum ErrorCode {
     private final HttpStatus status;
     private final String message;
 
+    public CustomException toException(String detail) {
+        return new CustomException(this, detail);
+    }
+
+    public CustomException toException() {
+        return new CustomException(this);
+    }
+
 }
