@@ -39,6 +39,7 @@ public enum ErrorCode {
     /*
      * 409 CONFLICT
      */
+    DATA_CONFLICT(HttpStatus.CONFLICT, "적절하지 않은 데이터입니다."),
     USERNAME_CONFLICT(HttpStatus.CONFLICT, "존재하는 회원 이름입니다."),
 
     /*
