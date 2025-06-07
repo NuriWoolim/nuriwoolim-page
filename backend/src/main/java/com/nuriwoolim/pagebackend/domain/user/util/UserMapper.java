@@ -1,5 +1,6 @@
 package com.nuriwoolim.pagebackend.domain.user.util;
 
+import com.nuriwoolim.pagebackend.domain.user.dto.LoginResponse;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserCreateRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
@@ -14,6 +15,13 @@ public class UserMapper {
                 .type(user.getType())
                 .year(user.getYear())
                 .createdDate(user.getCreatedAt())
+                .build();
+    }
+
+    public static LoginResponse toAuthResponse(final User user, final String accessToken) {
+        return LoginResponse.builder()
+                .user(toUserResponse(user))
+                .accessToken(accessToken)
                 .build();
     }
 
