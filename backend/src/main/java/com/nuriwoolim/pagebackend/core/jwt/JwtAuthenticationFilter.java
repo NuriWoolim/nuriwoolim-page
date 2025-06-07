@@ -33,27 +33,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = resolveToken(request);
         log.debug("Enter Filter: {}", token);
         try {
-            if (token != null && jwtTokenProvider.validate(token)) {
-                TokenBody tokenBody = jwtTokenProvider.parseJwt(token);
-                UserDetails userDetails = userDetailsService.loadUserById(tokenBody.id());
-                log.debug("User: {}", userDetails);
+            if (token != null) {
+                if (jwtTokenProvider.validate(token)) {
+                    TokenBody tokenBody = jwtTokenProvider.parseJwt(token);
+                    UserDetails userDetails = userDetailsService.loadUserById(tokenBody.id());
+                    log.debug("User: {}", userDetails);
 
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities());
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities());
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } else {
-                throw new BadCredentialsException("Invalid token");
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    throw new BadCredentialsException("Invalid token");
+                }
             }
+            filterChain.doFilter(request, response);
         } catch (AuthenticationException e) {
             SecurityContextHolder.clearContext();
             customEntryPoint.commence(request, response, e);
-            return;
         }
-
-        filterChain.doFilter(request, response);
     }
 
     private String resolveToken(HttpServletRequest request) {
