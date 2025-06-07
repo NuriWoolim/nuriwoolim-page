@@ -1,9 +1,11 @@
 package com.nuriwoolim.pagebackend.domain.user.service;
 
 import com.nuriwoolim.pagebackend.domain.user.dto.UserCreateRequest;
+import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import com.nuriwoolim.pagebackend.domain.user.repository.UserRepository;
+import com.nuriwoolim.pagebackend.domain.user.util.UserMapper;
 import com.nuriwoolim.pagebackend.global.exception.CustomException;
 import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +18,15 @@ public class UserService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public User findById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    public UserResponse findById(Long userId) {
+        User user = getUserById(userId);
+        return UserMapper.toUserResponse(user);
     }
 
     @Transactional
-    public User create(UserCreateRequest userCreateRequest) {
-        return userRepository.save(User.of(userCreateRequest));
+    public UserResponse create(UserCreateRequest userCreateRequest) {
+        User user = userRepository.save(UserMapper.fromUserCreateRequest(userCreateRequest));
+        return UserMapper.toUserResponse(user);
     }
 
     @Transactional
@@ -31,9 +35,13 @@ public class UserService {
     }
 
     @Transactional
-    public User update(Long userId, UserUpdateRequest userUpdateRequest) {
-        User user = findById(userId);
+    public UserResponse update(Long userId, UserUpdateRequest userUpdateRequest) {
+        User user = getUserById(userId);
         user.update(userUpdateRequest);
-        return userRepository.save(user);
+        return UserMapper.toUserResponse(user);
+    }
+
+    private User getUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 }

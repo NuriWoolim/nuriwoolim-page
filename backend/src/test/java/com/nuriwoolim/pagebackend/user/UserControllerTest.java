@@ -18,6 +18,7 @@ import com.nuriwoolim.pagebackend.domain.user.dto.UserUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import com.nuriwoolim.pagebackend.domain.user.entity.UserType;
 import com.nuriwoolim.pagebackend.domain.user.service.UserService;
+import com.nuriwoolim.pagebackend.domain.user.util.UserMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -42,7 +43,7 @@ public class UserControllerTest {
     void 사용자를_조회한다() throws Exception {
         // given
         User mockUser = User.builder().id(1L).username("test").email("test@email.com").nickname("test").build();
-        when(userService.findById(1L)).thenReturn(mockUser);
+        when(userService.findById(1L)).thenReturn(UserMapper.toUserResponse(mockUser));
 
         // when & then
         mockMvc.perform(get("/api/users/1"))
@@ -61,9 +62,9 @@ public class UserControllerTest {
                 .password("email@email.com")
                 .nickname("nickname")
                 .build();
-        User savedUser = User.of(userCreateRequest);
+        User savedUser = UserMapper.fromUserCreateRequest(userCreateRequest);
 
-        when(userService.create(any(UserCreateRequest.class))).thenReturn(savedUser);
+        when(userService.create(any(UserCreateRequest.class))).thenReturn(UserMapper.toUserResponse(savedUser));
 
         // when & then
         mockMvc.perform(post("/api/users")
@@ -89,7 +90,7 @@ public class UserControllerTest {
         User updated = User.builder().id(1L).nickname("nick2").year(1).email("email2@email.com")
                 .type(UserType.MEMBER).build();
 
-        when(userService.update(eq(1L), any(UserUpdateRequest.class))).thenReturn(updated);
+        when(userService.update(eq(1L), any(UserUpdateRequest.class))).thenReturn(UserMapper.toUserResponse(updated));
 
         // when & then
         mockMvc.perform(patch("/api/users/1")

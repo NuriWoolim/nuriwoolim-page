@@ -7,7 +7,6 @@ import com.nuriwoolim.pagebackend.domain.Post;
 import com.nuriwoolim.pagebackend.domain.Schedule;
 import com.nuriwoolim.pagebackend.domain.TimeTable;
 import com.nuriwoolim.pagebackend.domain.WeekSchedule;
-import com.nuriwoolim.pagebackend.domain.user.dto.UserCreateRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserUpdateRequest;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -89,16 +88,6 @@ public class User extends BaseEntity {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private RefreshToken refreshToken;
-
-    public static User of(UserCreateRequest userCreateRequest) {
-        User user = User.builder()
-                .username(userCreateRequest.username())
-                .email(userCreateRequest.email())
-                .password(userCreateRequest.password())
-                .nickname(userCreateRequest.nickname())
-                .build();
-        return user;
-    }
 
     public void update(UserUpdateRequest userUpdateRequest) {
         if (userUpdateRequest.email() != null) {

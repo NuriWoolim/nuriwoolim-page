@@ -3,7 +3,6 @@ package com.nuriwoolim.pagebackend.domain.user.controller;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserCreateRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserUpdateRequest;
-import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import com.nuriwoolim.pagebackend.domain.user.service.UserService;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -26,21 +25,21 @@ public class UserController {
 
     @GetMapping("/users/{userId}")
     public ResponseEntity<UserResponse> getUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(UserResponse.of(userService.findById(userId)));
+        return ResponseEntity.ok(userService.findById(userId));
     }
 
     @PostMapping("/users")
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserCreateRequest userCreateRequest) {
-        User createdUser = userService.create(userCreateRequest);
-        URI location = URI.create("/api/users/" + createdUser.getId());
+        UserResponse response = userService.create(userCreateRequest);
+        URI location = URI.create("/api/users/" + response.id());
         return ResponseEntity.created(location)
-                .body(UserResponse.of(createdUser));
+                .body(response);
     }
 
     @PatchMapping("/users/{userId}")
     public ResponseEntity<UserResponse> updateUser(@PathVariable Long userId,
                                                    @Valid @RequestBody UserUpdateRequest userUpdateRequest) {
-        return ResponseEntity.ok(UserResponse.of(userService.update(userId, userUpdateRequest)));
+        return ResponseEntity.ok(userService.update(userId, userUpdateRequest));
     }
 
     @DeleteMapping("/users/{userId}")

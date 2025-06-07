@@ -7,11 +7,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.nuriwoolim.pagebackend.domain.user.dto.UserCreateRequest;
+import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import com.nuriwoolim.pagebackend.domain.user.entity.UserType;
 import com.nuriwoolim.pagebackend.domain.user.repository.UserRepository;
 import com.nuriwoolim.pagebackend.domain.user.service.UserService;
+import com.nuriwoolim.pagebackend.domain.user.util.UserMapper;
 import com.nuriwoolim.pagebackend.global.exception.CustomException;
 import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
 import java.util.Optional;
@@ -37,11 +39,10 @@ class UserServiceTest {
         User user = User.builder().id(1L).username("username").build();
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        User findUser = userService.findById(1L);
+        UserResponse findUser = userService.findById(1L);
 
-        assertThat(findUser).isEqualTo(user);
-        assertThat(findUser.getUsername()).isEqualTo("username");
-        assertThat(findUser.getId()).isEqualTo(1L);
+        assertThat(findUser.username()).isEqualTo("username");
+        assertThat(findUser.id()).isEqualTo(1L);
     }
 
     @Test
@@ -66,12 +67,12 @@ class UserServiceTest {
                 .nickname("nickname")
                 .build();
 
-        User user = User.of(userCreateRequest);
+        User user = UserMapper.fromUserCreateRequest(userCreateRequest);
 
         when(userRepository.save(any())).thenAnswer(i -> i.getArgument(0));
-        User savedUser = userService.create(userCreateRequest);
+        UserResponse savedUser = userService.create(userCreateRequest);
 
-        assertThat(savedUser).usingRecursiveComparison().isEqualTo(user);
+        assertThat(savedUser).usingRecursiveComparison().isEqualTo(UserMapper.toUserResponse(user));
     }
 
     @Test
@@ -101,9 +102,9 @@ class UserServiceTest {
         when(userRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 
         // when
-        User result = userService.update(1L, userUpdateRequest);
+        UserResponse result = userService.update(1L, userUpdateRequest);
 
         // then
-        assertThat(result).usingRecursiveComparison().isEqualTo(updated);
+        assertThat(result).usingRecursiveComparison().isEqualTo(UserMapper.toUserResponse(updated));
     }
 }
