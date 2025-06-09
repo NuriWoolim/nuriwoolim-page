@@ -1,7 +1,6 @@
 package com.nuriwoolim.pagebackend.core.jwt;
 
 import com.nuriwoolim.pagebackend.core.jwt.dto.TokenBody;
-import com.nuriwoolim.pagebackend.core.security.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
@@ -14,14 +13,12 @@ import java.util.Date;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
-@Service
+@Component
 @Slf4j
 public class JwtTokenProvider {
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final CustomUserDetailsService customUserDetailsService;
     private final JwtConfig jwtConfig;
     private final MacAlgorithm macAlgorithm = SIG.HS256;
 

@@ -1,47 +1,33 @@
 package com.nuriwoolim.pagebackend.core.security;
 
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
-import com.nuriwoolim.pagebackend.domain.user.entity.UserType;
 import java.util.Collection;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @AllArgsConstructor
 @Builder
+@Getter
 public class CustomUserDetails implements UserDetails {
-    private final Long id;
     private final String username;
     private final String password;
-    private final String email;
-    private final String nickname;
-    private final UserType userType;
+    private final User user;
 
     public static CustomUserDetails of(User user) {
         return CustomUserDetails.builder()
-                .id(user.getId())
                 .username(user.getUsername())
-                .email(user.getEmail())
-                .nickname(user.getNickname())
-                .userType(user.getType())
+                .password(user.getPassword())
+                .user(user)
                 .build();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(userType.name()));
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
+        return List.of(new SimpleGrantedAuthority(user.getType().name()));
     }
 }
