@@ -18,18 +18,18 @@ public class UserMapper {
                 .build();
     }
 
-    public static LoginResponse toAuthResponse(final User user, final String accessToken) {
+    public static LoginResponse toLoginResponse(final User user, final String accessToken) {
         return LoginResponse.builder()
                 .user(toUserResponse(user))
                 .accessToken(accessToken)
                 .build();
     }
 
-    public static User fromUserCreateRequest(final UserCreateRequest userCreateRequest) {
+    public static User fromUserCreateRequest(final UserCreateRequest userCreateRequest, final String encodedPassword) {
         return User.builder()
                 .username(userCreateRequest.username())
                 .email(userCreateRequest.email())
-                .password(userCreateRequest.password())
+                .password(encodedPassword)
                 .nickname(userCreateRequest.nickname())
                 .build();
     }

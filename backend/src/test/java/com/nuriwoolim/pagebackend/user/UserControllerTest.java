@@ -62,9 +62,9 @@ public class UserControllerTest {
                 .password("email@email.com")
                 .nickname("nickname")
                 .build();
-        User savedUser = UserMapper.fromUserCreateRequest(userCreateRequest);
+        User savedUser = UserMapper.fromUserCreateRequest(userCreateRequest, userCreateRequest.password());
 
-        when(userService.create(any(UserCreateRequest.class))).thenReturn(UserMapper.toUserResponse(savedUser));
+        when(userService.create(any(User.class))).thenReturn(UserMapper.toUserResponse(savedUser));
 
         // when & then
         mockMvc.perform(post("/api/users")

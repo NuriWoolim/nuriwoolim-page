@@ -25,11 +25,12 @@ public class JwtTokenProvider {
     private final JwtConfig jwtConfig;
     private final MacAlgorithm macAlgorithm = SIG.HS256;
 
-    private String issueAccessToken(Long userId) {
+
+    public String issueAccessToken(Long userId) {
         return issue(userId, jwtConfig.expire().access());
     }
 
-    private String issueRefreshToken(Long userId) {
+    public String issueRefreshToken(Long userId) {
         return issue(userId, jwtConfig.expire().refresh());
     }
 
@@ -38,7 +39,7 @@ public class JwtTokenProvider {
                 .subject(userId.toString())
                 .issuedAt(new Date())
                 .expiration(new Date(new Date().getTime() + expTime))
-                .signWith(getSecretKey(), Jwts.SIG.HS256)
+                .signWith(getSecretKey(), macAlgorithm)
                 .compact();
     }
 

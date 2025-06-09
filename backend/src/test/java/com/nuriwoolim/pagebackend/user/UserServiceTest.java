@@ -67,10 +67,10 @@ class UserServiceTest {
                 .nickname("nickname")
                 .build();
 
-        User user = UserMapper.fromUserCreateRequest(userCreateRequest);
+        User user = UserMapper.fromUserCreateRequest(userCreateRequest, userCreateRequest.password());
 
         when(userRepository.save(any())).thenAnswer(i -> i.getArgument(0));
-        UserResponse savedUser = userService.create(userCreateRequest);
+        UserResponse savedUser = userService.create(user);
 
         assertThat(savedUser).usingRecursiveComparison().isEqualTo(UserMapper.toUserResponse(user));
     }

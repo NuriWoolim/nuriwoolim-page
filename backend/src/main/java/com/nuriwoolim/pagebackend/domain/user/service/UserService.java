@@ -1,6 +1,5 @@
 package com.nuriwoolim.pagebackend.domain.user.service;
 
-import com.nuriwoolim.pagebackend.domain.user.dto.UserCreateRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
@@ -24,9 +23,8 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse create(UserCreateRequest userCreateRequest) {
-        User user = userRepository.save(UserMapper.fromUserCreateRequest(userCreateRequest));
-        return UserMapper.toUserResponse(user);
+    public UserResponse create(User user) {
+        return UserMapper.toUserResponse(userRepository.save(user));
     }
 
     @Transactional
