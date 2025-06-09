@@ -1,13 +1,16 @@
 package com.nuriwoolim.pagebackend.domain.user.controller;
 
+import com.nuriwoolim.pagebackend.domain.user.dto.LoginDTO;
 import com.nuriwoolim.pagebackend.domain.user.dto.LoginRequest;
-import com.nuriwoolim.pagebackend.domain.user.dto.LoginResponse;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserCreateRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.domain.user.service.AuthService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,9 +32,24 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
-        //TODO: 로그인 로직 추가
-        return ResponseEntity.ok(authService.login(loginRequest));
+    public ResponseEntity<UserResponse> login(@Valid @RequestBody LoginRequest loginRequest,
+                                              HttpServletResponse response) {
+        LoginDTO data = authService.login(loginRequest);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(data.tokens().accessToken());
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", data.tokens().refreshToken())
+                .httpOnly(true)
+                .secure(true)
+                .path("/api")
+                .maxAge(3 * 24 * 60 * 60) //3일
+                .sameSite("Strict")
+                .build();
+        
+        headers.add(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
+        return ResponseEntity.ok().headers(headers).body(data.user());
     }
 
 }

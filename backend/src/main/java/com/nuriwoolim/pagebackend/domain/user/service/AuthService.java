@@ -1,15 +1,24 @@
 package com.nuriwoolim.pagebackend.domain.user.service;
 
 import com.nuriwoolim.pagebackend.core.jwt.JwtTokenProvider;
+import com.nuriwoolim.pagebackend.core.jwt.RefreshTokenRepository;
+import com.nuriwoolim.pagebackend.core.jwt.entity.RefreshToken;
+import com.nuriwoolim.pagebackend.core.security.CustomUserDetails;
+import com.nuriwoolim.pagebackend.domain.user.dto.LoginDTO;
 import com.nuriwoolim.pagebackend.domain.user.dto.LoginRequest;
-import com.nuriwoolim.pagebackend.domain.user.dto.LoginResponse;
+import com.nuriwoolim.pagebackend.domain.user.dto.TokenPair;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserCreateRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import com.nuriwoolim.pagebackend.domain.user.util.UserMapper;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,15 +26,40 @@ public class AuthService {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final AuthenticationManager authenticationManager;
+    private final RefreshTokenRepository refreshTokenRepository;
 
+
+    @Transactional
     public UserResponse signUp(UserCreateRequest userCreateRequest) {
         User endcodedUser = UserMapper.fromUserCreateRequest(userCreateRequest,
                 passwordEncoder.encode(userCreateRequest.password()));
         return userService.create(endcodedUser);
     }
 
-    public LoginResponse login(LoginRequest loginRequest) {
+    @Transactional
+    public LoginDTO login(LoginRequest loginRequest) {
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                loginRequest.username(),
+                loginRequest.password());
+        Authentication auth = authenticationManager.authenticate(authenticationToken);
+        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
 
-        return new LoginResponse(null, null);
+        String accessToken = jwtTokenProvider.issueAccessToken(userDetails.getUser().getId());
+        String refreshToken = jwtTokenProvider.issueRefreshToken(userDetails.getUser().getId());
+
+        Optional<RefreshToken> userRefreshToken = refreshTokenRepository.findByUser(userDetails.getUser());
+        userRefreshToken.ifPresent(refreshTokenRepository::delete);
+
+        RefreshToken token = RefreshToken.builder()
+                .token(refreshToken)
+                .member(userDetails.getUser())
+                .build();
+        refreshTokenRepository.save(token);
+
+        TokenPair tokenPair = new TokenPair(accessToken, refreshToken);
+
+        return new LoginDTO(UserMapper.toUserResponse(userDetails.getUser()), tokenPair);
+
     }
 }

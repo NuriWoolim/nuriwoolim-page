@@ -44,7 +44,8 @@ public class RefreshToken {
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
             nullable = false,
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT),
+            unique = true
     )
     private User user;
 
