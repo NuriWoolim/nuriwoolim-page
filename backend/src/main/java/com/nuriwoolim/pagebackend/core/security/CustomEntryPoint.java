@@ -26,7 +26,16 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
 
         log.info("authException.getMessage() == {}", authException.getMessage());
 
-        ErrorResponse error = new ErrorResponse(ErrorCode.UNAUTHORIZED.toException());
+        ErrorResponse error = new ErrorResponse(ErrorCode.UNAUTHORIZED.toException(authException.getMessage()));
+        response.setContentType("application/json;charset=UTF-8");
+        response.setStatus(error.getStatus());
+        try (PrintWriter w = response.getWriter()) {
+            w.write(objectMapper.writeValueAsString(error));
+        }
+    }
+
+    public void commenceExpiredToken(HttpServletResponse response) throws IOException {
+        ErrorResponse error = new ErrorResponse(ErrorCode.EXPIRED_TOKEN.toException("access token expired"));
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(error.getStatus());
         try (PrintWriter w = response.getWriter()) {

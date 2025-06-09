@@ -20,6 +20,7 @@ public enum ErrorCode {
      *  401 Unauthroized
      */
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증 실패"),
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
 
     /*
      * 403 FORBIDDEN: 승인을 거부함

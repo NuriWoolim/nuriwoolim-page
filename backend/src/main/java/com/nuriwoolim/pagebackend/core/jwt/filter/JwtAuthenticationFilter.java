@@ -4,6 +4,7 @@ import com.nuriwoolim.pagebackend.core.jwt.dto.TokenBody;
 import com.nuriwoolim.pagebackend.core.jwt.util.JwtTokenProvider;
 import com.nuriwoolim.pagebackend.core.security.CustomEntryPoint;
 import com.nuriwoolim.pagebackend.core.security.CustomUserDetailsService;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -13,6 +14,7 @@ import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -31,7 +33,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final CustomEntryPoint customEntryPoint;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain)
             throws ServletException, IOException {
         String token = resolveAccessToken(request);
         log.debug("Enter Filter: {}", token);
@@ -40,6 +44,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 try {
                     jwtTokenProvider.validate(token);
                     setAuthentication(token);
+                } catch (ExpiredJwtException e) {
+                    SecurityContextHolder.clearContext();
+                    customEntryPoint.commenceExpiredToken(response);
                 } catch (JwtException | IllegalArgumentException e) {
                     throw new BadCredentialsException("Invalid token");
                 }
