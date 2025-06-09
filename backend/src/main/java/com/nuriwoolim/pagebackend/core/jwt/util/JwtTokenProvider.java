@@ -1,9 +1,10 @@
-package com.nuriwoolim.pagebackend.core.jwt;
+package com.nuriwoolim.pagebackend.core.jwt.util;
 
+import com.nuriwoolim.pagebackend.core.jwt.JwtConfig;
 import com.nuriwoolim.pagebackend.core.jwt.dto.TokenBody;
+import com.nuriwoolim.pagebackend.domain.user.dto.TokenPair;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Jwts.SIG;
@@ -22,6 +23,12 @@ public class JwtTokenProvider {
     private final JwtConfig jwtConfig;
     private final MacAlgorithm macAlgorithm = SIG.HS256;
 
+    public TokenPair issueTokenPair(Long userId) {
+        return new TokenPair(
+                issueAccessToken(userId),
+                issueRefreshToken(userId)
+        );
+    }
 
     public String issueAccessToken(Long userId) {
         return issue(userId, jwtConfig.expire().access());
@@ -44,24 +51,12 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(jwtConfig.secretKey().getBytes());
     }
 
-    public boolean validate(String token) {
-        try {
-            JwtParser parser = getJwtParser();
+    public void validate(String token) {
+        JwtParser parser = getJwtParser();
 
-            parser.parseSignedClaims(token);
-            return true;
-        } catch (JwtException e) {
-            log.error("token={}", token);
-            log.error("Invalid JWT");
-        } catch (IllegalStateException e) {
-            log.error("token={}", token);
-            log.error("Weird JWT");
-        } catch (Exception e) {
-            log.error("token={}", token);
-            log.error("Unexpected error");
-        }
-        return false;
+        parser.parseSignedClaims(token);
     }
+
 
     private JwtParser getJwtParser() {
         return Jwts.parser()

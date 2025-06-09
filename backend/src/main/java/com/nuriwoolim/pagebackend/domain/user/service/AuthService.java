@@ -1,8 +1,8 @@
 package com.nuriwoolim.pagebackend.domain.user.service;
 
-import com.nuriwoolim.pagebackend.core.jwt.JwtTokenProvider;
 import com.nuriwoolim.pagebackend.core.jwt.RefreshTokenRepository;
 import com.nuriwoolim.pagebackend.core.jwt.entity.RefreshToken;
+import com.nuriwoolim.pagebackend.core.jwt.util.JwtTokenProvider;
 import com.nuriwoolim.pagebackend.core.security.CustomUserDetails;
 import com.nuriwoolim.pagebackend.domain.user.dto.LoginDTO;
 import com.nuriwoolim.pagebackend.domain.user.dto.LoginRequest;
@@ -45,21 +45,45 @@ public class AuthService {
         Authentication auth = authenticationManager.authenticate(authenticationToken);
         CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
 
-        String accessToken = jwtTokenProvider.issueAccessToken(userDetails.getUser().getId());
-        String refreshToken = jwtTokenProvider.issueRefreshToken(userDetails.getUser().getId());
+        TokenPair tokenPair = jwtTokenProvider.issueTokenPair(userDetails.getUser().getId());
 
         Optional<RefreshToken> userRefreshToken = refreshTokenRepository.findByUser(userDetails.getUser());
-        userRefreshToken.ifPresent(refreshTokenRepository::delete);
+        if (userRefreshToken.isPresent()) {
+            userDetails.getUser().setRefreshToken(null);
+            refreshTokenRepository.delete(userRefreshToken.get());
+            refreshTokenRepository.flush();
+        }
 
-        RefreshToken token = RefreshToken.builder()
-                .token(refreshToken)
-                .member(userDetails.getUser())
-                .build();
-        refreshTokenRepository.save(token);
-
-        TokenPair tokenPair = new TokenPair(accessToken, refreshToken);
+        saveRefreshToken(tokenPair.refreshToken(), userDetails.getUser());
 
         return new LoginDTO(UserMapper.toUserResponse(userDetails.getUser()), tokenPair);
+    }
 
+    @Transactional
+    public TokenPair refresh(String refreshToken) {
+        Optional<RefreshToken> userRefreshToken = refreshTokenRepository.findByToken(refreshToken);
+        if (userRefreshToken.isPresent()) {
+            Long userId = userRefreshToken.get().getUser().getId();
+            TokenPair tokenPair = jwtTokenProvider.issueTokenPair(userId);
+
+            User user = userRefreshToken.get().getUser();
+            user.setRefreshToken(null);
+            refreshTokenRepository.delete(userRefreshToken.get());
+            refreshTokenRepository.flush();
+
+            saveRefreshToken(tokenPair.refreshToken(), user);
+
+            return tokenPair;
+        }
+        return null;
+    }
+
+    private void saveRefreshToken(String token, User user) {
+        RefreshToken refreshToken = RefreshToken.builder()
+                .token(token)
+                .user(user)
+                .build();
+        user.setRefreshToken(refreshToken);
+        refreshTokenRepository.save(refreshToken);
     }
 }

@@ -12,6 +12,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 @Slf4j
@@ -62,10 +64,22 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT) // HTTP 상태 코드를 409 Conflict로 설정
-    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+    protected ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         log.debug("handleDataIntegrityViolationException: {}", e.getCause().getMessage());
 
         return ResponseEntity.ofNullable(new ErrorResponse(ErrorCode.DATA_CONFLICT.toException(e.getMessage())));
+    }
+
+
+    /*
+     * HTTP 404 잘못된 api 경로
+     */
+    @ExceptionHandler({NoHandlerFoundException.class, NoResourceFoundException.class})
+    protected ResponseEntity<ErrorResponse> handleNoHandlerFoundException(final Exception e) {
+        log.trace("handleNoHandlerFoundException: {}", e.getMessage());
+        return ResponseEntity
+                .status(ErrorCode.API_NOT_FOUND.getStatus())
+                .body(new ErrorResponse(ErrorCode.API_NOT_FOUND.toException()));
     }
 
     /*
@@ -76,6 +90,6 @@ public class GlobalExceptionHandler {
         log.error("handleException: {}", e.getMessage());
         return ResponseEntity
                 .status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
-                .body(new ErrorResponse(new CustomException(ErrorCode.INTERNAL_SERVER_ERROR)));
+                .body(new ErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR.toException()));
     }
 }

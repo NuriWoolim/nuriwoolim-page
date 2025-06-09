@@ -26,6 +26,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Entity
@@ -87,6 +88,7 @@ public class User extends BaseEntity {
     private List<WeekSchedule> weekScheduleList = new ArrayList<>();
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Setter
     private RefreshToken refreshToken;
 
     public void update(UserUpdateRequest userUpdateRequest) {

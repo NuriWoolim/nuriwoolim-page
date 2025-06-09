@@ -1,7 +1,7 @@
 package com.nuriwoolim.pagebackend.core.security;
 
-import com.nuriwoolim.pagebackend.core.jwt.JwtAuthenticationFilter;
-import com.nuriwoolim.pagebackend.core.jwt.JwtTokenProvider;
+import com.nuriwoolim.pagebackend.core.jwt.filter.JwtAuthenticationFilter;
+import com.nuriwoolim.pagebackend.core.jwt.util.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

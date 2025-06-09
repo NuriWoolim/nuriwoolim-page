@@ -29,6 +29,7 @@ public enum ErrorCode {
     /*
      * 404 NOT_FOUND: 리소스를 찾을 수 없음
      */
+    API_NOT_FOUND(HttpStatus.NOT_FOUND, "잘못된 경로입니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다."),
 
     /*

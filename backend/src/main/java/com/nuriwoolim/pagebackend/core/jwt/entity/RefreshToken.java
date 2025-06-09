@@ -4,6 +4,7 @@ import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
@@ -19,9 +20,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
         indexes = {
@@ -50,8 +53,8 @@ public class RefreshToken {
     private User user;
 
     @Builder
-    public RefreshToken(String token, User member) {
+    public RefreshToken(String token, User user) {
         this.token = token;
-        this.user = member;
+        this.user = user;
     }
 }
