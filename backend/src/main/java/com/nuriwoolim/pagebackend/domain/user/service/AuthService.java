@@ -86,4 +86,12 @@ public class AuthService {
         user.setRefreshToken(refreshToken);
         refreshTokenRepository.save(refreshToken);
     }
+
+    @Transactional
+    public void logout(User user) {
+        if (user.getRefreshToken() != null) {
+            refreshTokenRepository.delete(user.getRefreshToken());
+            user.setRefreshToken(null);
+        }
+    }
 }

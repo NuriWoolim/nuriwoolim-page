@@ -1,6 +1,7 @@
 package com.nuriwoolim.pagebackend.domain.user.controller;
 
 import com.nuriwoolim.pagebackend.core.jwt.util.TokenResponseHandler;
+import com.nuriwoolim.pagebackend.core.security.CustomUserDetails;
 import com.nuriwoolim.pagebackend.domain.user.dto.LoginDTO;
 import com.nuriwoolim.pagebackend.domain.user.dto.LoginRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserCreateRequest;
@@ -11,6 +12,7 @@ import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,4 +42,14 @@ public class AuthController {
         return ResponseEntity.ok(data.user());
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletResponse response,
+                                       @AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails != null) {
+            authService.logout(userDetails.getUser());
+        }
+        TokenResponseHandler.clearTokens(response);
+
+        return ResponseEntity.noContent().build();
+    }
 }

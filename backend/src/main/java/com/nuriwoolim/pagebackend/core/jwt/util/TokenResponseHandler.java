@@ -18,4 +18,13 @@ public class TokenResponseHandler {
 
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
     }
+
+    public static void clearTokens(HttpServletResponse response) {
+        ResponseCookie deleteCookie = ResponseCookie.from("refreshToken")
+                .path("/api")
+                .maxAge(0)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
+    }
 }
