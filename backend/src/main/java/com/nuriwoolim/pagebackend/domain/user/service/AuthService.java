@@ -11,6 +11,7 @@ import com.nuriwoolim.pagebackend.domain.user.dto.UserCreateRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import com.nuriwoolim.pagebackend.domain.user.util.UserMapper;
+import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -61,6 +62,11 @@ public class AuthService {
 
     @Transactional
     public TokenPair refresh(String refreshToken) {
+        try {
+            jwtTokenProvider.validate(refreshToken);
+        } catch (Exception e) {
+            throw ErrorCode.INVALID_TOKEN.toException();
+        }
         Optional<RefreshToken> userRefreshToken = refreshTokenRepository.findByToken(refreshToken);
         if (userRefreshToken.isPresent()) {
             Long userId = userRefreshToken.get().getUser().getId();
@@ -75,7 +81,7 @@ public class AuthService {
 
             return tokenPair;
         }
-        return null;
+        throw ErrorCode.INVALID_TOKEN.toException();
     }
 
     private void saveRefreshToken(String token, User user) {
