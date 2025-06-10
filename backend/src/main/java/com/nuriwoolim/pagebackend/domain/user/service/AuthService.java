@@ -94,10 +94,12 @@ public class AuthService {
     }
 
     @Transactional
-    public void logout(User user) {
-        if (user.getRefreshToken() != null) {
-            refreshTokenRepository.delete(user.getRefreshToken());
-            user.setRefreshToken(null);
+    public void logout(String refreshToken) {
+        try {
+            jwtTokenProvider.validate(refreshToken);
+        } catch (Exception e) {
+            throw ErrorCode.INVALID_TOKEN.toException();
         }
+        refreshTokenRepository.deleteByToken(refreshToken);
     }
 }

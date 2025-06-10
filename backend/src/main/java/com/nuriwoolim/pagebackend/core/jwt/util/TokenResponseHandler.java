@@ -11,7 +11,7 @@ public class TokenResponseHandler {
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
                 .secure(true)
-                .path("/api/auth/refresh")
+                .path("/api/auth")
                 .maxAge(3 * 24 * 60 * 60)
                 .sameSite("Strict")
                 .build();
@@ -21,7 +21,7 @@ public class TokenResponseHandler {
 
     public static void clearTokens(HttpServletResponse response) {
         ResponseCookie deleteCookie = ResponseCookie.from("refreshToken")
-                .path("/api/auth/refresh")
+                .path("/api/auth")
                 .maxAge(0)
                 .build();
 
