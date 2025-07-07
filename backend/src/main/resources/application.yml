@@ -10,7 +10,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         show_sql: true
@@ -21,3 +21,10 @@ logging:
     root: INFO
 #    org.springframework: INFO
 #    org.springframework.web: DEBUG
+
+custom:
+  jwt:
+    expire:
+      access: 3600_000 #1시간
+      refresh: 259200_000 #3일
+    secret-key: Q04DkgiuhVJ9fTCrBGTBJL4rr26mzP1czFELe7L74xB7Z+TOIt3KjGpzH4CTax5lzlqlJcCIpKzNf/g+59AWrA==
