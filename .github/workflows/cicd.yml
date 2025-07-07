@@ -119,7 +119,7 @@ jobs:
             export DB_NAME="${{ env.DB_NAME }}"
             export DB_USERNAME="${{ env.DB_USERNAME }}"
             export DB_PASSWORD="${{ env.DB_PASSWORD }}"
-            export DB_ROOT= "${{ env.DB_ROOT }}"
+            export DB_ROOT="${{ env.DB_ROOT }}"
             export SECRET_KEY="${{ env.SECRET_KEY }}"
             
             # 기존 컨테이너 중지 및 제거
