@@ -99,7 +99,6 @@ class UserServiceTest {
                 .type(UserType.MEMBER).build();
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(existing));
-        when(userRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 
         // when
         UserResponse result = userService.update(1L, userUpdateRequest);

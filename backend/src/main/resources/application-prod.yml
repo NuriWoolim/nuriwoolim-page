@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: backend
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://db:3306/${DB_NAME}?serverTimezone=Asia/Seoul
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+logging:
+  level:
+    root: info
+
+custom:
+  jwt:
+    expire:
+      access: 3600_000 #1시간
+      refresh: 259200_000 #3일
+    secret-key: ${SECRET_KEY}
