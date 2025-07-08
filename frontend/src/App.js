@@ -1,22 +1,27 @@
 import React from "react";
-import Header from "./components/Header";
-import Notice from "./components/Notice";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import NoticeDetail from "./components/NoticeDetail";
-import Footer from "./components/Footer";
+import Layout from "./layout/Layout";
+import Notice from "./pages/Notice";
+import NoticeDetail from "./pages/NoticeDetail";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Main from "./pages/Main";
 
 const App = () => {
   return (
-    <div className="App">
-      <Header />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Notice />} />
-          <Route path="/notice/:id" element={<NoticeDetail />} />
-        </Routes>
-      </BrowserRouter>
-      <Footer />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {/* 별도 페이지 (레이아웃 제외) */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="notice/:id" element={<NoticeDetail />} />
+
+        {/* 공통 레이아웃 안에 포함되는 Routes */}
+        <Route element={<Layout />}>
+          <Route path="/" element={<Main />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 };
 

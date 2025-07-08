@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 const HeaderContainer = styled.header`
@@ -109,6 +110,9 @@ const ImgBackground = styled.img`
 `;
 
 const Header = () => {
+
+  const navigate = useNavigate();
+
   return (
     <>
       <HeaderContainer>
@@ -128,7 +132,7 @@ const Header = () => {
               <a href="#Register">Register</a>
               <a href="#Wiki">Wiki</a>
             </NavLinks>
-            <LoginButton>Log In</LoginButton>
+            <LoginButton onClick={() => navigate("/login")}>Log In</LoginButton>
           </RightGroup>
         </NavBar>
 
