@@ -4,7 +4,7 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${HOST}:3306/${DB_NAME}?serverTimezone=Asia/Seoul
+    url: jdbc:mysql://localhost:3306/${DB_NAME}?serverTimezone=Asia/Seoul
     username: ${DB_USER}
     password: ${DB_PASSWORD}
 
@@ -21,6 +21,10 @@ logging:
     root: INFO
 #    org.springframework: INFO
 #    org.springframework.web: DEBUG
+
+springdoc:
+  swagger-ui:
+    with-credentials: true
 
 custom:
   jwt:
