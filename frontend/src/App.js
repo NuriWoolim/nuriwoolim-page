@@ -1,7 +1,6 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Layout from "./layout/Layout";
-import Notice from "./pages/Notice";
 import NoticeDetail from "./pages/NoticeDetail";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";

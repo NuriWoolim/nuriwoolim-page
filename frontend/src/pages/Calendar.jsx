@@ -1,7 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { Notices } from "../data/NoticeData";
 
 /* Notice 섹션의 전체 배경 */
 const NoticeSection = styled.section`

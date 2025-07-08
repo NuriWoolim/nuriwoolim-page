@@ -66,18 +66,6 @@ const BtnWrapper = styled.div`
   }
 `;
 
-const Form = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  div {
-    font-size: 14px;
-    color: grey;
-  }
-`;
-
 const Inputs = styled.div`
   display: flex;
   align-items: start;

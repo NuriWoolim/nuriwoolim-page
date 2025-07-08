@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosRequestConfig } from "axios";
+import axios from "axios";
 import { getNewRefreshToken } from "./user";
 
 export const getAuthAxios = () => {
