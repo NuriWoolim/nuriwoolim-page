@@ -22,29 +22,32 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 public class AuthController {
+
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<UserResponse> signup(@Valid @RequestBody UserCreateRequest userCreateRequest) {
+    public ResponseEntity<UserResponse> signup(
+        @Valid @RequestBody UserCreateRequest userCreateRequest) {
         UserResponse response = authService.signUp(userCreateRequest);
         URI location = URI.create("/api/users/" + response.id());
         return ResponseEntity.created(location)
-                .body(response);
+            .body(response);
     }
 
     @PostMapping("/login")
     public ResponseEntity<UserResponse> login(@Valid @RequestBody LoginRequest loginRequest,
-                                              HttpServletResponse response) {
+        HttpServletResponse response) {
         LoginDTO data = authService.login(loginRequest);
 
-        TokenResponseHandler.setTokens(response, data.tokens().accessToken(), data.tokens().refreshToken());
+        TokenResponseHandler.setTokens(response, data.tokens().accessToken(),
+            data.tokens().refreshToken());
 
         return ResponseEntity.ok(data.user());
     }
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletResponse response,
-                                       @CookieValue String refreshToken) {
+        @CookieValue String refreshToken) {
 
         authService.logout(refreshToken);
         TokenResponseHandler.clearTokens(response);
@@ -53,7 +56,8 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshToken(@CookieValue String refreshToken, HttpServletResponse response) {
+    public ResponseEntity<?> refreshToken(@CookieValue String refreshToken,
+        HttpServletResponse response) {
 
         TokenPair newTokens = authService.refresh(refreshToken);
 
