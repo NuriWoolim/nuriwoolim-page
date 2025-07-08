@@ -1,12 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { fadeIn } from "../style/fadeIn";
 
 const HeaderContainer = styled.header`
   position: relative;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
+  animation: ${fadeIn} 2s ease-out forwards;
 `;
 
 const NavBar = styled.nav`
@@ -110,7 +112,6 @@ const ImgBackground = styled.img`
 `;
 
 const Header = () => {
-
   const navigate = useNavigate();
 
   return (
