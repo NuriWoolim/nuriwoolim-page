@@ -22,10 +22,6 @@ logging:
 #    org.springframework: INFO
 #    org.springframework.web: DEBUG
 
-springdoc:
-  swagger-ui:
-    with-credentials: true
-
 custom:
   jwt:
     expire:
