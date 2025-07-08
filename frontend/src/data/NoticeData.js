@@ -21,4 +21,3 @@ export const CATEGORY_COLORS = {
   누리울림: "#656304",
   동아리연합회: "#2c75f3",
 };
-ㅅ
