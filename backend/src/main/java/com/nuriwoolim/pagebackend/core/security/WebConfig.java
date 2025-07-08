@@ -13,6 +13,7 @@ public class WebConfig implements WebMvcConfigurer {
             .allowedOrigins(
                 "http://localhost:3000",
                 "http://localhost:8080",
+                "http://localhost:5500",
                 "https://nuriwoolimtest.netlify.app",
                 "https://nuriwoolim.n-e.kr"
             )
