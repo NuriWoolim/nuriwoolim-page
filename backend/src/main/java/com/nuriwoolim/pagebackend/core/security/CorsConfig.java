@@ -21,7 +21,8 @@ public class CorsConfig {
             List.of(
                 "http://localhost:3000",
                 "http://localhost:8080",
-                "https://nuriwoolimtest.netlify.app"
+                "https://nuriwoolimtest.netlify.app",
+                "https://nuriwoolim.n-e.kr"
             )
         );
 
