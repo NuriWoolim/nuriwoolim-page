@@ -34,6 +34,6 @@ public class SwaggerConfig {
             .components(new Components()
                 .addSecuritySchemes("bearerAuth", securityScheme))
             .addSecurityItem(securityRequirement)
-            .servers(List.of(new Server().url("/api")));
+            .servers(List.of(new Server().url("/api"), new Server().url("/")));
     }
 }
