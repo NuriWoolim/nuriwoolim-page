@@ -18,10 +18,11 @@ public class CorsConfig {
         config.addAllowedMethod("*");
         config.setMaxAge(600L);
         config.setAllowedOriginPatterns(
-                List.of(
-                        "http://localhost:3000",    // React 개발 서버
-                        "http://localhost:8080"// Vue 개발 서버
-                )
+            List.of(
+                "http://localhost:3000",
+                "http://localhost:8080",
+                "https://nuriwoolimtest.netlify.app"
+            )
         );
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
