@@ -4,7 +4,7 @@ import { getAuthAxios } from "./authAxios";
 const baseURL = "https://nuriwoolim.n-e.kr";
 
 export const signup = async (username, email, password, nickname) => {
-  const result = await axios.post(`${baseURL}/api/auth/signup/`, {
+  const result = await axios.post(`${baseURL}/api/auth/signup`, {
     username,
     email,
     password,
@@ -15,7 +15,7 @@ export const signup = async (username, email, password, nickname) => {
 
 export const login = async (username, password) => {
   const result = await axios.post(
-    `${baseURL}/api/auth/login/`,
+    `${baseURL}/api/auth/login`,
     {
       username,
       password,
@@ -34,7 +34,7 @@ export const login = async (username, password) => {
 export const logout = async () => {
   try {
     await axios.post(
-      `${baseURL}/api/auth/logout/`,
+      `${baseURL}/api/auth/logout`,
       {},
       {
         withCredentials: true,

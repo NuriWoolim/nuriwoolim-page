@@ -4,6 +4,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "../hooks/useForm";
 import { getMyPage, login } from "../apis/user";
 
+const Body = styled.div`
+  background: linear-gradient(to right, #daf0f6, #fff2ce);
+  min-height: 100vh;
+`;
 const Logo = styled.div`
   display: flex;
   align-items: center;
@@ -11,59 +15,62 @@ const Logo = styled.div`
   height: 100%;
 
   img {
-    margin-top: 50px;
-    width: 150px;
-    height: 150px;
+    width: 242px;
+    height: 242px;
   }
 `;
 
 const Wrapper = styled.div`
-  width: 400px;
+  width: 452px;
+  height: 458px;
+  border: 2px solid #033148;
   padding: 40px 25px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.95);
+  background: radial-gradient(circle at top left, #fff2ce 17%, #daf0f6 70%);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(4px);
-  margin: 20px auto;
+  margin: -25px auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap:20px;
 `;
 
 const Title = styled.h2`
-  font-family: "SUITE";
-  font-size: 28px;
-  font-weight: 800;
-  margin-bottom: 20px;
+  font-family: "Adobe-Caslon-Pro";
+  font-size: 80px;
+  font-weight: 700;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  letter-spacing: -4px;
   color: #0f2230;
 `;
 
 const TextWrap = styled.div`
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-between;
   align-items: center;
-  width: 80%;
+  width: 100%;
 `;
 
 const BtnWrapper = styled.div`
-  height: 100%;
+  width: 100%;
+  height: 30%;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 1.5rem;
+  justify-content: flex-end;
+  margin-top: 20px;
   button {
-    font-weight: 800;
+    justify-content: flex-end;
+    font-weight: 500;
+    font-size: 14px;
     background-color: rgb(39, 94, 129);
     color: white;
-    padding: 19px;
-    border-radius: 10px;
+    letter-spacing: -1px;
+    padding: 0px;
     border: none;
     height: 30px;
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 315px;
+    width: 80px;
     cursor: pointer;
     &:hover {
       box-shadow: 0 0 3px 3px skyblue;
@@ -81,7 +88,8 @@ const Form = styled.div`
   height: 100%;
   div {
     font-size: 14px;
-    color: grey;
+    color: #031148;
+    letter-spacing: -1px;
   }
 `;
 
@@ -92,27 +100,26 @@ const Inputs = styled.div`
   gap: 8px;
   input {
     font-size: 20px;
-    height: 20px;
-    width: 290px;
-    border-radius: 10px;
+    height: 12px;
+    width: 324px;
     border: 1px solid #888;
     padding: 10px;
-    margin-bottom: 1rem;
+
     &::placeholder {
-      color: darkgray;
+      color: #033148;
       font-size: 20px;
       font-weight: 500;
-      font-family: "OTWelcomeRA";
+      font-family: "Pretendard";
     }
   }
 `;
 
 const SignupLink = styled(Link)`
   text-decoration: none;
-  color: inherit;
+  color: #413100;
 
   &:hover {
-    text-decoration: underline; /* 필요하다면 hover 시만 밑줄 */
+    text-decoration: underline;
   }
 `;
 
@@ -147,17 +154,17 @@ const Login = () => {
   };
 
   return (
-    <>
+    <Body>
       <Logo>
-        <a href="#Home">
+        <a href="/">
           <img src="/assets/mainlogo.png" alt="누리울림 로고" />
         </a>
       </Logo>
       <Wrapper>
-        <Title>로그인</Title>
+        <Title>LOG-IN</Title>
         <Form>
           <Inputs>
-            <div>아이디</div>
+            <div>사용자명(아이디)</div>
             <input value={username} onChange={onChangeUsername}></input>
             <div>비밀번호</div>
             <input
@@ -166,19 +173,17 @@ const Login = () => {
               onChange={onChangePassword}
             ></input>
           </Inputs>
+          <BtnWrapper>
+            <button onClick={onClick}>로그인</button>
+          </BtnWrapper>
           <TextWrap>
-            <div>비밀번호 찾기</div>
-            <div>ㅣ</div>
-            <div>아이디 찾기</div>
-            <div>ㅣ</div>
+            <SignupLink to="/signup">비밀번호 찾기</SignupLink>
+            <SignupLink to="/signup">아이디 찾기</SignupLink>
             <SignupLink to="/signup">회원가입</SignupLink>
           </TextWrap>
         </Form>
-        <BtnWrapper>
-          <button onClick={onClick}>로그인</button>
-        </BtnWrapper>
       </Wrapper>
-    </>
+    </Body>
   );
 };
 
