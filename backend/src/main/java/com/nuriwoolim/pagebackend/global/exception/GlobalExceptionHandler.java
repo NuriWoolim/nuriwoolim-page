@@ -26,8 +26,8 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleCustomException(final CustomException e) {
         log.debug("handleCustomException: {}", e.getErrorCode());
         return ResponseEntity
-                .status(e.getErrorCode().getStatus())
-                .body(new ErrorResponse(e));
+            .status(e.getErrorCode().getStatus())
+            .body(new ErrorResponse(e));
     }
 
     /*
@@ -35,7 +35,8 @@ public class GlobalExceptionHandler {
      * */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException e) {
+    protected ResponseEntity<Map<String, String>> handleValidationExceptions(
+        MethodArgumentNotValidException e) {
         log.debug("handleValidationExceptions: {}", e.getMessage());
         Map<String, String> errors = new HashMap<>();
         e.getBindingResult().getFieldErrors().forEach((error) -> {
@@ -43,31 +44,34 @@ public class GlobalExceptionHandler {
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-        return ResponseEntity.ofNullable(errors);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 
     // 인증은 되었지만 권한이 없는 경우
     @ExceptionHandler(AccessDeniedException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    protected ResponseEntity<ErrorResponse> handleAccessDeniedException(final AccessDeniedException e) {
+    protected ResponseEntity<ErrorResponse> handleAccessDeniedException(
+        final AccessDeniedException e) {
         log.debug("handleAccessDeniedException: {}", e.getMessage());
-        return ResponseEntity.ofNullable(new ErrorResponse(ErrorCode.AUTHORITY_FORBIDDEN.toException()));
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            .body(new ErrorResponse(ErrorCode.AUTHORITY_FORBIDDEN.toException()));
     }
 
     // 인증 자체가 실패한 경우 (로그인 안 됨, 토큰 만료 등)
     @ExceptionHandler(AuthenticationException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    protected ResponseEntity<ErrorResponse> handleAuthenticationException(final AuthenticationException e) {
+    protected ResponseEntity<ErrorResponse> handleAuthenticationException(
+        final AuthenticationException e) {
         log.debug("handleAuthenticationException: {}", e.getMessage());
-        return ResponseEntity.ofNullable(new ErrorResponse(ErrorCode.UNAUTHORIZED.toException()));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(new ErrorResponse(ErrorCode.UNAUTHORIZED.toException()));
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    @ResponseStatus(HttpStatus.CONFLICT) // HTTP 상태 코드를 409 Conflict로 설정
-    protected ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+    protected ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(
+        DataIntegrityViolationException e) {
         log.debug("handleDataIntegrityViolationException: {}", e.getCause().getMessage());
 
-        return ResponseEntity.ofNullable(new ErrorResponse(ErrorCode.DATA_CONFLICT.toException(e.getMessage())));
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+            new ErrorResponse(ErrorCode.DATA_CONFLICT.toException(e.getMessage())));
     }
 
 
@@ -78,8 +82,8 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleNoHandlerFoundException(final Exception e) {
         log.trace("handleNoHandlerFoundException: {}", e.getMessage());
         return ResponseEntity
-                .status(ErrorCode.API_NOT_FOUND.getStatus())
-                .body(new ErrorResponse(ErrorCode.API_NOT_FOUND.toException()));
+            .status(ErrorCode.API_NOT_FOUND.getStatus())
+            .body(new ErrorResponse(ErrorCode.API_NOT_FOUND.toException()));
     }
 
     /*
@@ -89,7 +93,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleException(final Exception e) {
         log.error("handleException: {}", e.getMessage());
         return ResponseEntity
-                .status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
-                .body(new ErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR.toException()));
+            .status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
+            .body(new ErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR.toException()));
     }
 }
