@@ -25,7 +25,7 @@ export const login = async (username, password) => {
     }
   );
 
-  const accessToken = result.headers["Authorization"]?.split("Bearer ")[1]; // 응답 형식 : Authorization: Bearer abc.def.jhi
+  const accessToken = result.headers["authorization"]?.split("Bearer ")[1]; // 응답 형식 : Authorization: Bearer abc.def.jhi
   if (accessToken) localStorage.setItem("accessToken", accessToken);
 
   return result.data;
