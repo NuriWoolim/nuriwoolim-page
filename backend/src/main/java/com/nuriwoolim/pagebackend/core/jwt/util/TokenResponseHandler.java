@@ -15,7 +15,7 @@ public class TokenResponseHandler {
             .secure(true)
             .path("/api/auth")
             .maxAge(3 * 24 * 60 * 60)
-            .sameSite("Lax")
+            .sameSite("None")
             .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
