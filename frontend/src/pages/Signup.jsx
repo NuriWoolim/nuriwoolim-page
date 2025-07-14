@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { signup } from "../apis/user";
 import { useForm } from "../hooks/useForm";
@@ -42,13 +42,6 @@ const Title = styled.h2`
   margin-bottom: 0px;
   letter-spacing: -4px;
   color: #0f2230;
-`;
-
-const TextWrap = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
 `;
 
 const BtnWrapper = styled.div`
@@ -111,15 +104,6 @@ const Inputs = styled.div`
       font-weight: 500;
       font-family: "Pretendard";
     }
-  }
-`;
-
-const SignupLink = styled(Link)`
-  text-decoration: none;
-  color: #413100;
-
-  &:hover {
-    text-decoration: underline;
   }
 `;
 
