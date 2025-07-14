@@ -25,7 +25,7 @@ const NoticeWrapper = styled.div`
     line-height: 127%;
     letter-spacing: -6%;
     text-transform: uppercase;
-    margin-top:40px;
+    margin-top: 40px;
     margin-bottom: 50px;
   }
 
@@ -41,12 +41,11 @@ const Item = styled.li`
   font-weight: 520;
   font-size: 25px;
   letter-spacing: -1px;
-  margin-left:30px;
+  margin-left: 30px;
 
   a {
     text-decoration: none;
     color: #033148;
-    transition: 0.2s;
 
     &:hover {
       text-decoration: underline;
@@ -55,7 +54,7 @@ const Item = styled.li`
     span.category {
       color: ${({ $category }) => CATEGORY_COLORS[$category] || "#555"};
       margin-right: 10px;
-      font-weight:700;
+      font-weight: 700;
     }
   }
 `;

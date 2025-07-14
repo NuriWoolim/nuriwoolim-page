@@ -17,7 +17,7 @@ const NavBar = styled.nav`
   left: 0;
   width: 100%;
   height: 85px;
-  padding: 0 20px;
+  padding: 0 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -34,7 +34,6 @@ const Logo = styled.div`
   height: 100%;
 
   img {
-    margin-top: 15px;
     width: 120px;
     height: 120px;
   }
@@ -71,6 +70,12 @@ const LoginButton = styled.button`
   letter-spacing: -0.5px;
   font-size: 16px;
   text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
 `;
 
 const OverlayText = styled.div`
