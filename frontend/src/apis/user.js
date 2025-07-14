@@ -57,24 +57,21 @@ export const getMyPage = async (token) => {
 export const getNewRefreshToken = async () => {
   try {
     const accessToken = localStorage.getItem("accessToken");
-    const refreshToken = localStorage.getItem("refreshToken");
 
     const result = await axios.post(
       `${baseURL}/api/auth/refresh`,
-      {
-        refreshToken,
-      },
+      {},
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
+        withCredentials: true,
       }
     );
     return result.data;
   } catch (error) {
     alert("토큰이 만료되었습니다. 다시 로그인해주세요.");
     localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
     window.location.href = "/"; // 강제 이동!
   }
 };

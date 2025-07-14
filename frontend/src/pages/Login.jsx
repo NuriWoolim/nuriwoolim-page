@@ -1,8 +1,8 @@
 import styled from "styled-components";
-import React, { useEffect } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "../hooks/useForm";
-import { getMyPage, login } from "../apis/user";
+import { login } from "../apis/user";
 
 const Body = styled.div`
   background: linear-gradient(to right, #daf0f6, #fff2ce);
@@ -129,24 +129,10 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
-    if (!accessToken) return;
-
-    getMyPage(accessToken)
-      .then(() => {
-        navigate("/mypage");
-      })
-      .catch(() => {
-        localStorage.clear();
-      });
-  }, [navigate]);
-
   const onClick = async () => {
     try {
       const result = await login(username, password);
       localStorage.setItem("access", result.accessToken);
-      localStorage.setItem("refresh", result.refreshToken);
       navigate("/mypage");
     } catch (error) {
       alert("id나 pw를 확인하세요.");
