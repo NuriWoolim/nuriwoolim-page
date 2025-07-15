@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { signup } from "../apis/user";
-import { useForm } from "../hooks/useForm";
+import { signup } from "../../apis/user";
+import { useForm } from "../../hooks/useForm";
 
 const Body = styled.div`
   background: linear-gradient(to right, #daf0f6, #fff2ce);
@@ -107,7 +107,7 @@ const Inputs = styled.div`
   }
 `;
 
-const Signup = () => {
+const FindMyPw = () => {
   const [username, onChangeUsername] = useForm("");
   const [email, onChangeEmail] = useForm("");
   const [password, onChangePassword] = useForm("");
@@ -184,4 +184,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default FindMyPw;

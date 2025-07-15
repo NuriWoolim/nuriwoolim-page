@@ -9,4 +9,19 @@ export const archiveData = [
     date: "2024년",
     title: "보고싶다 37기 운영진",
   },
+  {
+    image: "/assets/archive/test1.jpeg",
+    date: "2025년",
+    title: "test1",
+  },
+  {
+    image: "/assets/archive/test2.jpeg",
+    date: "2025년",
+    title: "test2",
+  },
+  {
+    image: "/assets/archive/test3.jpeg",
+    date: "2025년",
+    title: "test3",
+  },
 ];

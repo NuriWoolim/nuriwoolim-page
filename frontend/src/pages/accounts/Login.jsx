@@ -1,8 +1,9 @@
 import styled from "styled-components";
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useForm } from "../hooks/useForm";
-import { login } from "../apis/user";
+import { useForm } from "../../hooks/useForm";
+import { login } from "../../apis/user";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Body = styled.div`
   background: linear-gradient(to right, #daf0f6, #fff2ce);
@@ -51,11 +52,11 @@ const TextWrap = styled.div`
   width: 100%;
 `;
 
-const BtnWrapper = styled.div`
+const RowWrapper = styled.div`
   width: 100%;
   height: 30%;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   margin-top: 20px;
   button {
     justify-content: flex-end;
@@ -72,10 +73,13 @@ const BtnWrapper = styled.div`
     align-items: center;
     width: 80px;
     cursor: pointer;
+    transition: transform 0.2s ease;
+
     &:hover {
       box-shadow: 0 0 3px 3px skyblue;
       color: black;
       background-color: white;
+      transform: scale(1.1);
     }
   }
 `;
@@ -86,10 +90,12 @@ const Form = styled.div`
   justify-content: center;
   align-items: center;
   height: 100%;
-  div {
-    font-size: 14px;
+  letter-spacing: -1px;
+  font-size: 14px;
+  p {
+    margin: 0;  
+    font-size: 15px;
     color: #031148;
-    letter-spacing: -1px;
   }
 `;
 
@@ -99,19 +105,43 @@ const Inputs = styled.div`
   flex-direction: column;
   gap: 8px;
   input {
-    font-size: 20px;
+    font-size: 14px;
     height: 12px;
     width: 324px;
     border: 1px solid #888;
     padding: 10px;
 
     &::placeholder {
-      color: #033148;
-      font-size: 20px;
-      font-weight: 500;
+      color: #8888;
+      font-size: 13px;
+      font-weight: 300;
       font-family: "Pretendard";
     }
   }
+`;
+
+const PasswordInput = styled.div`
+  position: relative;
+`;
+
+const ShowPwBtn = styled.button`
+  position: absolute;
+  top: 57%;
+  transform: translateY(-50%);
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: #033148;
+  font-size: 19px;
+  cursor: pointer;
+`;
+
+const ErrorMessage = styled.div`
+  color: rgb(195, 25, 13);
+  font-weight: 500;
+  transition: opacity 0.3s ease;
+  opacity: ${(props) => (props.visible ? 1 : 0)};
+  visibility: ${(props) => (props.visible ? "visible" : "hidden")};
 `;
 
 const SignupLink = styled(Link)`
@@ -126,6 +156,8 @@ const SignupLink = styled(Link)`
 const Login = () => {
   const [username, onChangeUsername] = useForm();
   const [password, onChangePassword] = useForm();
+  const [showPassword, setShowPassoword] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
   const navigate = useNavigate();
 
@@ -135,7 +167,7 @@ const Login = () => {
       localStorage.setItem("access", result.accessToken);
       navigate("/mypage");
     } catch (error) {
-      alert("id나 pw를 확인하세요.");
+      setHasError(true);
     }
   };
 
@@ -150,21 +182,41 @@ const Login = () => {
         <Title>LOG-IN</Title>
         <Form>
           <Inputs>
-            <div>사용자명(아이디)</div>
-            <input value={username} onChange={onChangeUsername}></input>
-            <div>비밀번호</div>
+            <p>사용자명(아이디)</p>
             <input
-              type="password"
-              value={password}
-              onChange={onChangePassword}
+              value={username}
+              placeholder="아이디를 입력해주세요."
+              onChange={onChangeUsername}
             ></input>
+            <p>비밀번호</p>
+
+            <PasswordInput>
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="비밀번호를 입력해주세요."
+                value={password}
+                onChange={onChangePassword}
+              />
+              <ShowPwBtn
+                type="button"
+                class="fa fa-eye fa-lg"
+                onClick={() => setShowPassoword(!showPassword)}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </ShowPwBtn>
+            </PasswordInput>
           </Inputs>
-          <BtnWrapper>
+          <RowWrapper>
+            <ErrorMessage visible={hasError}>
+              아이디 또는 비밀번호가 잘못되었습니다.
+              <br />
+              아이디와 비밀번호를 다시 확인해주세요.
+            </ErrorMessage>
             <button onClick={onClick}>로그인</button>
-          </BtnWrapper>
+          </RowWrapper>
           <TextWrap>
-            <SignupLink to="/signup">비밀번호 찾기</SignupLink>
-            <SignupLink to="/signup">아이디 찾기</SignupLink>
+            <SignupLink to="/findMyPw">비밀번호 찾기</SignupLink>
+            <SignupLink to="/findMyId">아이디 찾기</SignupLink>
             <SignupLink to="/signup">회원가입</SignupLink>
           </TextWrap>
         </Form>
