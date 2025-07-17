@@ -164,8 +164,8 @@ const Login = () => {
   const onClick = async () => {
     try {
       const result = await login(username, password);
-      localStorage.setItem("access", result.accessToken);
-      navigate("/mypage");
+      localStorage.setItem("accessToken", result.accessToken);
+      navigate("/");
     } catch (error) {
       setHasError(true);
     }

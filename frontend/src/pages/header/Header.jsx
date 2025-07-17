@@ -1,7 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { fadeIn } from "../style/fadeIn";
+import { fadeIn } from "../../style/fadeIn";
+import MyPageDropdown from "./MyPageDropdown";
 
 const HeaderContainer = styled.header`
   position: relative;
@@ -118,6 +119,12 @@ const ImgBackground = styled.img`
 
 const Header = () => {
   const navigate = useNavigate();
+  const isLoggedIn = !!localStorage.getItem("accessToken");
+
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    navigate("/");
+  };
 
   return (
     <>
@@ -138,7 +145,17 @@ const Header = () => {
               <a href="#Register">Register</a>
               <a href="#Wiki">Wiki</a>
             </NavLinks>
-            <LoginButton onClick={() => navigate("/login")}>Log In</LoginButton>
+
+            {isLoggedIn ? (
+              <>
+                <MyPageDropdown />
+                <LoginButton onClick={handleLogout}>Log out</LoginButton>
+              </>
+            ) : (
+              <LoginButton onClick={() => navigate("/login")}>
+                Log In
+              </LoginButton>
+            )}
           </RightGroup>
         </NavBar>
 
