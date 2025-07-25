@@ -93,7 +93,7 @@ const Form = styled.div`
   letter-spacing: -1px;
   font-size: 14px;
   p {
-    margin: 0;  
+    margin: 0;
     font-size: 15px;
     color: #031148;
   }
@@ -217,7 +217,7 @@ const Login = () => {
           <TextWrap>
             <SignupLink to="/findMyPw">비밀번호 찾기</SignupLink>
             <SignupLink to="/findMyId">아이디 찾기</SignupLink>
-            <SignupLink to="/signup">회원가입</SignupLink>
+            <SignupLink to="/signup-terms">회원가입</SignupLink>
           </TextWrap>
         </Form>
       </Wrapper>

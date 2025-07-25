@@ -7,6 +7,7 @@ import Signup from "./pages/accounts/Signup";
 import Main from "./pages/Main";
 import FindMyId from "./pages/accounts/FindMyId";
 import FindMyPw from "./pages/accounts/FindMyPw";
+import SignupTerms from "./pages/accounts/SignupTerms";
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
         <Route path="/findMyPw" element={<FindMyPw />} />
         <Route path="findMyId" element={<FindMyId />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/signup-terms" element={<SignupTerms />} />
         <Route path="notice/:id" element={<NoticeDetail />} />
 
         {/* 공통 레이아웃 안에 포함되는 Routes */}
