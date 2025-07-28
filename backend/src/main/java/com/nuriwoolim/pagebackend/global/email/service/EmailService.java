@@ -23,7 +23,7 @@ public class EmailService {
             helper.setTo(to);
             helper.setSubject("[누리울림] 이메일 인증을 완료해주세요");
 
-            String verificationUrl = "localhost:8080" + "/verify-email?token=" + token;
+            String verificationUrl = "http://localhost:8080" + "/auth/verify-email?token=" + token;
             String htmlContent = buildEmailContent(verificationUrl);
 
             helper.setText(htmlContent, true);
@@ -37,18 +37,19 @@ public class EmailService {
     }
 
     private String buildEmailContent(String verificationUrl) {
-        return
+        return String.format(
             "<div style='max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;'>"
                 +
                 "<h2 style='color: #333;'>이메일 인증</h2>" +
                 "<p>안녕하세요!</p>" +
                 "<p>회원가입을 완료하기 위해 아래 링크를 클릭하여 이메일 인증을 완료해주세요.</p>" +
                 "<div style='text-align: center; margin: 30px 0;'>" +
-                "<a href='" + verificationUrl
-                + "' style='background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;'>이메일 인증하기</a>"
+                "<a href='%s' style='background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;'>이메일 인증하기</a>"
                 +
                 "</div>" +
                 "<p><small>이 링크는 24시간 후에 만료됩니다.</small></p>" +
-                "</div>";
+                "</div>",
+            verificationUrl
+        );
     }
 }

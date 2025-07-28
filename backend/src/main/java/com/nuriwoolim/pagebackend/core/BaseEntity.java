@@ -31,6 +31,6 @@ public abstract class BaseEntity {
     @LastModifiedBy
     protected String updatedBy;
 
-    private boolean isDeleted;
+    private boolean deleted;
 
 }

@@ -15,6 +15,7 @@ import com.nuriwoolim.pagebackend.domain.user.repository.UserRepository;
 import com.nuriwoolim.pagebackend.domain.user.util.UserMapper;
 import com.nuriwoolim.pagebackend.global.email.service.EmailService;
 import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
+import io.jsonwebtoken.JwtException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -44,6 +45,7 @@ public class AuthService {
         }
         if (pendingUserRepository.existsByEmail(userSignupRequest.email())) {
             pendingUserRepository.deleteByEmail(userSignupRequest.email());
+            pendingUserRepository.flush();
         }
 
         String encodedPassword = passwordEncoder.encode(userSignupRequest.password());
@@ -58,19 +60,24 @@ public class AuthService {
 
     @Transactional
     public void verifyEmail(String token) {
-        jwtTokenProvider.validate(token);
+        try {
+            jwtTokenProvider.validate(token);
+        } catch (JwtException e) {
+            throw ErrorCode.INVALID_TOKEN.toException();
+        }
 
         String email = jwtTokenProvider.getSubject(token);
         if (userRepository.existsByEmail(email)) {
             throw ErrorCode.DATA_CONFLICT.toException();
         }
-        Optional<PendingUser> pendingUser = pendingUserRepository.findByEmail(email);
+        Optional<PendingUser> pendingUser = pendingUserRepository.findByToken(token);
         if (pendingUser.isEmpty()) {
             throw ErrorCode.USER_NOT_FOUND.toException();
         }
 
         User user = UserMapper.fromPendingUser(pendingUser.get());
         userRepository.save(user);
+        pendingUserRepository.delete(pendingUser.get());
     }
 
     @Transactional
