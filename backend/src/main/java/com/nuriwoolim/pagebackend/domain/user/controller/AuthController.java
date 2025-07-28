@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -26,9 +27,15 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<UserResponse> signup(
+    public ResponseEntity<Void> signup(
         @Valid @RequestBody UserSignupRequest userSignupRequest) {
         authService.signUp(userSignupRequest);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PostMapping("/verify-email")
+    public ResponseEntity<Void> verifyEmail(@RequestParam String token) {
+        authService.verifyEmail(token);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -54,7 +61,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshToken(@CookieValue String refreshToken,
+    public ResponseEntity<Void> refreshToken(@CookieValue String refreshToken,
         HttpServletResponse response) {
 
         TokenPair newTokens = authService.refresh(refreshToken);

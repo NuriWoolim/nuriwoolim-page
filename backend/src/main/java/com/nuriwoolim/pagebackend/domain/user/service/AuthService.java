@@ -16,7 +16,6 @@ import com.nuriwoolim.pagebackend.domain.user.util.UserMapper;
 import com.nuriwoolim.pagebackend.global.email.service.EmailService;
 import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
 import java.util.Optional;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -48,7 +47,7 @@ public class AuthService {
         }
 
         String encodedPassword = passwordEncoder.encode(userSignupRequest.password());
-        String token = UUID.randomUUID().toString();
+        String token = jwtTokenProvider.issueEmailToken(userSignupRequest.email());
 
         PendingUser pendingUser = UserMapper.fromUserCreateRequest(userSignupRequest,
             encodedPassword, token);
@@ -59,7 +58,19 @@ public class AuthService {
 
     @Transactional
     public void verifyEmail(String token) {
-        
+        jwtTokenProvider.validate(token);
+
+        String email = jwtTokenProvider.getSubject(token);
+        if (userRepository.existsByEmail(email)) {
+            throw ErrorCode.DATA_CONFLICT.toException();
+        }
+        Optional<PendingUser> pendingUser = pendingUserRepository.findByEmail(email);
+        if (pendingUser.isEmpty()) {
+            throw ErrorCode.USER_NOT_FOUND.toException();
+        }
+
+        User user = UserMapper.fromPendingUser(pendingUser.get());
+        userRepository.save(user);
     }
 
     @Transactional

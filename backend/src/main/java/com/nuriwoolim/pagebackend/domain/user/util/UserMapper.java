@@ -27,4 +27,12 @@ public class UserMapper {
             .token(token)
             .build();
     }
+
+    public static User fromPendingUser(final PendingUser pendingUser) {
+        return User.builder()
+            .name(pendingUser.getName())
+            .email(pendingUser.getEmail())
+            .password(pendingUser.getPassword())
+            .build();
+    }
 }
