@@ -4,18 +4,21 @@ import com.nuriwoolim.pagebackend.core.jwt.util.TokenResponseHandler;
 import com.nuriwoolim.pagebackend.domain.user.dto.LoginDTO;
 import com.nuriwoolim.pagebackend.domain.user.dto.LoginRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.TokenPair;
-import com.nuriwoolim.pagebackend.domain.user.dto.UserCreateRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
+import com.nuriwoolim.pagebackend.domain.user.dto.UserSignupRequest;
+import com.nuriwoolim.pagebackend.domain.user.dto.VerificationResendResponse;
 import com.nuriwoolim.pagebackend.domain.user.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import java.net.URI;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -26,12 +29,23 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<UserResponse> signup(
-        @Valid @RequestBody UserCreateRequest userCreateRequest) {
-        UserResponse response = authService.signUp(userCreateRequest);
-        URI location = URI.create("/api/users/" + response.id());
-        return ResponseEntity.created(location)
-            .body(response);
+    public ResponseEntity<VerificationResendResponse> signup(
+        @Valid @RequestBody UserSignupRequest userSignupRequest) {
+        VerificationResendResponse response = authService.signUp(userSignupRequest);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/verify-email")
+    public ResponseEntity<Void> verifyEmail(@RequestParam String token) {
+        authService.verifyEmail(token);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/resend-verification")
+    public ResponseEntity<VerificationResendResponse> resendVerification(
+        @RequestParam String resendToken) {
+        VerificationResendResponse response = authService.resendVerificationEmail(resendToken);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/login")
@@ -56,7 +70,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshToken(@CookieValue String refreshToken,
+    public ResponseEntity<Void> refreshToken(@CookieValue String refreshToken,
         HttpServletResponse response) {
 
         TokenPair newTokens = authService.refresh(refreshToken);

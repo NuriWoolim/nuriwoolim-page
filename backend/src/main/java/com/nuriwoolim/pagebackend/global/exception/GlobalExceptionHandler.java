@@ -71,7 +71,7 @@ public class GlobalExceptionHandler {
         log.debug("handleDataIntegrityViolationException: {}", e.getCause().getMessage());
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(
-            new ErrorResponse(ErrorCode.DATA_CONFLICT.toException(e.getMessage())));
+            new ErrorResponse(ErrorCode.DATA_CONFLICT.toException()));
     }
 
 

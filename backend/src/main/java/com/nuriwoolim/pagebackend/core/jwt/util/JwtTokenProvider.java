@@ -20,31 +20,36 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class JwtTokenProvider {
+
     private final JwtConfig jwtConfig;
     private final MacAlgorithm macAlgorithm = SIG.HS256;
 
     public TokenPair issueTokenPair(Long userId) {
         return new TokenPair(
-                issueAccessToken(userId),
-                issueRefreshToken(userId)
+            issueAccessToken(userId),
+            issueRefreshToken(userId)
         );
     }
 
+    public String issueEmailToken(String email) {
+        return issue(email, jwtConfig.expire().email());
+    }
+
     public String issueAccessToken(Long userId) {
-        return issue(userId, jwtConfig.expire().access());
+        return issue(userId.toString(), jwtConfig.expire().access());
     }
 
     public String issueRefreshToken(Long userId) {
-        return issue(userId, jwtConfig.expire().refresh());
+        return issue(userId.toString(), jwtConfig.expire().refresh());
     }
 
-    private String issue(Long userId, Long expTime) {
+    private String issue(String subject, Long expTime) {
         return Jwts.builder()
-                .subject(userId.toString())
-                .issuedAt(new Date())
-                .expiration(new Date(new Date().getTime() + expTime))
-                .signWith(getSecretKey(), macAlgorithm)
-                .compact();
+            .subject(subject)
+            .issuedAt(new Date())
+            .expiration(new Date(new Date().getTime() + expTime))
+            .signWith(getSecretKey(), macAlgorithm)
+            .compact();
     }
 
     private SecretKey getSecretKey() {
@@ -60,8 +65,8 @@ public class JwtTokenProvider {
 
     private JwtParser getJwtParser() {
         return Jwts.parser()
-                .verifyWith(getSecretKey())
-                .build();
+            .verifyWith(getSecretKey())
+            .build();
     }
 
     public TokenBody parseJwt(String token) {
@@ -69,7 +74,12 @@ public class JwtTokenProvider {
         Long id = Long.parseLong(claimsJws.getPayload().getSubject());
 
         return TokenBody.builder()
-                .id(id)
-                .build();
+            .id(id)
+            .build();
+    }
+
+    public String getSubject(String token) {
+        Jws<Claims> claimsJws = getJwtParser().parseSignedClaims(token);
+        return claimsJws.getPayload().getSubject();
     }
 }

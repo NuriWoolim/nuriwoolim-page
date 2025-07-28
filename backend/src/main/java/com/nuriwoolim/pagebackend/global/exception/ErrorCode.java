@@ -15,6 +15,7 @@ public enum ErrorCode {
     BAD_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "파일 형식이 올바르지 않습니다."),
     ROLE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "역할이 올바르지 않습니다."),
     PASSWORD_BAD_REQUEST(HttpStatus.BAD_REQUEST, "비밀번호가 올바르지 않습니다."),
+    TOO_MANY_RESEND(HttpStatus.BAD_REQUEST, "인증 메일 재전송 요청이 너무 많습니다."),
 
     /*
      *  401 Unauthroized
@@ -48,6 +49,7 @@ public enum ErrorCode {
     /*
      * 500 INTERNAL_SERVER_ERROR: 내부 서버 오류
      */
+    MAIL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "메일 전송에 오류 발생"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "내부 서버 오류입니다.");
 
     private final HttpStatus status;
