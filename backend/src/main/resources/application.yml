@@ -44,3 +44,5 @@ custom:
       refresh: 259200_000 #3일
       email: 600_000 # 10분
     secret-key: Q04DkgiuhVJ9fTCrBGTBJL4rr26mzP1czFELe7L74xB7Z+TOIt3KjGpzH4CTax5lzlqlJcCIpKzNf/g+59AWrA==
+  resendLimit: 5
+  frontUrl: http://localhost:8080

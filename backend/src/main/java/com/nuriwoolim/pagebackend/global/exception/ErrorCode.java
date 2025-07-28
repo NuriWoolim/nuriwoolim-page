@@ -49,6 +49,7 @@ public enum ErrorCode {
     /*
      * 500 INTERNAL_SERVER_ERROR: 내부 서버 오류
      */
+    MAIL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "메일 전송에 오류 발생"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "내부 서버 오류입니다.");
 
     private final HttpStatus status;

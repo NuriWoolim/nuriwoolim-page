@@ -1,9 +1,11 @@
 package com.nuriwoolim.pagebackend.global.email.service;
 
+import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -16,6 +18,9 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
+    @Value("${custom.frontUrl}")
+    private String frontUrl;
+
     @Async
     public void sendVerificationEmail(String to, String token) {
         try {
@@ -25,7 +30,7 @@ public class EmailService {
             helper.setTo(to);
             helper.setSubject("[누리울림] 이메일 인증을 완료해주세요");
 
-            String verificationUrl = "http://localhost:8080" + "/auth/verify-email?token=" + token;
+            String verificationUrl = frontUrl + "/auth/verify-email?token=" + token;
             String htmlContent = buildEmailContent(verificationUrl);
 
             helper.setText(htmlContent, true);
@@ -34,7 +39,7 @@ public class EmailService {
             mailSender.send(message);
 
         } catch (MessagingException e) {
-            throw new RuntimeException("이메일 발송에 실패했습니다: " + e.getMessage());
+            throw ErrorCode.MAIL_ERROR.toException();
         }
     }
 

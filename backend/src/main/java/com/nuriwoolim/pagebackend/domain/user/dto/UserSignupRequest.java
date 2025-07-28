@@ -16,7 +16,7 @@ public record UserSignupRequest(
     String email,
 
     @NotBlank
-    @Pattern(regexp = "^(?=.*[0-9])(?=.*[A-z]).{8,20}$"
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[A-Za-z]).{8,20}$"
         , message = "비밀번호는 숫자와 영문이 포함된 8자 ~ 20자의 비밀번호여야 합니다.")
     String password
 ) {

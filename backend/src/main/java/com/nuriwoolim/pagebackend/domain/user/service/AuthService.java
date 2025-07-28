@@ -19,6 +19,7 @@ import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
 import io.jsonwebtoken.JwtException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -38,6 +39,8 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenRepository refreshTokenRepository;
 
+    @Value("${custom.resendLimit}")
+    private int resendLimit;
 
     @Transactional
     public VerificationResendResponse signUp(UserSignupRequest userSignupRequest) {
@@ -77,7 +80,7 @@ public class AuthService {
         PendingUser pendingUser = pendingUserRepository.findByResendToken(resendToken)
             .orElseThrow(ErrorCode.USER_NOT_FOUND::toException);
 
-        if (pendingUser.getResendCount() >= 5) {
+        if (pendingUser.getResendCount() >= resendLimit) {
             throw ErrorCode.TOO_MANY_RESEND.toException();
         }
 
