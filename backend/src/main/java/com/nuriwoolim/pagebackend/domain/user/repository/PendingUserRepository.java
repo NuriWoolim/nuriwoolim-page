@@ -13,4 +13,6 @@ public interface PendingUserRepository extends JpaRepository<PendingUser, Long> 
     boolean existsByEmail(String email);
 
     void deleteByEmail(String email);
+
+    Optional<PendingUser> findByResendToken(String resendToken);
 }

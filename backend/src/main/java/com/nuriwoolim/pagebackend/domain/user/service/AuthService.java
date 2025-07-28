@@ -8,6 +8,7 @@ import com.nuriwoolim.pagebackend.domain.user.dto.LoginDTO;
 import com.nuriwoolim.pagebackend.domain.user.dto.LoginRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.TokenPair;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserSignupRequest;
+import com.nuriwoolim.pagebackend.domain.user.dto.VerificationResendResponse;
 import com.nuriwoolim.pagebackend.domain.user.entity.PendingUser;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import com.nuriwoolim.pagebackend.domain.user.repository.PendingUserRepository;
@@ -39,7 +40,7 @@ public class AuthService {
 
 
     @Transactional
-    public void signUp(UserSignupRequest userSignupRequest) {
+    public VerificationResendResponse signUp(UserSignupRequest userSignupRequest) {
         if (userRepository.existsByEmail(userSignupRequest.email())) {
             throw ErrorCode.DATA_CONFLICT.toException();
         }
@@ -50,12 +51,43 @@ public class AuthService {
 
         String encodedPassword = passwordEncoder.encode(userSignupRequest.password());
         String token = jwtTokenProvider.issueEmailToken(userSignupRequest.email());
+        String resendToken = jwtTokenProvider.issueEmailToken(userSignupRequest.email());
 
         PendingUser pendingUser = UserMapper.fromUserCreateRequest(userSignupRequest,
-            encodedPassword, token);
-        pendingUserRepository.save(pendingUser);
+            encodedPassword, token, resendToken);
 
         emailService.sendVerificationEmail(pendingUser.getEmail(), token);
+
+        return UserMapper.toVerificationResendResponse(pendingUserRepository.save(pendingUser));
+    }
+
+    @Transactional
+    public VerificationResendResponse resendVerificationEmail(String resendToken) {
+        try {
+            jwtTokenProvider.validate(resendToken);
+        } catch (JwtException e) {
+            throw ErrorCode.INVALID_TOKEN.toException();
+        }
+
+        String email = jwtTokenProvider.getSubject(resendToken);
+        if (userRepository.existsByEmail(email)) {
+            throw ErrorCode.DATA_CONFLICT.toException();
+        }
+
+        PendingUser pendingUser = pendingUserRepository.findByResendToken(resendToken)
+            .orElseThrow(ErrorCode.USER_NOT_FOUND::toException);
+
+        if (pendingUser.getResendCount() >= 5) {
+            throw ErrorCode.TOO_MANY_RESEND.toException();
+        }
+
+        String newToken = jwtTokenProvider.issueEmailToken(pendingUser.getEmail());
+        pendingUser.updateToken(newToken);
+        pendingUser.countResend();
+
+        emailService.sendVerificationEmail(pendingUser.getEmail(), newToken);
+
+        return UserMapper.toVerificationResendResponse(pendingUser);
     }
 
     @Transactional

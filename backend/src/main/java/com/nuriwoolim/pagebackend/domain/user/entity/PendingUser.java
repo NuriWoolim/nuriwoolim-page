@@ -34,4 +34,18 @@ public class PendingUser extends BaseEntity {
 
     @Column(nullable = false, unique = true)
     private String token;
+
+    @Column(nullable = false)
+    private String resendToken;
+
+    @Column(nullable = false)
+    private int resendCount = 0;
+
+    public void updateToken(String token) {
+        this.token = token;
+    }
+
+    public void countResend() {
+        this.resendCount++;
+    }
 }

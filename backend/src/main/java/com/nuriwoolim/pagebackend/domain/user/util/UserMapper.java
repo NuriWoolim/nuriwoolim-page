@@ -2,6 +2,7 @@ package com.nuriwoolim.pagebackend.domain.user.util;
 
 import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserSignupRequest;
+import com.nuriwoolim.pagebackend.domain.user.dto.VerificationResendResponse;
 import com.nuriwoolim.pagebackend.domain.user.entity.PendingUser;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 
@@ -19,12 +20,13 @@ public class UserMapper {
     }
 
     public static PendingUser fromUserCreateRequest(final UserSignupRequest userSignupRequest,
-        final String encodedPassword, String token) {
+        final String encodedPassword, String token, String resendToken) {
         return PendingUser.builder()
             .name(userSignupRequest.name())
             .email(userSignupRequest.email())
             .password(encodedPassword)
             .token(token)
+            .resendToken(resendToken)
             .build();
     }
 
@@ -33,6 +35,14 @@ public class UserMapper {
             .name(pendingUser.getName())
             .email(pendingUser.getEmail())
             .password(pendingUser.getPassword())
+            .build();
+    }
+
+    public static VerificationResendResponse toVerificationResendResponse(
+        final PendingUser pendingUser) {
+        return VerificationResendResponse.builder()
+            .resendToken(pendingUser.getResendToken())
+            .resendCount(pendingUser.getResendCount())
             .build();
     }
 }
