@@ -59,9 +59,6 @@ public class User extends BaseEntity {
     private Integer year;
 
     @Builder.Default
-    private boolean emailVerified = false;
-
-    @Builder.Default
     private boolean isDeleted = false;
 
     @OneToMany(mappedBy = "writer", fetch = FetchType.LAZY)
@@ -73,17 +70,17 @@ public class User extends BaseEntity {
     private List<Comment> commentList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true,
-            cascade = {jakarta.persistence.CascadeType.REMOVE})
+        cascade = {jakarta.persistence.CascadeType.REMOVE})
     @Builder.Default
     private List<Schedule> scheduleList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true,
-            cascade = {jakarta.persistence.CascadeType.REMOVE})
+        cascade = {jakarta.persistence.CascadeType.REMOVE})
     @Builder.Default
     private List<TimeTable> timeTableList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true,
-            cascade = {jakarta.persistence.CascadeType.REMOVE})
+        cascade = {jakarta.persistence.CascadeType.REMOVE})
     @Builder.Default
     private List<WeekSchedule> weekScheduleList = new ArrayList<>();
 
