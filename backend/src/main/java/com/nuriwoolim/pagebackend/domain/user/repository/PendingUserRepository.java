@@ -1,13 +1,13 @@
 package com.nuriwoolim.pagebackend.domain.user.repository;
 
-import com.nuriwoolim.pagebackend.domain.user.entity.User;
+import com.nuriwoolim.pagebackend.domain.user.entity.PendingUser;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface PendingUserRepository extends JpaRepository<PendingUser, Long> {
 
-    Optional<User> findByEmail(String email);
+    Optional<PendingUser> findByEmail(String email);
 
 }

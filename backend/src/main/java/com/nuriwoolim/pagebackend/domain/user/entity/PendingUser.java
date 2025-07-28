@@ -23,8 +23,8 @@ public class PendingUser extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 20)
-    private String username;
+    @Column(nullable = false, length = 20)
+    private String name;
 
     @Column(nullable = false, unique = true, length = 50)
     private String email;
@@ -32,12 +32,9 @@ public class PendingUser extends BaseEntity {
     @Column
     private String password;
 
-    @Column(nullable = false, unique = true, length = 10)
-    private String nickname;
-
     @Builder.Default
     private boolean emailVerified = false;
 
     @Builder.Default
-    private boolean isDeleted = false;
+    private boolean deleted = false;
 }

@@ -6,13 +6,12 @@ import lombok.Builder;
 
 @Builder
 public record UserResponse(
-        Long id,
-        String username,
-        String email,
-        String nickname,
-        UserType type,
-        Integer year,
-        LocalDateTime createdDate,
-        boolean emailVerified
+    Long id,
+    String name,
+    String email,
+    UserType type,
+    Integer year,
+    LocalDateTime createdDate
 ) {
+
 }

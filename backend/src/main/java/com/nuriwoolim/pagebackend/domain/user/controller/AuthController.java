@@ -4,8 +4,8 @@ import com.nuriwoolim.pagebackend.core.jwt.util.TokenResponseHandler;
 import com.nuriwoolim.pagebackend.domain.user.dto.LoginDTO;
 import com.nuriwoolim.pagebackend.domain.user.dto.LoginRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.TokenPair;
-import com.nuriwoolim.pagebackend.domain.user.dto.UserCreateRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
+import com.nuriwoolim.pagebackend.domain.user.dto.UserSignupRequest;
 import com.nuriwoolim.pagebackend.domain.user.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -27,8 +27,8 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<UserResponse> signup(
-        @Valid @RequestBody UserCreateRequest userCreateRequest) {
-        UserResponse response = authService.signUp(userCreateRequest);
+        @Valid @RequestBody UserSignupRequest userSignupRequest) {
+        UserResponse response = authService.signUp(userSignupRequest);
         URI location = URI.create("/api/users/" + response.id());
         return ResponseEntity.created(location)
             .body(response);

@@ -15,21 +15,22 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
+
     private final UserRepository userRepository;
 
     @Override
     @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(ErrorCode.USER_NOT_FOUND::toException);
-        log.debug("loadUserByUsername: {} -> {}", username, user);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(ErrorCode.USER_NOT_FOUND::toException);
+        log.debug("loadUserByUsername: {} -> {}", email, user);
         return CustomUserDetails.of(user);
     }
 
     @Transactional(readOnly = true)
     public UserDetails loadUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(ErrorCode.USER_NOT_FOUND::toException);
+            .orElseThrow(ErrorCode.USER_NOT_FOUND::toException);
         log.debug("loadUserById: {} -> {}", id, user);
         return CustomUserDetails.of(user);
     }
