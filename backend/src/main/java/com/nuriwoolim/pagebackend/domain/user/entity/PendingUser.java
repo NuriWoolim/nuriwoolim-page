@@ -29,12 +29,7 @@ public class PendingUser extends BaseEntity {
     @Column(nullable = false, unique = true, length = 50)
     private String email;
 
-    @Column
     private String password;
 
-    @Builder.Default
-    private boolean emailVerified = false;
-
-    @Builder.Default
-    private boolean deleted = false;
+    private String token;
 }

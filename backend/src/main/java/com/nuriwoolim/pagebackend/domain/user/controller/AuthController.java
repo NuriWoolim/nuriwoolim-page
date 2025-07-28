@@ -9,8 +9,8 @@ import com.nuriwoolim.pagebackend.domain.user.dto.UserSignupRequest;
 import com.nuriwoolim.pagebackend.domain.user.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import java.net.URI;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,10 +28,8 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<UserResponse> signup(
         @Valid @RequestBody UserSignupRequest userSignupRequest) {
-        UserResponse response = authService.signUp(userSignupRequest);
-        URI location = URI.create("/api/users/" + response.id());
-        return ResponseEntity.created(location)
-            .body(response);
+        authService.signUp(userSignupRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/login")

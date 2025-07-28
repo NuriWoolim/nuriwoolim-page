@@ -18,8 +18,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: cau.nuriwoolim@gmail.com
-    password: zhxiqmowgpcgdaaz
+    username: ${EMAIL}
+    password: ${EMAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -42,4 +42,5 @@ custom:
     expire:
       access: 3600_000 #1시간
       refresh: 259200_000 #3일
+      email: 600_000 # 10분
     secret-key: Q04DkgiuhVJ9fTCrBGTBJL4rr26mzP1czFELe7L74xB7Z+TOIt3KjGpzH4CTax5lzlqlJcCIpKzNf/g+59AWrA==

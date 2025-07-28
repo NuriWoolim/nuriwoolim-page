@@ -2,6 +2,7 @@ package com.nuriwoolim.pagebackend.domain.user.util;
 
 import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserSignupRequest;
+import com.nuriwoolim.pagebackend.domain.user.entity.PendingUser;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 
 public class UserMapper {
@@ -17,12 +18,13 @@ public class UserMapper {
             .build();
     }
 
-    public static User fromUserCreateRequest(final UserSignupRequest userSignupRequest,
-        final String encodedPassword) {
-        return User.builder()
+    public static PendingUser fromUserCreateRequest(final UserSignupRequest userSignupRequest,
+        final String encodedPassword, String token) {
+        return PendingUser.builder()
             .name(userSignupRequest.name())
             .email(userSignupRequest.email())
             .password(encodedPassword)
+            .token(token)
             .build();
     }
 }

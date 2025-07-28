@@ -7,13 +7,16 @@ import com.nuriwoolim.pagebackend.core.security.CustomUserDetails;
 import com.nuriwoolim.pagebackend.domain.user.dto.LoginDTO;
 import com.nuriwoolim.pagebackend.domain.user.dto.LoginRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.TokenPair;
-import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserSignupRequest;
+import com.nuriwoolim.pagebackend.domain.user.entity.PendingUser;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
+import com.nuriwoolim.pagebackend.domain.user.repository.PendingUserRepository;
 import com.nuriwoolim.pagebackend.domain.user.repository.UserRepository;
 import com.nuriwoolim.pagebackend.domain.user.util.UserMapper;
+import com.nuriwoolim.pagebackend.global.email.service.EmailService;
 import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,18 +30,36 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final PendingUserRepository pendingUserRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenRepository refreshTokenRepository;
 
 
     @Transactional
-    public UserResponse signUp(UserSignupRequest userSignupRequest) {
-        User endcodedUser = UserMapper.fromUserCreateRequest(userSignupRequest,
-            passwordEncoder.encode(userSignupRequest.password()));
-        UserResponse response = UserMapper.toUserResponse(userRepository.save(endcodedUser));
-        return response;
+    public void signUp(UserSignupRequest userSignupRequest) {
+        if (userRepository.existsByEmail(userSignupRequest.email())) {
+            throw ErrorCode.DATA_CONFLICT.toException();
+        }
+        if (pendingUserRepository.existsByEmail(userSignupRequest.email())) {
+            pendingUserRepository.deleteByEmail(userSignupRequest.email());
+        }
+
+        String encodedPassword = passwordEncoder.encode(userSignupRequest.password());
+        String token = UUID.randomUUID().toString();
+
+        PendingUser pendingUser = UserMapper.fromUserCreateRequest(userSignupRequest,
+            encodedPassword, token);
+        pendingUserRepository.save(pendingUser);
+
+        emailService.sendVerificationEmail(pendingUser.getEmail(), token);
+    }
+
+    @Transactional
+    public void verifyEmail(String token) {
+        
     }
 
     @Transactional
