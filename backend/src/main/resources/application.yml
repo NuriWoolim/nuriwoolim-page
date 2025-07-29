@@ -1,7 +1,6 @@
 spring:
   application:
     name: backend
-
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/${DB_NAME}?serverTimezone=Asia/Seoul
@@ -26,12 +25,9 @@ spring:
           auth: true
           starttls:
             enable: true
-
 logging:
   level:
     root: INFO
-#    org.springframework: INFO
-#    org.springframework.web: DEBUG
 
 springdoc:
   swagger-ui:

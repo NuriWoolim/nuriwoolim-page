@@ -12,9 +12,20 @@ spring:
     hibernate:
       ddl-auto: validate
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 logging:
-  level:
-    root: info
+  config: classpath:logback-spring-prod.xml
+
 springdoc:
   swagger-ui:
     with-credentials: true
@@ -26,4 +37,7 @@ custom:
     expire:
       access: 3600_000 #1시간
       refresh: 259200_000 #3일
+      email: 600_000 # 10분
     secret-key: ${SECRET_KEY}
+  resendLimit: 5
+  frontUrl: ${FRONT_URL}
