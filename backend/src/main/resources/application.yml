@@ -25,12 +25,9 @@ spring:
           auth: true
           starttls:
             enable: true
-
 logging:
   level:
     root: INFO
-#    org.springframework: INFO
-#    org.springframework.web: DEBUG
 
 springdoc:
   swagger-ui:
