@@ -1,9 +1,9 @@
 package com.nuriwoolim.pagebackend.core.jwt.filter;
 
+import com.nuriwoolim.pagebackend.core.jwt.dto.JwtPrincipal;
 import com.nuriwoolim.pagebackend.core.jwt.dto.TokenBody;
 import com.nuriwoolim.pagebackend.core.jwt.util.JwtTokenProvider;
 import com.nuriwoolim.pagebackend.core.security.CustomEntryPoint;
-import com.nuriwoolim.pagebackend.core.security.CustomUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -11,6 +11,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -18,8 +19,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -29,7 +30,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final CustomUserDetailsService userDetailsService;
     private final CustomEntryPoint customEntryPoint;
 
     @Override
@@ -66,12 +66,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private void setAuthentication(String accessToken) {
         TokenBody tokenBody = jwtTokenProvider.parseJwt(accessToken);
-        UserDetails userDetails = userDetailsService.loadUserById(tokenBody.id());
-        log.debug("User: {}", userDetails);
+        JwtPrincipal jwtPrincipal = JwtPrincipal.of(tokenBody);
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-            userDetails,
+            jwtPrincipal,
             null,
-            userDetails.getAuthorities()
+            List.of(new SimpleGrantedAuthority(jwtPrincipal.getType()))
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);

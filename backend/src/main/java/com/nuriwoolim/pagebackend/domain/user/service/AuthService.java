@@ -118,12 +118,12 @@ public class AuthService {
     @Transactional
     public LoginDTO login(LoginRequest loginRequest) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-            loginRequest.username(),
+            loginRequest.email(),
             loginRequest.password());
         Authentication auth = authenticationManager.authenticate(authenticationToken);
         CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
 
-        TokenPair tokenPair = jwtTokenProvider.issueTokenPair(userDetails.getUser().getId());
+        TokenPair tokenPair = jwtTokenProvider.issueTokenPair(userDetails.getUser());
 
         Optional<RefreshToken> userRefreshToken = refreshTokenRepository.findByUser(
             userDetails.getUser());
@@ -147,8 +147,7 @@ public class AuthService {
         }
         Optional<RefreshToken> userRefreshToken = refreshTokenRepository.findByToken(refreshToken);
         if (userRefreshToken.isPresent()) {
-            Long userId = userRefreshToken.get().getUser().getId();
-            TokenPair tokenPair = jwtTokenProvider.issueTokenPair(userId);
+            TokenPair tokenPair = jwtTokenProvider.issueTokenPair(userRefreshToken.get().getUser());
 
             User user = userRefreshToken.get().getUser();
             user.setRefreshToken(null);
