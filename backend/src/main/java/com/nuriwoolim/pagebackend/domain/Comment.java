@@ -21,19 +21,22 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-        indexes = {
-                @Index(name = "idx_comment_writer", columnList = "writer_id"),
-                @Index(name = "idx_comment_post", columnList = "post_id")
-        }
+    indexes = {
+        @Index(name = "idx_comment_writer", columnList = "writer_id"),
+        @Index(name = "idx_comment_post", columnList = "post_id")
+    }
 )
 @Builder
 @AllArgsConstructor
+@SQLRestriction("deleted = false")
 public class Comment extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -49,12 +52,12 @@ public class Comment extends BaseEntity {
 
     @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY, optional = false)
     @JoinColumn(
-            nullable = false,
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+        nullable = false,
+        foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User writer;
     @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY, optional = false)
     @JoinColumn(
-            nullable = false,
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+        nullable = false,
+        foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Post post;
 }
