@@ -118,7 +118,7 @@ public class AuthService {
     @Transactional
     public LoginDTO login(LoginRequest loginRequest) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-            loginRequest.username(),
+            loginRequest.email(),
             loginRequest.password());
         Authentication auth = authenticationManager.authenticate(authenticationToken);
         CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
