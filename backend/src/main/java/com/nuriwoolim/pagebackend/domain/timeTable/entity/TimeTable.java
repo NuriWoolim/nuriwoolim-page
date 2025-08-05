@@ -5,6 +5,7 @@ import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -38,18 +39,21 @@ public class TimeTable extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, length = 20, nullable = false)
+    @Column(length = 20, nullable = false)
     private String title;
+
+    @Column(nullable = false)
+    private String team;
 
     @Column(length = 100)
     private String description;
-
+    
     @Column(nullable = false)
     private LocalDateTime start;
     @Column(nullable = false)
     private LocalDateTime end;
 
-    @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
         nullable = false,
         foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
