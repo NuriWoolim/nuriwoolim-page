@@ -1,4 +1,4 @@
-package com.nuriwoolim.pagebackend.domain;
+package com.nuriwoolim.pagebackend.domain.timeTable.entity;
 
 import com.nuriwoolim.pagebackend.core.BaseEntity;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
@@ -13,7 +13,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,12 +45,9 @@ public class TimeTable extends BaseEntity {
     private String description;
 
     @Column(nullable = false)
-    private Integer startHour;
+    private LocalDateTime start;
     @Column(nullable = false)
-    private Integer endHour;
-
-    @Column(nullable = false)
-    private LocalDate date;
+    private LocalDateTime end;
 
     @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY, optional = false)
     @JoinColumn(
