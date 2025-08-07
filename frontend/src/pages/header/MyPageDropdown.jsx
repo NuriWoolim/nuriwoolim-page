@@ -63,24 +63,11 @@ const MyPageDropdown = () => {
     >
       <DropdownToggle>최영현 님 ⌄</DropdownToggle>
       <DropdownMenu visible={visible}>
-        <MenuItem onClick={() => go("/mypage")}>내 정보 수정</MenuItem>
-        <MenuItem onClick={() => go("/edit-parent")}>학부모 정보 수정</MenuItem>
-        <MenuItem onClick={() => go("/change-password")}>
-          비밀번호 수정
+        <MenuItem onClick={() => go("/mypage")}>내 정보 보기</MenuItem>
+        <MenuItem onClick={() => go("/chnage-password")}>
+          내 비밀번호 수정
         </MenuItem>
-        <MenuItem onClick={() => go("/set-representative")}>
-          대표신문 설정
-        </MenuItem>
-        <MenuItem onClick={() => go("/push")}>PUSH함</MenuItem>
-        <MenuItem onClick={() => go("/mailbox")}>메일함</MenuItem>
-        <MenuItem onClick={() => go("/agreement")}>정보제공 동의</MenuItem>
-        <MenuItem onClick={() => go("/subscription")}>정보수신 동의</MenuItem>
-        <hr />
-        <MenuItem onClick={() => go("/env")}>환경설정</MenuItem>
-        <MenuItem onClick={() => go("/personalize")}>개인화 설정</MenuItem>
-        <MenuItem onClick={() => go("/theme")}>테마 설정</MenuItem>
-        <MenuItem onClick={() => go("/font")}>폰트 설정</MenuItem>
-        <MenuItem onClick={() => go("/shortcut")}>바로가기 설정</MenuItem>
+        <MenuItem onClick={() => go("/mybandschedule")}>내 합주 보기</MenuItem>
       </DropdownMenu>
     </DropdownContainer>
   );
