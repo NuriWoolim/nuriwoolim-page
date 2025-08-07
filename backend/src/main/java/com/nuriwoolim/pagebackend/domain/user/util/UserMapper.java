@@ -5,7 +5,10 @@ import com.nuriwoolim.pagebackend.domain.user.dto.UserSignupRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.VerificationResendResponse;
 import com.nuriwoolim.pagebackend.domain.user.entity.PendingUser;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserMapper {
 
     public static UserResponse toUserResponse(final User user) {

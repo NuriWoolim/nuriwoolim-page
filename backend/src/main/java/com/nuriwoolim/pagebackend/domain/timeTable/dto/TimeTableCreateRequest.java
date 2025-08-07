@@ -1,6 +1,7 @@
 package com.nuriwoolim.pagebackend.domain.timeTable.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.Builder;
 
@@ -11,7 +12,10 @@ public record TimeTableCreateRequest(
     String description,
     @NotBlank
     String team,
+
+    @NotNull
     LocalDateTime start,
+    @NotNull
     LocalDateTime end
 ) {
 
