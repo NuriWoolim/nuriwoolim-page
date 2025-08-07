@@ -57,7 +57,6 @@ public class JwtTokenProvider {
         return Jwts.builder()
             .subject(user.getId().toString())
             .claim("email", user.getEmail())
-            .claim("name", user.getName())
             .claim("type", user.getType().toString())
             .issuedAt(new Date())
             .expiration(new Date(new Date().getTime() + expTime))
@@ -86,13 +85,11 @@ public class JwtTokenProvider {
         Jws<Claims> claimsJws = getJwtParser().parseSignedClaims(token);
         Long id = Long.parseLong(claimsJws.getPayload().getSubject());
         String email = claimsJws.getPayload().get("email", String.class);
-        String name = claimsJws.getPayload().get("name", String.class);
         String type = claimsJws.getPayload().get("type", String.class);
 
         return TokenBody.builder()
             .id(id)
             .email(email)
-            .name(name)
             .type(type)
             .build();
     }
