@@ -148,6 +148,9 @@ const Header = () => {
 
             {isLoggedIn ? (
               <>
+                <button onClick={handleLogout} style={{ all: "unset" }}>
+                  Log out
+                </button>{" "}
                 <MyPageDropdown />
                 <LoginButton onClick={handleLogout}>Log out</LoginButton>
               </>
