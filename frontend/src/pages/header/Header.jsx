@@ -141,8 +141,8 @@ const Header = () => {
               <a href="#Home">Home</a>
               <a href="#Notice">Notice</a>
               <a href="#Archive">Archive</a>
+              <a href="#Equipment">Equipment</a>
               <a href="#Calendar">Calendar</a>
-              <a href="#Register">Register</a>
               <a href="#Wiki">Wiki</a>
             </NavLinks>
 
