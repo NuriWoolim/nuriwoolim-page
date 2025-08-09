@@ -25,19 +25,22 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-        indexes = {
-                @Index(name = "idx_post_writer", columnList = "writer_id"),
-                @Index(name = "idx_post_board", columnList = "board_id")
-        }
+    indexes = {
+        @Index(name = "idx_post_writer", columnList = "writer_id"),
+        @Index(name = "idx_post_board", columnList = "board_id")
+    }
 )
 @Builder
 @AllArgsConstructor
+@SQLRestriction("deleted = false")
 public class Post extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -56,18 +59,18 @@ public class Post extends BaseEntity {
 
     @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY, optional = false)
     @JoinColumn(
-            nullable = false,
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+        nullable = false,
+        foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User writer;
 
     @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY, optional = false)
     @JoinColumn(
-            nullable = false,
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+        nullable = false,
+        foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Board board;
 
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true,
-            cascade = {jakarta.persistence.CascadeType.REMOVE})
+        cascade = {jakarta.persistence.CascadeType.REMOVE})
     @Builder.Default
     private List<Comment> commentList = new ArrayList<>();
 }

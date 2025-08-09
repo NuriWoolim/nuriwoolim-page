@@ -3,6 +3,7 @@ package com.nuriwoolim.pagebackend.core.jwt.util;
 import com.nuriwoolim.pagebackend.core.jwt.JwtConfig;
 import com.nuriwoolim.pagebackend.core.jwt.dto.TokenBody;
 import com.nuriwoolim.pagebackend.domain.user.dto.TokenPair;
+import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtParser;
@@ -20,31 +21,47 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class JwtTokenProvider {
+
     private final JwtConfig jwtConfig;
     private final MacAlgorithm macAlgorithm = SIG.HS256;
 
-    public TokenPair issueTokenPair(Long userId) {
+    public TokenPair issueTokenPair(User user) {
         return new TokenPair(
-                issueAccessToken(userId),
-                issueRefreshToken(userId)
+            issueAccessToken(user),
+            issueRefreshToken(user)
         );
     }
 
-    public String issueAccessToken(Long userId) {
-        return issue(userId, jwtConfig.expire().access());
+    public String issueEmailToken(String email) {
+        return issue(email, jwtConfig.expire().email());
     }
 
-    public String issueRefreshToken(Long userId) {
-        return issue(userId, jwtConfig.expire().refresh());
+    public String issueAccessToken(User user) {
+        return issue(user, jwtConfig.expire().access());
     }
 
-    private String issue(Long userId, Long expTime) {
+    public String issueRefreshToken(User user) {
+        return issue(user, jwtConfig.expire().refresh());
+    }
+
+    private String issue(String email, Long expTime) {
         return Jwts.builder()
-                .subject(userId.toString())
-                .issuedAt(new Date())
-                .expiration(new Date(new Date().getTime() + expTime))
-                .signWith(getSecretKey(), macAlgorithm)
-                .compact();
+            .subject(email)
+            .issuedAt(new Date())
+            .expiration(new Date(new Date().getTime() + expTime))
+            .signWith(getSecretKey(), macAlgorithm)
+            .compact();
+    }
+
+    private String issue(User user, Long expTime) {
+        return Jwts.builder()
+            .subject(user.getId().toString())
+            .claim("email", user.getEmail())
+            .claim("type", user.getType().toString())
+            .issuedAt(new Date())
+            .expiration(new Date(new Date().getTime() + expTime))
+            .signWith(getSecretKey(), macAlgorithm)
+            .compact();
     }
 
     private SecretKey getSecretKey() {
@@ -60,16 +77,25 @@ public class JwtTokenProvider {
 
     private JwtParser getJwtParser() {
         return Jwts.parser()
-                .verifyWith(getSecretKey())
-                .build();
+            .verifyWith(getSecretKey())
+            .build();
     }
 
     public TokenBody parseJwt(String token) {
         Jws<Claims> claimsJws = getJwtParser().parseSignedClaims(token);
         Long id = Long.parseLong(claimsJws.getPayload().getSubject());
+        String email = claimsJws.getPayload().get("email", String.class);
+        String type = claimsJws.getPayload().get("type", String.class);
 
         return TokenBody.builder()
-                .id(id)
-                .build();
+            .id(id)
+            .email(email)
+            .type(type)
+            .build();
+    }
+
+    public String getSubject(String token) {
+        Jws<Claims> claimsJws = getJwtParser().parseSignedClaims(token);
+        return claimsJws.getPayload().getSubject();
     }
 }

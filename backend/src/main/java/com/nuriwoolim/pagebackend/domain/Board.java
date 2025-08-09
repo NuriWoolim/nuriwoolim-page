@@ -17,12 +17,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 
 @Getter
 @Entity
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLRestriction("deleted = false")
 public class Board extends BaseEntity {
 
     @Id
@@ -41,7 +43,7 @@ public class Board extends BaseEntity {
     private BoardType type = BoardType.OTHER;
 
     @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, orphanRemoval = true,
-            cascade = {jakarta.persistence.CascadeType.REMOVE})
+        cascade = {jakarta.persistence.CascadeType.REMOVE})
     @Builder.Default
     private List<Post> postList = new ArrayList<>();
 }

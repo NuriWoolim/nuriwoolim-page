@@ -14,16 +14,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Builder
 @Getter
 public class CustomUserDetails implements UserDetails {
+
     private final String username;
     private final String password;
     private final User user;
 
     public static CustomUserDetails of(User user) {
         return CustomUserDetails.builder()
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .user(user)
-                .build();
+            .username(user.getEmail())
+            .password(user.getPassword())
+            .user(user)
+            .build();
     }
 
     @Override
