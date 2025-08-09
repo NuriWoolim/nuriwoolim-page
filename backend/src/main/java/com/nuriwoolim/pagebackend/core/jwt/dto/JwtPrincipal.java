@@ -12,13 +12,11 @@ public class JwtPrincipal implements Principal {
 
     private final Long id;
     private final String email;
-    private final String name;
     private final String type;
 
     public static JwtPrincipal of(TokenBody tokenBody) {
         return JwtPrincipal.builder()
             .id(tokenBody.id())
-            .name(tokenBody.name())
             .email(tokenBody.email())
             .type(tokenBody.type())
             .build();

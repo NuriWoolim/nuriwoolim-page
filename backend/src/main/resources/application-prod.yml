@@ -41,3 +41,5 @@ custom:
     secret-key: ${SECRET_KEY}
   resendLimit: 5
   frontUrl: ${FRONT_URL}
+  cors:
+    origins: ${PRIVATE_ORIGINS}
