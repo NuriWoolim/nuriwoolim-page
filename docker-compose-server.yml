@@ -13,6 +13,7 @@ services:
       - FRONT_URL=${FRONT_URL}
       - EMAIL=${EMAIL}
       - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - PRIVATE_ORIGINS=${PRIVATE_ORIGINS}
       - SERVER_PORT=8080
     networks:
       - app-network
