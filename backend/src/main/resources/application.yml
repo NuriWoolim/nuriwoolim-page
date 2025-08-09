@@ -42,3 +42,5 @@ custom:
     secret-key: Q04DkgiuhVJ9fTCrBGTBJL4rr26mzP1czFELe7L74xB7Z+TOIt3KjGpzH4CTax5lzlqlJcCIpKzNf/g+59AWrA==
   resendLimit: 5
   frontUrl: http://localhost:8080
+  cors:
+    origins: ${PRIVATE_ORIGINS}
