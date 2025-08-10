@@ -34,6 +34,7 @@ public enum ErrorCode {
      */
     API_NOT_FOUND(HttpStatus.NOT_FOUND, "잘못된 경로입니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다."),
+    DATA_NOT_FOUND(HttpStatus.NOT_FOUND, "정보를 찾을 수 없습니다."),
 
     /*
      * 405 METHOD_NOT_ALLOWED: 허용되지 않은 Request Method 호출
