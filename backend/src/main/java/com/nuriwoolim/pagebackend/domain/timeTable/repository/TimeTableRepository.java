@@ -14,4 +14,13 @@ public interface TimeTableRepository extends JpaRepository<TimeTable, Long> {
     @Query("SELECT t FROM TimeTable t WHERE t.start >= :from AND t.end <= :to")
     List<TimeTable> findBetween(@Param("from") LocalDateTime from,
         @Param("to") LocalDateTime to);
+
+    @Query("""
+                SELECT COUNT(t) > 0 FROM TimeTable t WHERE
+                (t.start >= :from AND t.start < :to)
+                OR
+                (t.end > :from AND t.end <= :to)
+        """)
+    boolean existsTimeTableBetween(@Param("from") LocalDateTime from,
+        @Param("to") LocalDateTime to);
 }

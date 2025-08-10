@@ -52,6 +52,9 @@ public class TimeTableService {
         if (minutes > 120) {
             throw ErrorCode.BAD_REQUEST.toException("타임테이블이 너무 깁니다.");
         }
+        if (timeTableRepository.existsTimeTableBetween(start, end)) {
+            throw ErrorCode.DATA_CONFLICT.toException("다른 정보와 충돌합니다.");
+        }
     }
 
     @Transactional(readOnly = true)
