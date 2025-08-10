@@ -28,6 +28,7 @@ public enum ErrorCode {
      * 403 FORBIDDEN: 승인을 거부함
      */
     AUTHORITY_FORBIDDEN(HttpStatus.FORBIDDEN, "인가 실패"),
+    DATA_FORBIDDEN(HttpStatus.FORBIDDEN, "데이터에 권한이 없습니다."),
 
     /*
      * 404 NOT_FOUND: 리소스를 찾을 수 없음

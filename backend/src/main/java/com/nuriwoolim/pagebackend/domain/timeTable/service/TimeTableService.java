@@ -3,6 +3,7 @@ package com.nuriwoolim.pagebackend.domain.timeTable.service;
 import com.nuriwoolim.pagebackend.domain.timeTable.dto.TimeTableCreateRequest;
 import com.nuriwoolim.pagebackend.domain.timeTable.dto.TimeTableListResponse;
 import com.nuriwoolim.pagebackend.domain.timeTable.dto.TimeTableResponse;
+import com.nuriwoolim.pagebackend.domain.timeTable.dto.TimeTableUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.timeTable.entity.TimeTable;
 import com.nuriwoolim.pagebackend.domain.timeTable.repository.TimeTableRepository;
 import com.nuriwoolim.pagebackend.domain.timeTable.util.TimeTableMapper;
@@ -52,7 +53,7 @@ public class TimeTableService {
         if (minutes > 120) {
             throw ErrorCode.BAD_REQUEST.toException("타임테이블이 너무 깁니다.");
         }
-        if (timeTableRepository.existsTimeTableBetween(start, end)) {
+        if (timeTableRepository.existsTimeTableBetweenExcludingId(timeTable.getId(), start, end)) {
             throw ErrorCode.DATA_CONFLICT.toException("다른 정보와 충돌합니다.");
         }
     }
@@ -71,6 +72,30 @@ public class TimeTableService {
     public TimeTableListResponse findTimeTableList(LocalDateTime from, LocalDateTime to) {
         List<TimeTable> timeTables = timeTableRepository.findBetween(from, to);
         return TimeTableMapper.timeTableListResponse(timeTables, from, to);
+    }
+
+    @Transactional
+    public void deleteTimeTableById(Long id, Long actorId) {
+        validatePermission(getTimeTableById(id), actorId);
+        timeTableRepository.deleteById(id);
+    }
+
+    private void validatePermission(TimeTable timeTable, Long actorId) {
+        if (!timeTable.getUser().getId().equals(actorId) && !userService.isManager(actorId)) {
+            throw ErrorCode.DATA_FORBIDDEN.toException();
+        }
+    }
+
+    @Transactional
+    public TimeTableResponse updateTimeTable(Long id, TimeTableUpdateRequest request,
+        Long actorId) {
+        validatePermission(getTimeTableById(id), actorId);
+
+        TimeTable timeTable = getTimeTableById(id);
+        timeTable.update(request);
+
+        validateTimeTable(timeTable);
+        return TimeTableMapper.toTimeTableResponse(timeTable);
     }
 
 }

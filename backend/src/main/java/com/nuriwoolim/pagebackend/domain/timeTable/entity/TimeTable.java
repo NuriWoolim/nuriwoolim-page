@@ -1,6 +1,7 @@
 package com.nuriwoolim.pagebackend.domain.timeTable.entity;
 
 import com.nuriwoolim.pagebackend.core.BaseEntity;
+import com.nuriwoolim.pagebackend.domain.timeTable.dto.TimeTableUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -47,7 +48,7 @@ public class TimeTable extends BaseEntity {
 
     @Column(length = 100)
     private String description;
-    
+
     @Column(nullable = false)
     private LocalDateTime start;
     @Column(nullable = false)
@@ -58,4 +59,22 @@ public class TimeTable extends BaseEntity {
         nullable = false,
         foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User user;
+
+    public void update(TimeTableUpdateRequest request) {
+        if (request.title() != null) {
+            this.title = request.title();
+        }
+        if (request.team() != null) {
+            this.team = request.team();
+        }
+        if (request.description() != null) {
+            this.description = request.description();
+        }
+        if (request.start() != null) {
+            this.start = request.start();
+        }
+        if (request.end() != null) {
+            this.end = request.end();
+        }
+    }
 }

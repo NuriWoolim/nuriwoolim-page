@@ -17,10 +17,10 @@ public interface TimeTableRepository extends JpaRepository<TimeTable, Long> {
 
     @Query("""
                 SELECT COUNT(t) > 0 FROM TimeTable t WHERE
-                (t.start >= :from AND t.start < :to)
-                OR
-                (t.end > :from AND t.end <= :to)
+                (t.start < :to AND t.end > :from)
+                AND t.id != :excludeId
         """)
-    boolean existsTimeTableBetween(@Param("from") LocalDateTime from,
+    boolean existsTimeTableBetweenExcludingId(@Param("excludeId") Long excludeId,
+        @Param("from") LocalDateTime from,
         @Param("to") LocalDateTime to);
 }
