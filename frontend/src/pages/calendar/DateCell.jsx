@@ -17,19 +17,9 @@ const Plan = styled.div`
   border: 1px orange solid;
 `;
 
-const DateCell = ({ dateObj }) => {
+const DateCell = ({ dateObj, color }) => {
   const date = new Date(dateObj);
   const today = new Date();
-
-  let color;
-  if (date.getDay() === 0) {
-    color = date.getMonth() === today.getMonth() ? "red" : "rgba(255,0,0,0.7)";
-  } else if (date.getDay() === 6) {
-    color =
-      date.getMonth() === today.getMonth() ? "cyan" : "rgba(0,255,255,0.7)";
-  } else {
-    color = date.getMonth() === today.getMonth() ? "black" : "gray";
-  }
 
   return (
     <DateCellContainer $color={color}>
