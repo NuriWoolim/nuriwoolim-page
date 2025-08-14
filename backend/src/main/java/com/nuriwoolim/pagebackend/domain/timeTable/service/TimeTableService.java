@@ -12,6 +12,7 @@ import com.nuriwoolim.pagebackend.domain.user.service.UserService;
 import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,21 +26,23 @@ public class TimeTableService {
     private final UserService userService;
 
     @Transactional
-    public TimeTableResponse create(TimeTableCreateRequest request, Long userId) {
-        User user = userService.getUserById(userId);
+    public TimeTableResponse create(TimeTableCreateRequest request, Long actorId) {
+        User user = userService.getUserById(actorId);
         TimeTable timeTable = TimeTableMapper.fromTimeTableCreateRequest(request, user);
-        validateTimeTable(timeTable);
+        validateTimeTable(timeTable, actorId);
 
         TimeTable timetable = timeTableRepository.save(timeTable);
         return TimeTableMapper.toTimeTableResponse(timetable);
     }
 
-    private void validateTimeTable(TimeTable timeTable) {
+    private void validateTimeTable(TimeTable timeTable, Long actorId) {
         LocalDateTime start = timeTable.getStart();
         LocalDateTime end = timeTable.getEnd();
+        //시작시간과 종료시간의 순서가 맞지 않는 경우
         if (!start.isBefore(end)) {
             throw ErrorCode.BAD_REQUEST.toException("시간이 잘못되었습니다.");
         }
+        // 분 이하 단위가 있는 경우
         if (start.getMinute() != 0 ||
             start.getSecond() != 0 ||
             start.getNano() != 0 ||
@@ -48,11 +51,17 @@ public class TimeTableService {
             end.getNano() != 0) {
             throw ErrorCode.BAD_REQUEST.toException("시간이 잘못되었습니다.");
         }
-
+        // 22시~익일9시 사이일경우
+        if (start.toLocalTime().isBefore(LocalTime.of(9, 0)) || end.toLocalTime()
+            .isAfter(LocalTime.of(22, 0))) {
+            throw ErrorCode.BAD_REQUEST.toException("시간이 잘못되었습니다.");
+        }
+        // 운영자가 아닌데 2시간 이상을 잡을경우
         long minutes = Duration.between(timeTable.getStart(), timeTable.getEnd()).toMinutes();
-        if (minutes > 120) {
+        if (minutes > 120 || !userService.isManager(actorId)) {
             throw ErrorCode.BAD_REQUEST.toException("타임테이블이 너무 깁니다.");
         }
+        // 다른 정보와 겹칠경우
         if (timeTableRepository.existsTimeTableBetweenExcludingId(timeTable.getId(), start, end)) {
             throw ErrorCode.DATA_CONFLICT.toException("다른 정보와 충돌합니다.");
         }
@@ -94,7 +103,7 @@ public class TimeTableService {
         TimeTable timeTable = getTimeTableById(id);
         timeTable.update(request);
 
-        validateTimeTable(timeTable);
+        validateTimeTable(timeTable, actorId);
         return TimeTableMapper.toTimeTableResponse(timeTable);
     }
 
