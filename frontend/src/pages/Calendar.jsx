@@ -43,11 +43,11 @@ const CalendarWrapper = styled.div`
 
 const GridContainer = styled.div`
   display: grid;
-  grid-template-columns: repeat(7, 100px);
-  grid-template-rows: 30px repeat(6, 110px);
+  grid-template-columns: repeat(7, calc(100% / 7));
+  grid-template-rows: 30px repeat(6, 120px);
+  width: 100%;
 
   border: 2px black solid;
-  width: 700px;
 `;
 
 const WeekDayCell = styled.div`
