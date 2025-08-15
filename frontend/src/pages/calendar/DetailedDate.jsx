@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import styled, { css } from "styled-components";
+import _ from "lodash";
 
 const DetailedDateContainer = styled.div`
   background-color: orange;
@@ -65,7 +66,7 @@ const DetailedDate = ({ timeTables }) => {
   }, []);
 
   const handleTouchMove = useCallback(
-    (e) => {
+    _.throttle((e) => {
       if (isTouched === -1) return;
 
       const clientX = e.type.startsWith("touch")
@@ -100,7 +101,7 @@ const DetailedDate = ({ timeTables }) => {
       console.log(st_col, cur_col);
 
       setSelectedCells(newSelected);
-    },
+    }, 75),
     [isTouched]
   );
   useEffect(() => {
@@ -125,12 +126,11 @@ const DetailedDate = ({ timeTables }) => {
 
   return (
     <DetailedDateContainer>
+      <h1>{timeTables.from.split("T")[0]}</h1>
       <GridContainer
         className="grid-container"
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        onMouseDown={handleTouchStart}
-        onMouseUp={handleTouchEnd}
+        onPointerDown={handleTouchStart}
+        onPointerUp={handleTouchEnd}
       >
         {times.map((time, index) => (
           <TableCell
@@ -144,7 +144,6 @@ const DetailedDate = ({ timeTables }) => {
         ))}
       </GridContainer>
 
-      <h1>{timeTables.from.split("T")[0]}</h1>
       {timeTables.timetables.map((timetable, index) => (
         <div key={index}>
           <div>{timetable.title}</div>
