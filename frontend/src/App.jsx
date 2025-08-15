@@ -11,7 +11,6 @@ import SignupTerms from "./pages/accounts/SignupTerms";
 import Modal from "react-modal";
 
 Modal.setAppElement("#root");
-// document.getElementById("root");
 const App = () => {
   return (
     <BrowserRouter>
