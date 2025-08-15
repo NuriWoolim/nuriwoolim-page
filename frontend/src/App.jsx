@@ -8,7 +8,10 @@ import Main from "./pages/Main";
 import FindMyId from "./pages/accounts/FindMyId";
 import FindMyPw from "./pages/accounts/FindMyPw";
 import SignupTerms from "./pages/accounts/SignupTerms";
+import Modal from "react-modal";
 
+Modal.setAppElement("#root");
+// document.getElementById("root");
 const App = () => {
   return (
     <BrowserRouter>

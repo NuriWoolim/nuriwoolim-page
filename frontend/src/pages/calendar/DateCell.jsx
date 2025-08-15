@@ -1,6 +1,7 @@
 import { React, useState, useEffect } from "react";
 import styled from "styled-components";
 import { TimeTableAPI } from "../../apis/common";
+import CustomModal from "../CustomModal";
 import DetailedDate from "./detailedDate";
 
 const DateCellContainer = styled.div`
@@ -26,7 +27,11 @@ const DateCell = ({ dateObj, color }) => {
   const date = new Date(dateObj);
   const today = new Date();
 
-  const [timeTables, setTimeTables] = useState({ timetables: [] });
+  const [timeTables, setTimeTables] = useState({
+    from: "",
+    to: "",
+    timetables: [],
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -45,15 +50,18 @@ const DateCell = ({ dateObj, color }) => {
     getTimeTables();
   }, []);
 
-  
+  const [isDetailedDateOpen, setIsDetailedDateOpen] = useState(false);
 
   return (
     <>
-      <DateCellContainer $color={color}>
+      <DateCellContainer
+        $color={color}
+        onClick={() => setIsDetailedDateOpen(true)}
+      >
         <h2>{date.getDate()}</h2>
 
-        {timeTables.timetables.slice(0, 2).map((timetable) => (
-          <TimeTableContainer>
+        {timeTables.timetables.slice(0, 2).map((timetable, index) => (
+          <TimeTableContainer key={index}>
             {timetable.start.split("T")[1]} {timetable.title}
           </TimeTableContainer>
         ))}
@@ -63,7 +71,12 @@ const DateCell = ({ dateObj, color }) => {
         )}
       </DateCellContainer>
 
-      {/* <DetailedDate timeTables={timeTables} /> */}
+      <CustomModal
+        isOpen={isDetailedDateOpen}
+        onRequestClose={() => setIsDetailedDateOpen(false)}
+      >
+        <DetailedDate timeTables={timeTables} />
+      </CustomModal>
     </>
   );
 };
