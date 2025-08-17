@@ -17,11 +17,16 @@ const DetailedDate = ({ timeTables }) => {
     tempDate.setMinutes(tempDate.getMinutes() + 30);
   }
 
+  //   const [selectedTimeTable, setselectedTimeTable] = useState();
   return (
     <DetailedDateContainer>
       <h1>{timeTables.from.split("T")[0]}</h1>
 
-      <DraggableTable dataArray={times} />
+      <DraggableTable
+        times={times}
+        timeTables={timeTables}
+        enableChange={true}
+      />
       {timeTables.timetables.map((timetable, index) => (
         <div key={index}>
           <div>{timetable.title}</div>

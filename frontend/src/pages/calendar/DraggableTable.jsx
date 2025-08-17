@@ -4,7 +4,7 @@ import _ from "lodash";
 
 const GridContainer = styled.div`
   display: grid;
-  grid-template-columns: repeat(${(props) => props.length}, 1fr);
+  grid-template-columns: repeat(${(props) => props.$length}, 1fr);
   grid-template-rows: 100px;
   border: solid 1px black;
   /* overflow: hidden; */
@@ -21,14 +21,37 @@ const TableCell = styled.div`
 
   font-size: 0.8rem;
 
-  background-color: ${(props) => (props.$selected ? "green" : "red")};
+  background-color: ${(props) => props.$color};
 `;
 
-const DraggableTable = ({ dataArray, ...props }) => {
+const DraggableTable = ({ times, timeTables, enableChange = false }) => {
   const [isTouched, setIsTouched] = useState(-1);
-  const [selectedCells, setSelectedCells] = useState(
-    Array.from({ length: dataArray.length }, () => null)
+  const [cellDataArr, setcellDataArr] = useState(
+    Array.from({ length: times.length }, () => null)
   );
+
+  const initTable = useEffect(() => {
+    for (let i = 0; i < timeTables.timetables.length; i++) {
+      const parseTime = (str) => {
+        const [datePart, timePart] = str.split("T");
+        const [year, month, day] = datePart.split("-").map(Number);
+        const [hour, minute] = timePart.split(":").map(Number);
+        return (hour * 60 + minute - 9 * 60) / 30;
+      };
+
+      const startidx = parseTime(timeTables.timetables[i].start);
+      const endidx = parseTime(timeTables.timetables[i].end);
+
+      setcellDataArr((prevSelected) => {
+        const newSelected = [...prevSelected];
+
+        for (let j = startidx; j < endidx; j++) {
+          newSelected[j] = timeTables.timetables[i];
+        }
+        return newSelected;
+      });
+    }
+  }, []);
 
   // 이벤트 핸들러 함수들을 useCallback으로 메모이제이션
   const handleTouchStart = useCallback((e) => {
@@ -38,11 +61,13 @@ const DraggableTable = ({ dataArray, ...props }) => {
 
     const col = parseInt(target.dataset.key, 10);
 
-    setSelectedCells((prevSelected) => {
-      const newSelected = new Array(...prevSelected);
+    setcellDataArr((prevSelected) => {
+      const newSelected = [...prevSelected];
 
-      if (newSelected[col] === null) newSelected[col] = 1;
-      else newSelected[col] = null;
+      if (newSelected[col] === 1 || newSelected[col] === null) {
+        if (newSelected[col] === null) newSelected[col] = 1;
+        else newSelected[col] = null;
+      }
       return newSelected;
     });
 
@@ -70,7 +95,7 @@ const DraggableTable = ({ dataArray, ...props }) => {
       const st_col = isTouched;
 
       let add_dates = true;
-      if (selectedCells[st_col] === null) add_dates = false;
+      if (cellDataArr[st_col] === null) add_dates = false;
 
       if (target.getAttribute("data-key") == null) return;
       const cur_col = +target.getAttribute("data-key");
@@ -78,19 +103,20 @@ const DraggableTable = ({ dataArray, ...props }) => {
       // console.log(cur_col, lastTouchedCol)
       //////////
 
-      const newSelected = new Array(...selectedCells);
+      const newSelected = [...cellDataArr];
 
       const minCol = Math.min(st_col, cur_col);
       const maxCol = Math.max(st_col, cur_col);
 
       for (let c = minCol; c <= maxCol; c++) {
         if (c == st_col) continue;
+        if (newSelected[c] !== 1 && newSelected[c] !== null) continue;
         if (add_dates) newSelected[c] = 1;
         else newSelected[c] = null;
       }
       //   console.log(st_col, cur_col);
 
-      setSelectedCells(newSelected);
+      setcellDataArr(newSelected);
     }, 75),
     [isTouched]
   );
@@ -115,15 +141,21 @@ const DraggableTable = ({ dataArray, ...props }) => {
   }, [isTouched]);
   return (
     <GridContainer
-      onPointerDown={handleTouchStart}
-      onPointerUp={handleTouchEnd}
-      length={dataArray.length}
+      onPointerDown={enableChange ? handleTouchStart : undefined}
+      onPointerUp={enableChange ? handleTouchEnd : undefined}
+      $length={times.length}
     >
-      {dataArray.map((time, index) => (
+      {times.map((time, index) => (
         <TableCell
           key={index}
           data-key={index}
-          $selected={selectedCells[index] !== null}
+          $color={
+            cellDataArr[index] === null
+              ? "white"
+              : cellDataArr[index] === 1
+              ? "green"
+              : cellDataArr[index]?.color ?? "white"
+          }
         >
           {String(time.getHours()).padStart(2, "0")}:
           {String(time.getMinutes()).padStart(2, "0")}
