@@ -49,6 +49,9 @@ public class TimeTable extends BaseEntity {
     @Column(length = 100)
     private String description;
 
+    @Column(length = 6)
+    private String color;
+
     @Column(nullable = false)
     private LocalDateTime start;
     @Column(nullable = false)
@@ -75,6 +78,9 @@ public class TimeTable extends BaseEntity {
         }
         if (request.end() != null) {
             this.end = request.end();
+        }
+        if (request.color() != null) {
+            this.color = request.color();
         }
     }
 }

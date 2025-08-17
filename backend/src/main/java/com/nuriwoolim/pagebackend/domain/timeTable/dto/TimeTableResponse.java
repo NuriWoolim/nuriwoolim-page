@@ -9,6 +9,7 @@ public record TimeTableResponse(
     String title,
     String team,
     String description,
+    String color,
     LocalDateTime start,
     LocalDateTime end) {
 

@@ -21,6 +21,7 @@ public class TimeTableMapper {
             .start(request.start())
             .end(request.end())
             .user(user)
+            .color(request.color())
             .build();
     }
 
@@ -32,6 +33,7 @@ public class TimeTableMapper {
             .team(timeTable.getTeam())
             .start(timeTable.getStart())
             .end(timeTable.getEnd())
+            .color(timeTable.getColor())
             .build();
     }
 
