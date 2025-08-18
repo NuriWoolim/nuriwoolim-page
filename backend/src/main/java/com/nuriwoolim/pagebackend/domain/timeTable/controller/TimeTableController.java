@@ -6,6 +6,7 @@ import com.nuriwoolim.pagebackend.domain.timeTable.dto.TimeTableListResponse;
 import com.nuriwoolim.pagebackend.domain.timeTable.dto.TimeTableResponse;
 import com.nuriwoolim.pagebackend.domain.timeTable.dto.TimeTableUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.timeTable.service.TimeTableService;
+import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,7 +30,8 @@ public class TimeTableController {
     private final TimeTableService timeTableService;
 
     @PostMapping
-    public ResponseEntity<TimeTableResponse> create(@RequestBody TimeTableCreateRequest request,
+    public ResponseEntity<TimeTableResponse> create(
+        @Valid @RequestBody TimeTableCreateRequest request,
         @AuthenticationPrincipal JwtPrincipal principal) {
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(timeTableService.create(request, principal.getId()));
@@ -56,7 +58,7 @@ public class TimeTableController {
     @PatchMapping("/{timetableId}")
     public ResponseEntity<TimeTableResponse> update(
         @PathVariable Long timetableId,
-        @RequestBody TimeTableUpdateRequest request,
+        @Valid @RequestBody TimeTableUpdateRequest request,
         @AuthenticationPrincipal JwtPrincipal principal) {
         return ResponseEntity.ok(
             timeTableService.updateTimeTable(timetableId, request, principal.getId()));

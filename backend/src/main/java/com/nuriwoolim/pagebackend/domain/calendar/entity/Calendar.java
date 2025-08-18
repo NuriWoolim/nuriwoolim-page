@@ -55,6 +55,7 @@ public class Calendar extends BaseEntity {
             this.end = request.end();
         }
         if (request.color() != null) {
+            this.color = request.color();
         }
     }
 }

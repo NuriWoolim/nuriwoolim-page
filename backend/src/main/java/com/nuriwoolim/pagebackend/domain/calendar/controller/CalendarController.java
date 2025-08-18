@@ -6,6 +6,7 @@ import com.nuriwoolim.pagebackend.domain.calendar.dto.CalendarListResponse;
 import com.nuriwoolim.pagebackend.domain.calendar.dto.CalendarResponse;
 import com.nuriwoolim.pagebackend.domain.calendar.dto.CalendarUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.calendar.service.CalendarService;
+import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,7 +30,8 @@ public class CalendarController {
     private final CalendarService calendarService;
 
     @PostMapping
-    public ResponseEntity<CalendarResponse> create(@RequestBody CalendarCreateRequest request,
+    public ResponseEntity<CalendarResponse> create(
+        @Valid @RequestBody CalendarCreateRequest request,
         @AuthenticationPrincipal JwtPrincipal principal) {
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(calendarService.create(request, principal.getId()));
@@ -56,7 +58,7 @@ public class CalendarController {
     @PatchMapping("/{calendarId}")
     public ResponseEntity<CalendarResponse> update(
         @PathVariable Long calendarId,
-        @RequestBody CalendarUpdateRequest request,
+        @Valid @RequestBody CalendarUpdateRequest request,
         @AuthenticationPrincipal JwtPrincipal principal) {
         return ResponseEntity.ok(
             calendarService.updateCalendar(calendarId, request, principal.getId()));
