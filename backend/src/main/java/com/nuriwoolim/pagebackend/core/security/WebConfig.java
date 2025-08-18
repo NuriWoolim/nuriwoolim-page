@@ -15,7 +15,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        List<String> allowedOrigins = new ArrayList<String>();
+        List<String> allowedOrigins = new ArrayList<>();
         allowedOrigins.addAll(List.of("http://localhost:3000",
             "http://localhost:8080",
             "http://localhost:5500",

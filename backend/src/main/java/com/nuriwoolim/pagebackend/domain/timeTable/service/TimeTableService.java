@@ -58,7 +58,7 @@ public class TimeTableService {
         }
         // 운영자가 아닌데 2시간 이상을 잡을경우
         long minutes = Duration.between(timeTable.getStart(), timeTable.getEnd()).toMinutes();
-        if (minutes > 120 || !userService.isManager(actorId)) {
+        if (minutes > 120 && !userService.isManager(actorId)) {
             throw ErrorCode.BAD_REQUEST.toException("타임테이블이 너무 깁니다.");
         }
         // 다른 정보와 겹칠경우
@@ -98,9 +98,9 @@ public class TimeTableService {
     @Transactional
     public TimeTableResponse updateTimeTable(Long id, TimeTableUpdateRequest request,
         Long actorId) {
-        validatePermission(getTimeTableById(id), actorId);
-
         TimeTable timeTable = getTimeTableById(id);
+        validatePermission(timeTable, actorId);
+
         timeTable.update(request);
 
         validateTimeTable(timeTable, actorId);
