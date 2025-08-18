@@ -11,24 +11,54 @@ const GridContainer = styled.div`
 `;
 
 const TableCell = styled.div`
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-right: 1px solid #ccc;
+  /* box-sizing: border-box; */
   cursor: pointer;
-  user-select: none;
 
   font-size: 0.8rem;
+  overflow: hidden;
+  text-overflow: clip;
+  /* border-right: solid 1px #ccc; */
 
   background-color: ${(props) => props.$color};
+
+  user-select: none;
+`;
+
+const TTTitleContainer = styled.div`
+  top: -102px;
+  position: relative;
+  display: grid;
+  grid-template-rows: 100px;
+  border: solid 1px black;
+
+  background: transparent;
+  pointer-events: none;
+`;
+
+const TTTCell = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  text-overflow: clip;
+
+  background: transparent;
+  pointer-events: none;
+
+  /* 마지막 요소는 오른쪽 보더 제거 */
+  &:last-child {
+    border-right: none;
+  }
 `;
 
 const DraggableTable = ({ times, timeTables, enableChange = false }) => {
   const [isTouched, setIsTouched] = useState(-1);
-  const [cellDataArr, setcellDataArr] = useState(
+  const [cells, setCells] = useState(
     Array.from({ length: times.length }, () => null)
   );
+  const [TTTCells, setTTTCells] = useState([]);
+  const [TTTStyle, setTTTStyle] = useState("");
 
   const initTable = useEffect(() => {
     for (let i = 0; i < timeTables.timetables.length; i++) {
@@ -42,7 +72,7 @@ const DraggableTable = ({ times, timeTables, enableChange = false }) => {
       const startidx = parseTime(timeTables.timetables[i].start);
       const endidx = parseTime(timeTables.timetables[i].end);
 
-      setcellDataArr((prevSelected) => {
+      setCells((prevSelected) => {
         const newSelected = [...prevSelected];
 
         for (let j = startidx; j < endidx; j++) {
@@ -53,6 +83,31 @@ const DraggableTable = ({ times, timeTables, enableChange = false }) => {
     }
   }, []);
 
+  useEffect(() => {
+    let prev = null;
+    let cnt = 0;
+    let cssstr = "";
+    let cellData = [];
+
+    for (let i = 0; i < times.length; i++) {
+      if (i === 0 || cells[i] === prev) cnt++;
+      else {
+        cssstr += String(cnt) + "." + String(cnt) + "fr ";
+
+        if (prev === null) cellData.push(null);
+        else cellData.push({ title: prev.title, team: prev.team });
+        cnt = 1;
+      }
+      prev = cells[i];
+    }
+    if (prev === null) cellData.push(null);
+    else cellData.push({ title: prev.title, team: prev.team });
+    cssstr += String(cnt) + "." + String(cnt) + "fr ";
+
+    setTTTStyle(cssstr);
+    setTTTCells(cellData);
+  }, [cells]);
+
   // 이벤트 핸들러 함수들을 useCallback으로 메모이제이션
   const handleTouchStart = useCallback((e) => {
     // if (isTouched != -1) return;
@@ -61,7 +116,7 @@ const DraggableTable = ({ times, timeTables, enableChange = false }) => {
 
     const col = parseInt(target.dataset.key, 10);
 
-    setcellDataArr((prevSelected) => {
+    setCells((prevSelected) => {
       const newSelected = [...prevSelected];
 
       if (newSelected[col] === 1 || newSelected[col] === null) {
@@ -95,7 +150,7 @@ const DraggableTable = ({ times, timeTables, enableChange = false }) => {
       const st_col = isTouched;
 
       let add_dates = true;
-      if (cellDataArr[st_col] === null) add_dates = false;
+      if (cells[st_col] === null) add_dates = false;
 
       if (target.getAttribute("data-key") == null) return;
       const cur_col = +target.getAttribute("data-key");
@@ -103,7 +158,7 @@ const DraggableTable = ({ times, timeTables, enableChange = false }) => {
       // console.log(cur_col, lastTouchedCol)
       //////////
 
-      const newSelected = [...cellDataArr];
+      const newSelected = [...cells];
 
       const minCol = Math.min(st_col, cur_col);
       const maxCol = Math.max(st_col, cur_col);
@@ -116,7 +171,7 @@ const DraggableTable = ({ times, timeTables, enableChange = false }) => {
       }
       //   console.log(st_col, cur_col);
 
-      setcellDataArr(newSelected);
+      setCells(newSelected);
     }, 75),
     [isTouched]
   );
@@ -140,28 +195,43 @@ const DraggableTable = ({ times, timeTables, enableChange = false }) => {
     };
   }, [isTouched]);
   return (
-    <GridContainer
-      onPointerDown={enableChange ? handleTouchStart : undefined}
-      onPointerUp={enableChange ? handleTouchEnd : undefined}
-      $length={times.length}
-    >
-      {times.map((time, index) => (
-        <TableCell
-          key={index}
-          data-key={index}
-          $color={
-            cellDataArr[index] === null
-              ? "white"
-              : cellDataArr[index] === 1
-              ? "green"
-              : cellDataArr[index]?.color ?? "white"
-          }
-        >
-          {String(time.getHours()).padStart(2, "0")}:
-          {String(time.getMinutes()).padStart(2, "0")}
-        </TableCell>
-      ))}
-    </GridContainer>
+    <>
+      <GridContainer
+        onPointerDown={enableChange ? handleTouchStart : undefined}
+        onPointerUp={enableChange ? handleTouchEnd : undefined}
+        $length={times.length}
+      >
+        {times.map((time, index) => (
+          <TableCell
+            key={index}
+            data-key={index}
+            $color={
+              cells[index] === null
+                ? "white"
+                : cells[index] === 1
+                ? "green"
+                : cells[index]?.color ?? "white"
+            }
+          >
+            {String(time.getHours()).padStart(2, "0")}:
+            {String(time.getMinutes()).padStart(2, "0")}
+          </TableCell>
+        ))}
+      </GridContainer>
+      <TTTitleContainer
+        id="TTTitleContainer"
+        style={{
+          gridTemplateColumns: TTTStyle,
+        }}
+      >
+        {TTTCells.map((cell, index) => (
+          <TTTCell key={index}>
+            <div>{TTTCells[index] === null ? null : TTTCells[index].title}</div>
+            <div>{TTTCells[index] === null ? null : TTTCells[index].team}</div>
+          </TTTCell>
+        ))}
+      </TTTitleContainer>
+    </>
   );
 };
 export default DraggableTable;
