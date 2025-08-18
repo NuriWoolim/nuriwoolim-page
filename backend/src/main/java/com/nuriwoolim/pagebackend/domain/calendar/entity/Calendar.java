@@ -1,7 +1,7 @@
 package com.nuriwoolim.pagebackend.domain.calendar.entity;
 
 import com.nuriwoolim.pagebackend.core.BaseEntity;
-import com.nuriwoolim.pagebackend.domain.timeTable.dto.TimeTableUpdateRequest;
+import com.nuriwoolim.pagebackend.domain.calendar.dto.CalendarUpdateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -41,8 +41,7 @@ public class Calendar extends BaseEntity {
     @Column(nullable = false)
     private LocalDateTime end;
 
-    //TODO: 변경
-    public void update(TimeTableUpdateRequest request) {
+    public void update(CalendarUpdateRequest request) {
         if (request.title() != null) {
             this.title = request.title();
         }

@@ -28,11 +28,11 @@ public class TimeTableService {
     @Transactional
     public TimeTableResponse create(TimeTableCreateRequest request, Long actorId) {
         User user = userService.getUserById(actorId);
-        TimeTable timeTable = TimeTableMapper.fromTimeTableCreateRequest(request, user);
-        validateTimeTable(timeTable, actorId);
+        TimeTable timetable = TimeTableMapper.fromTimeTableCreateRequest(request, user);
+        validateTimeTable(timetable, actorId);
 
-        TimeTable timetable = timeTableRepository.save(timeTable);
-        return TimeTableMapper.toTimeTableResponse(timetable);
+        TimeTable savedTimetable = timeTableRepository.save(timetable);
+        return TimeTableMapper.toTimeTableResponse(savedTimetable);
     }
 
     private void validateTimeTable(TimeTable timeTable, Long actorId) {
@@ -80,7 +80,7 @@ public class TimeTableService {
     @Transactional(readOnly = true)
     public TimeTableListResponse findTimeTableList(LocalDateTime from, LocalDateTime to) {
         List<TimeTable> timeTables = timeTableRepository.findBetween(from, to);
-        return TimeTableMapper.timeTableListResponse(timeTables, from, to);
+        return TimeTableMapper.toTimeTableListResponse(timeTables, from, to);
     }
 
     @Transactional

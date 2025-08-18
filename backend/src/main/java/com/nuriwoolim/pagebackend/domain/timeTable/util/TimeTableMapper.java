@@ -37,13 +37,13 @@ public class TimeTableMapper {
             .build();
     }
 
-    public static TimeTableListResponse timeTableListResponse(List<TimeTable> timeTables,
+    public static TimeTableListResponse toTimeTableListResponse(List<TimeTable> timeTables,
         LocalDateTime from,
         LocalDateTime to) {
         return TimeTableListResponse.builder()
             .from(from)
             .to(to)
-            .timetables(timeTables.stream().map(TimeTableMapper::toTimeTableResponse).toList())
+            .data(timeTables.stream().map(TimeTableMapper::toTimeTableResponse).toList())
             .build();
     }
 }
