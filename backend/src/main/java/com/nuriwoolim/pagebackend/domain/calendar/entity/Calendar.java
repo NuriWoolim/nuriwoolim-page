@@ -1,20 +1,12 @@
-package com.nuriwoolim.pagebackend.domain.timeTable.entity;
+package com.nuriwoolim.pagebackend.domain.calendar.entity;
 
 import com.nuriwoolim.pagebackend.core.BaseEntity;
-import com.nuriwoolim.pagebackend.domain.timeTable.dto.TimeTableUpdateRequest;
-import com.nuriwoolim.pagebackend.domain.user.entity.User;
+import com.nuriwoolim.pagebackend.domain.calendar.dto.CalendarUpdateRequest;
 import jakarta.persistence.Column;
-import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -26,15 +18,10 @@ import org.hibernate.annotations.SQLRestriction;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(
-    indexes = {
-        @Index(name = "idx_schedule_user", columnList = "user_id"),
-    }
-)
 @Builder
 @AllArgsConstructor
 @SQLRestriction("deleted = false")
-public class TimeTable extends BaseEntity {
+public class Calendar extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,9 +29,6 @@ public class TimeTable extends BaseEntity {
 
     @Column(length = 20, nullable = false)
     private String title;
-
-    @Column(nullable = false)
-    private String team;
 
     @Column(length = 100)
     private String description;
@@ -57,18 +41,9 @@ public class TimeTable extends BaseEntity {
     @Column(nullable = false)
     private LocalDateTime end;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(
-        nullable = false,
-        foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private User user;
-
-    public void update(TimeTableUpdateRequest request) {
+    public void update(CalendarUpdateRequest request) {
         if (request.title() != null) {
             this.title = request.title();
-        }
-        if (request.team() != null) {
-            this.team = request.team();
         }
         if (request.description() != null) {
             this.description = request.description();

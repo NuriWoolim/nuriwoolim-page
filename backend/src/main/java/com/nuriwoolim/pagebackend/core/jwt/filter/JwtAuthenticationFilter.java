@@ -52,6 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 } catch (ExpiredJwtException e) {
                     SecurityContextHolder.clearContext();
                     customEntryPoint.commenceExpiredToken(response);
+                    return;
                 } catch (JwtException | IllegalArgumentException e) {
                     throw new BadCredentialsException("Invalid token");
                 }

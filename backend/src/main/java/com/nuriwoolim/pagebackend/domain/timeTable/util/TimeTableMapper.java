@@ -1,9 +1,12 @@
 package com.nuriwoolim.pagebackend.domain.timeTable.util;
 
 import com.nuriwoolim.pagebackend.domain.timeTable.dto.TimeTableCreateRequest;
+import com.nuriwoolim.pagebackend.domain.timeTable.dto.TimeTableListResponse;
 import com.nuriwoolim.pagebackend.domain.timeTable.dto.TimeTableResponse;
 import com.nuriwoolim.pagebackend.domain.timeTable.entity.TimeTable;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -18,6 +21,7 @@ public class TimeTableMapper {
             .start(request.start())
             .end(request.end())
             .user(user)
+            .color(request.color())
             .build();
     }
 
@@ -29,6 +33,17 @@ public class TimeTableMapper {
             .team(timeTable.getTeam())
             .start(timeTable.getStart())
             .end(timeTable.getEnd())
+            .color(timeTable.getColor())
+            .build();
+    }
+
+    public static TimeTableListResponse toTimeTableListResponse(List<TimeTable> timeTables,
+        LocalDateTime from,
+        LocalDateTime to) {
+        return TimeTableListResponse.builder()
+            .from(from)
+            .to(to)
+            .data(timeTables.stream().map(TimeTableMapper::toTimeTableResponse).toList())
             .build();
     }
 }

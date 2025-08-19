@@ -1,11 +1,11 @@
-package com.nuriwoolim.pagebackend.domain.timeTable.controller;
+package com.nuriwoolim.pagebackend.domain.calendar.controller;
 
 import com.nuriwoolim.pagebackend.core.jwt.dto.JwtPrincipal;
-import com.nuriwoolim.pagebackend.domain.timeTable.dto.TimeTableCreateRequest;
-import com.nuriwoolim.pagebackend.domain.timeTable.dto.TimeTableListResponse;
-import com.nuriwoolim.pagebackend.domain.timeTable.dto.TimeTableResponse;
-import com.nuriwoolim.pagebackend.domain.timeTable.dto.TimeTableUpdateRequest;
-import com.nuriwoolim.pagebackend.domain.timeTable.service.TimeTableService;
+import com.nuriwoolim.pagebackend.domain.calendar.dto.CalendarCreateRequest;
+import com.nuriwoolim.pagebackend.domain.calendar.dto.CalendarListResponse;
+import com.nuriwoolim.pagebackend.domain.calendar.dto.CalendarResponse;
+import com.nuriwoolim.pagebackend.domain.calendar.dto.CalendarUpdateRequest;
+import com.nuriwoolim.pagebackend.domain.calendar.service.CalendarService;
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -24,43 +24,43 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/timetables")
-public class TimeTableController {
+@RequestMapping("/calendars")
+public class CalendarController {
 
-    private final TimeTableService timeTableService;
+    private final CalendarService calendarService;
 
     @PostMapping
-    public ResponseEntity<TimeTableResponse> create(
-        @Valid @RequestBody TimeTableCreateRequest request,
+    public ResponseEntity<CalendarResponse> create(
+        @Valid @RequestBody CalendarCreateRequest request,
         @AuthenticationPrincipal JwtPrincipal principal) {
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(timeTableService.create(request, principal.getId()));
+            .body(calendarService.create(request, principal.getId()));
     }
 
     @GetMapping
-    public ResponseEntity<TimeTableListResponse> readBetween(
+    public ResponseEntity<CalendarListResponse> readBetween(
         @RequestParam(required = false) LocalDateTime from,
         @RequestParam(required = false) LocalDateTime to) {
         if (from == null || to == null) {
             from = LocalDateTime.now().toLocalDate().withDayOfMonth(1).atStartOfDay();
             to = LocalDateTime.now().toLocalDate().plusMonths(1).withDayOfMonth(1).atStartOfDay();
         }
-        return ResponseEntity.ok(timeTableService.findTimeTableList(from, to));
+        return ResponseEntity.ok(calendarService.findCalendarList(from, to));
     }
 
-    @DeleteMapping("/{timetableId}")
-    public ResponseEntity<Void> delete(@PathVariable Long timetableId,
+    @DeleteMapping("/{calendarId}")
+    public ResponseEntity<Void> delete(@PathVariable Long calendarId,
         @AuthenticationPrincipal JwtPrincipal principal) {
-        timeTableService.deleteTimeTableById(timetableId, principal.getId());
+        calendarService.deleteCalendarById(calendarId, principal.getId());
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{timetableId}")
-    public ResponseEntity<TimeTableResponse> update(
-        @PathVariable Long timetableId,
-        @Valid @RequestBody TimeTableUpdateRequest request,
+    @PatchMapping("/{calendarId}")
+    public ResponseEntity<CalendarResponse> update(
+        @PathVariable Long calendarId,
+        @Valid @RequestBody CalendarUpdateRequest request,
         @AuthenticationPrincipal JwtPrincipal principal) {
         return ResponseEntity.ok(
-            timeTableService.updateTimeTable(timetableId, request, principal.getId()));
+            calendarService.updateCalendar(calendarId, request, principal.getId()));
     }
 }

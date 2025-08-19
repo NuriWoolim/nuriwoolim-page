@@ -1,7 +1,6 @@
 package com.nuriwoolim.pagebackend.core.security;
 
 import com.nuriwoolim.pagebackend.core.jwt.filter.JwtAuthenticationFilter;
-import com.nuriwoolim.pagebackend.core.jwt.util.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,8 +24,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, JwtTokenProvider jwtTokenProvider,
-        CustomUserDetailsService customUserDetailsService) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .formLogin(AbstractHttpConfigurer::disable)
@@ -42,6 +40,7 @@ public class SecurityConfig {
                     "/swagger-resources/**",
                     "/webjars/**",
                     "/refresh").permitAll()
+                .requestMatchers(HttpMethod.GET, "/calendars", "/timetables").permitAll()
                 .anyRequest().authenticated());
         return http.build();
     }

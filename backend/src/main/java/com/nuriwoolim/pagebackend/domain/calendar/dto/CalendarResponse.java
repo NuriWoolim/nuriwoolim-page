@@ -1,13 +1,12 @@
-package com.nuriwoolim.pagebackend.domain.timeTable.dto;
+package com.nuriwoolim.pagebackend.domain.calendar.dto;
 
 import java.time.LocalDateTime;
 import lombok.Builder;
 
 @Builder
-public record TimeTableResponse(
+public record CalendarResponse(
     Long id,
     String title,
-    String team,
     String description,
     String color,
     LocalDateTime start,
