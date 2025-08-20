@@ -28,12 +28,14 @@ public enum ErrorCode {
      * 403 FORBIDDEN: 승인을 거부함
      */
     AUTHORITY_FORBIDDEN(HttpStatus.FORBIDDEN, "인가 실패"),
+    DATA_FORBIDDEN(HttpStatus.FORBIDDEN, "데이터에 권한이 없습니다."),
 
     /*
      * 404 NOT_FOUND: 리소스를 찾을 수 없음
      */
     API_NOT_FOUND(HttpStatus.NOT_FOUND, "잘못된 경로입니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다."),
+    DATA_NOT_FOUND(HttpStatus.NOT_FOUND, "정보를 찾을 수 없습니다."),
 
     /*
      * 405 METHOD_NOT_ALLOWED: 허용되지 않은 Request Method 호출
