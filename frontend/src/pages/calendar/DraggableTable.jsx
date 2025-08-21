@@ -25,8 +25,8 @@ const TableCell = styled.div`
 `;
 
 const TTTitleContainer = styled.div`
-  top: -102px;
-  position: relative;
+  position: absolute;
+  top: 0;
   display: grid;
   grid-template-rows: 100px;
   border: solid 1px black;
@@ -52,14 +52,31 @@ const TTTCell = styled.div`
   }
 `;
 
-const DraggableTable = ({ times, timeTables, enableChange = false }) => {
+const Wrapper = styled.div`
+  position: relative;
+`;
+const DraggableTable = ({
+  times, // 시간들
+  cells,
+  setCells,
+  timeTables, // 해당 일(날짜)의 타임테이블 데이터들
+  setSelectedTT, // 현재 선택된 타임테이블
+  enableChange = false, // 변경 가능 여부
+}) => {
   const [isTouched, setIsTouched] = useState(-1);
-  const [cells, setCells] = useState(
-    Array.from({ length: times.length }, () => null)
-  );
+
   const [TTTCells, setTTTCells] = useState([]);
   const [TTTStyle, setTTTStyle] = useState("");
 
+  useEffect(() => {
+    let newCells = [...cells];
+    for (let i = 0; i < times.length; i++) {
+      if (newCells[i] === 1) newCells[i] = null;
+    }
+    setCells(newCells);
+  }, [enableChange]);
+
+  // cells를 채워주는 useEffect
   const initTable = useEffect(() => {
     for (let i = 0; i < timeTables.timetables.length; i++) {
       const parseTime = (str) => {
@@ -83,6 +100,7 @@ const DraggableTable = ({ times, timeTables, enableChange = false }) => {
     }
   }, []);
 
+  // 테이블 위에 표시되는 팀 이름을 표시해주는 useEffect
   useEffect(() => {
     let prev = null;
     let cnt = 0;
@@ -108,7 +126,6 @@ const DraggableTable = ({ times, timeTables, enableChange = false }) => {
     setTTTCells(cellData);
   }, [cells]);
 
-  // 이벤트 핸들러 함수들을 useCallback으로 메모이제이션
   const handleTouchStart = useCallback((e) => {
     // if (isTouched != -1) return;
     const target = e.target.closest("div[data-key]");
@@ -195,7 +212,7 @@ const DraggableTable = ({ times, timeTables, enableChange = false }) => {
     };
   }, [isTouched]);
   return (
-    <>
+    <Wrapper>
       <GridContainer
         onPointerDown={enableChange ? handleTouchStart : undefined}
         onPointerUp={enableChange ? handleTouchEnd : undefined}
@@ -205,6 +222,14 @@ const DraggableTable = ({ times, timeTables, enableChange = false }) => {
           <TableCell
             key={index}
             data-key={index}
+            onClick={
+              enableChange
+                ? undefined
+                : () => {
+                    if (cells[index] !== null && cells[index] !== 1)
+                      return setSelectedTT(cells[index]);
+                  }
+            }
             $color={
               cells[index] === null
                 ? "white"
@@ -231,7 +256,7 @@ const DraggableTable = ({ times, timeTables, enableChange = false }) => {
           </TTTCell>
         ))}
       </TTTitleContainer>
-    </>
+    </Wrapper>
   );
 };
 export default DraggableTable;
