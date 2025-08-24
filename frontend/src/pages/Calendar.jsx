@@ -1,6 +1,8 @@
-import { React, useState } from "react";
+import { React, useState, useEffect } from "react";
 import styled from "styled-components";
 import DateCell from "./calendar/DateCell";
+import { TimeTableAPI } from "../apis/common";
+import { createDate } from "../tools/DateTool";
 
 /* Calendar 섹션의 전체 배경 */
 const CalendarSection = styled.section`
@@ -54,68 +56,108 @@ const WeekDayCell = styled.div`
   border: solid 2px blue;
 `;
 
+// 현재 달의 날짜들을 찾고 올바른 위치를 찾아주는 함수
+const createCalendarData = (startDate) => {
+  const dates = [];
+  const row = 6;
+  const col = 7;
+
+  // 현재 달의 마지막 날
+  const lastDate = new Date(
+    startDate.getFullYear(),
+    startDate.getMonth() + 1,
+    0
+  ).getDate();
+
+  // 이전 달의 마지막 날
+  const prevLastDate = new Date(
+    startDate.getFullYear(),
+    startDate.getMonth(),
+    0
+  ).getDate();
+
+  // 첫 번째 날의 요일 (0: 일요일, 1: 월요일, ...)
+  const firstDayOfWeek = startDate.getDay();
+
+  // 이전 달 날짜들 추가
+  for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+    dates.push(
+      new Date(
+        startDate.getFullYear(),
+        startDate.getMonth() - 1,
+        prevLastDate - i
+      )
+    );
+  }
+
+  // 현재 달 날짜들 추가
+  for (let date = 1; date <= lastDate; date++) {
+    dates.push(new Date(startDate.getFullYear(), startDate.getMonth(), date));
+  }
+
+  // 다음 달 날짜들 추가
+  const totalCells = row * col;
+  const remainingCells = totalCells - dates.length;
+  for (let date = 1; date <= remainingCells; date++) {
+    dates.push(
+      new Date(startDate.getFullYear(), startDate.getMonth() + 1, date)
+    );
+  }
+
+  return {
+    startDate: startDate,
+    dates: dates,
+  };
+};
+
 const Calendar = () => {
   const row = 6;
   const col = 7;
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const curDate = new Date();
 
-  const createCalendarData = (startDate) => {
-    const dates = [];
-
-    // 현재 달의 마지막 날
-    const lastDate = new Date(
-      startDate.getFullYear(),
-      startDate.getMonth() + 1,
-      0
-    ).getDate();
-
-    // 이전 달의 마지막 날
-    const prevLastDate = new Date(
-      startDate.getFullYear(),
-      startDate.getMonth(),
-      0
-    ).getDate();
-
-    // 첫 번째 날의 요일 (0: 일요일, 1: 월요일, ...)
-    const firstDayOfWeek = startDate.getDay();
-
-    // 이전 달 날짜들 추가
-    for (let i = firstDayOfWeek - 1; i >= 0; i--) {
-      dates.push(
-        new Date(
-          startDate.getFullYear(),
-          startDate.getMonth() - 1,
-          prevLastDate - i
-        )
-      );
-    }
-
-    // 현재 달 날짜들 추가
-    for (let date = 1; date <= lastDate; date++) {
-      dates.push(new Date(startDate.getFullYear(), startDate.getMonth(), date));
-    }
-
-    // 다음 달 날짜들 추가
-    const totalCells = row * col;
-    const remainingCells = totalCells - dates.length;
-    for (let date = 1; date <= remainingCells; date++) {
-      dates.push(
-        new Date(startDate.getFullYear(), startDate.getMonth() + 1, date)
-      );
-    }
-
-    return {
-      startDate: startDate,
-      dates: dates,
-    };
-  };
-
   const [calendarState, setCalendarState] = useState(() => {
     const today = new Date();
     const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
     return createCalendarData(startDate);
   });
+
+  const getTimeTables = async () => {
+    try {
+      // 한달간 기간 설정
+      const result = await TimeTableAPI.getTimeTable();
+      const resultdata = result.data;
+
+      const newMonthTT = Array.from({ length: 42 }, () => []);
+      calendarState.dates.map((date, i) => {
+        resultdata.data.map((timetable) => {
+          const start = createDate(timetable.start);
+          const end = createDate(timetable.end);
+
+          if (
+            date.getDate() == start.getDate() &&
+            date.getMonth() == start.getMonth()
+          )
+            newMonthTT[i].push(timetable);
+
+          if (end.getDate() != start.getDate()) {
+            if (
+              date.getDate() == end.getDate() &&
+              date.getMonth() == end.getMonth()
+            )
+              newMonthTT[i].push(timetable);
+          }
+        });
+      });
+
+      setMonthTT(newMonthTT);
+    } catch (error) {
+      console.log("getTimeTable error ", error);
+    }
+  };
+  const [monthTT, setMonthTT] = useState(() =>
+    Array.from({ length: 30 }, () => [])
+  );
 
   const onMonthChange = (direction) => {
     setCalendarState((prevState) => {
@@ -124,6 +166,10 @@ const Calendar = () => {
       return createCalendarData(newStartDate);
     });
   };
+
+  useEffect(() => {
+    getTimeTables();
+  }, [calendarState]);
 
   const getColor = (date) => {
     const isSameMonth = date.getMonth() === calendarState.startDate.getMonth();
@@ -160,6 +206,7 @@ const Calendar = () => {
               <DateCell
                 key={index}
                 dateObj={calendarState.dates[index]}
+                timetables={monthTT[index]}
                 color={getColor(calendarState.dates[index])}
               />
             );

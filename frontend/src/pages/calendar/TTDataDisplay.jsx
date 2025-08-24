@@ -90,10 +90,16 @@ const UpdateMode = ({ setDataMode, cells, times, selectedTT }) => {
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div>
-          <input {...register("title")} placeholder="제목" />
+          <input
+            {...register("title", { required: "제목을 입력하세요" })}
+            placeholder="제목"
+          />
         </div>
         <div>
-          <input {...register("team")} placeholder="팀" />
+          <input
+            {...register("team", { required: "제목을 입력하세요" })}
+            placeholder="팀"
+          />
         </div>
         <div>
           <input {...register("description")} placeholder="설명" />
@@ -155,14 +161,23 @@ const CreateMode = ({ setDataMode, cells, times }) => {
     setDataMode(READ);
   };
 
+  const onError = (errors) => {
+    console.log("Cannot submit - validation errors:", errors);
+  };
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit, onError)}>
         <div>
-          <input {...register("title")} placeholder="제목" />
+          <input
+            {...register("title", { required: "제목을 입력하세요" })}
+            placeholder="제목"
+          />
         </div>
         <div>
-          <input {...register("team")} placeholder="팀" />
+          <input
+            {...register("team", { required: "팀명을 입력하세요" })}
+            placeholder="팀"
+          />
         </div>
         <div>
           <input {...register("description")} placeholder="설명" />

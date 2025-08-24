@@ -78,7 +78,7 @@ const DraggableTable = ({
 
   // cells를 채워주는 useEffect
   const initTable = useEffect(() => {
-    for (let i = 0; i < timeTables.timetables.length; i++) {
+    for (let i = 0; i < timeTables.data.length; i++) {
       const parseTime = (str) => {
         const [datePart, timePart] = str.split("T");
         const [year, month, day] = datePart.split("-").map(Number);
@@ -86,19 +86,19 @@ const DraggableTable = ({
         return (hour * 60 + minute - 9 * 60) / 30;
       };
 
-      const startidx = parseTime(timeTables.timetables[i].start);
-      const endidx = parseTime(timeTables.timetables[i].end);
+      const startidx = parseTime(timeTables.data[i].start);
+      const endidx = parseTime(timeTables.data[i].end);
 
       setCells((prevSelected) => {
         const newSelected = [...prevSelected];
 
         for (let j = startidx; j < endidx; j++) {
-          newSelected[j] = timeTables.timetables[i];
+          newSelected[j] = timeTables.data[i];
         }
         return newSelected;
       });
     }
-  }, []);
+  }, [timeTables]);
 
   // 테이블 위에 표시되는 팀 이름을 표시해주는 useEffect
   useEffect(() => {

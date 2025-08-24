@@ -23,32 +23,12 @@ const TimeTableContainer = styled.div`
   text-overflow: ellipsis;
 `;
 
-const DateCell = ({ dateObj, color }) => {
+const DateCell = ({ dateObj, timetables, color }) => {
   const date = new Date(dateObj);
   const today = new Date();
 
-  const [timeTables, setTimeTables] = useState({
-    from: "",
-    to: "",
-    timetables: [],
-  });
+  // api 불러오는 중인 상태 (필요 없을 수도)
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const getTimeTables = async () => {
-      try {
-        setLoading(true);
-        const result = await TimeTableAPI.getTimeTable();
-        setTimeTables(result);
-      } catch (error) {
-        console.log("getTimeTable error ", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getTimeTables();
-  }, []);
 
   const [isDetailedDateOpen, setIsDetailedDateOpen] = useState(false);
 
@@ -60,14 +40,16 @@ const DateCell = ({ dateObj, color }) => {
       >
         <h2>{date.getDate()}</h2>
 
-        {timeTables.timetables.slice(0, 2).map((timetable, index) => (
-          <TimeTableContainer key={index}>
-            {timetable.start.split("T")[1]} {timetable.title}
-          </TimeTableContainer>
-        ))}
+        {timetables
+          ? timetables.slice(0, 2).map((timetable, index) => (
+              <TimeTableContainer key={index}>
+                {timetable.start.split("T")[1]} {timetable.title}
+              </TimeTableContainer>
+            ))
+          : null}
 
-        {timeTables.timetables.length > 2 && (
-          <div>외 {timeTables.timetables.length - 2}개 일정</div>
+        {timetables && timetables.length > 2 && (
+          <div>외 {timetables.length - 2}개 일정</div>
         )}
       </DateCellContainer>
 
@@ -75,7 +57,7 @@ const DateCell = ({ dateObj, color }) => {
         isOpen={isDetailedDateOpen}
         onRequestClose={() => setIsDetailedDateOpen(false)}
       >
-        <DetailedDate timeTables={timeTables} />
+        <DetailedDate dateObj={dateObj} />
       </CustomModal>
     </>
   );
