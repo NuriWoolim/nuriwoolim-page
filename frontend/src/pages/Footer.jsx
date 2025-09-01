@@ -72,6 +72,10 @@ const Portal = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+
+  img {
+    width: 60px;
+  }
 `;
 
 const PortalContainer = styled.div`
@@ -105,7 +109,11 @@ const Footer = () => {
           <p>©2025 Nuriwoolimhompageteam. All rights reserved</p>
 
           <PortalContainer>
-            <Portal>youtube</Portal>
+            <Portal>
+              <a href="https://www.youtube.com/@%EC%A4%91%EC%95%99%EB%8C%80%ED%95%99%EA%B5%90%EC%A4%91%EC%95%99%EB%8F%99%EC%95%84%EB%A6%AC">
+                <img src="public/yt_icon_almostblack_digital.png" />
+              </a>
+            </Portal>
 
             <Portal>instagram</Portal>
 
