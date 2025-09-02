@@ -1,19 +1,17 @@
 spring:
   application:
     name: backend
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/${DB_NAME}?serverTimezone=Asia/Seoul
-    username: ${DB_USER}
+    url: jdbc:mysql://db:3306/${DB_NAME}?serverTimezone=Asia/Seoul
+    username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
   jpa:
     hibernate:
-      ddl-auto: ${DDL_AUTO}
-    properties:
-      hibernate:
-        show_sql: true
-        format_sql: true
+      ddl-auto: validate
+
   mail:
     host: smtp.gmail.com
     port: 587
@@ -26,12 +24,13 @@ spring:
           starttls:
             enable: true
 logging:
-  level:
-    root: INFO
+  config: classpath:logback-spring-prod.xml
 
 springdoc:
   swagger-ui:
     with-credentials: true
+    url: /api/v3/api-docs
+    config-url: /api/v3/api-docs/swagger-config
 
 custom:
   jwt:
@@ -39,8 +38,8 @@ custom:
       access: 3600_000 #1시간
       refresh: 259200_000 #3일
       email: 600_000 # 10분
-    secret-key: Q04DkgiuhVJ9fTCrBGTBJL4rr26mzP1czFELe7L74xB7Z+TOIt3KjGpzH4CTax5lzlqlJcCIpKzNf/g+59AWrA==
+    secret-key: ${SECRET_KEY}
   resendLimit: 5
-  frontUrl: http://localhost:8080
+  frontUrl: ${FRONT_URL}
   cors:
     origins: ${PRIVATE_ORIGINS}
