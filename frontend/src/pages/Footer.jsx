@@ -73,8 +73,19 @@ const Portal = styled.div`
   justify-content: center;
   align-items: center;
 
-  img {
-    width: 60px;
+  .yt {
+    position: relative;
+    top: 2px;
+    width: 50px;
+  }
+
+  .inst {
+    position: relative;
+    top: 2px;
+    width: 35px;
+  }
+  .linktree {
+    width: 27px;
   }
 `;
 
@@ -111,13 +122,21 @@ const Footer = () => {
           <PortalContainer>
             <Portal>
               <a href="https://www.youtube.com/@%EC%A4%91%EC%95%99%EB%8C%80%ED%95%99%EA%B5%90%EC%A4%91%EC%95%99%EB%8F%99%EC%95%84%EB%A6%AC">
-                <img src="public/yt_icon_almostblack_digital.png" />
+                <img className="yt" src="/assets/youtube_logo.png" />
               </a>
             </Portal>
 
-            <Portal>instagram</Portal>
+            <Portal>
+              <a href="https://www.instagram.com/cau_nuriwoolim">
+                <img className="inst" src="/assets/instagram_logo.png" />
+              </a>
+            </Portal>
 
-            <Portal>linktree</Portal>
+            <Portal>
+              <a>
+                <img className="linktree" src="/assets/linktree_logo.svg" />
+              </a>
+            </Portal>
           </PortalContainer>
         </LeftPart>
 
