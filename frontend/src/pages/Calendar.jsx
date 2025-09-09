@@ -7,35 +7,17 @@ import { createDate } from "../tools/DateTool";
 /* Calendar 섹션의 전체 배경 */
 const CalendarSection = styled.section`
   background-color: #fefaef;
-  padding: 45px 0;
+  padding: 2.8rem 0;
 `;
 
 /* Calendar 섹션의 컨테이너 박스 */
-
 const CalendarWrapper = styled.div`
-  width: 90%;
+  width: 92%;
   margin: 0 auto;
-  padding: 0px 40px 40px;
+  padding: 0px 17rem 0 17rem;
+  box-sizing: border-box;
   background-color: #ffffff;
   border: 4px solid #033148;
-
-  > h2 {
-    font-family: Plus Jakarta Sans;
-    font-weight: 800;
-    font-size: 40px;
-    line-height: 127%;
-    letter-spacing: -6%;
-    text-transform: uppercase;
-  }
-
-  > p {
-    font-family: Pretendard;
-    font-weight: 500;
-    font-size: 30px;
-    line-height: 127%;
-    letter-spacing: -3%;
-    text-transform: uppercase;
-  }
 
   > ul {
     list-style: none;
@@ -43,17 +25,72 @@ const CalendarWrapper = styled.div`
   }
 `;
 
+// 전체 테이블
 const GridContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(7, calc(100% / 7));
-  grid-template-rows: 30px repeat(6, 120px);
+  grid-template-rows: 2.7rem repeat(6, 9rem);
   width: 100%;
 
-  border: 2px black solid;
+  border-top: 1px solid #033148;
+  border-left: 1px solid #033148;
 `;
 
+// Days of Weeks의 셀 한 칸.
 const WeekDayCell = styled.div`
-  border: solid 2px blue;
+  padding: 0.6rem;
+
+  border-right: 1px solid #033148;
+  border-bottom: 1px solid #033148;
+  background: #486284;
+  color: #fefaef;
+  font-family: Pretendard;
+  font-size: 1.1rem;
+  font-weight: 800;
+`;
+
+// 현재 년월 라벨과 버튼들을 감싸는 컨테이너
+const MonthYearContainer = styled.div`
+  display: flex;
+  width: 17rem;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1.2rem 0 1.2rem 0;
+  h2 {
+    color: #486284;
+
+    font-family: Pretendard;
+    font-size: 2.2rem;
+    font-weight: 900;
+    margin: 0;
+  }
+
+  button {
+    background: none; /* 배경 제거 */
+    width: 2rem;
+    border: none; /* 보더 제거 */
+    padding: 0; /* 기본 패딩 제거 */
+    cursor: pointer; /* 포인터 커서 */
+  }
+
+  button:focus {
+    outline: none;
+  }
+
+  button img{
+    height: 1.5rem;
+    margin-top: 5px;
+  }
+  button:hover img {
+    filter: brightness(0.8); /* 밝게 */
+  }
+  button:active img {
+    filter: brightness(0.6); /* 어둡게 */
+  }
+
+  .down {
+    transform: scaleX(-1);
+  }
 `;
 
 // 현재 달의 날짜들을 찾고 올바른 위치를 찾아주는 함수
@@ -77,7 +114,7 @@ const createCalendarData = (startDate) => {
   ).getDate();
 
   // 첫 번째 날의 요일 (0: 일요일, 1: 월요일, ...)
-  const firstDayOfWeek = startDate.getDay();
+  const firstDayOfWeek = (startDate.getDay() + 6) % 7;
 
   // 이전 달 날짜들 추가
   for (let i = firstDayOfWeek - 1; i >= 0; i--) {
@@ -113,7 +150,21 @@ const createCalendarData = (startDate) => {
 const Calendar = () => {
   const row = 6;
   const col = 7;
-  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
   const curDate = new Date();
 
   const [calendarState, setCalendarState] = useState(() => {
@@ -171,32 +222,24 @@ const Calendar = () => {
     getTimeTables();
   }, [calendarState]);
 
-  const getColor = (date) => {
-    const isSameMonth = date.getMonth() === calendarState.startDate.getMonth();
-    const dayOfWeek = date.getDay();
-
-    if (dayOfWeek === 0) {
-      // 일요일
-      return isSameMonth ? "red" : "rgba(255,0,0,0.7)";
-    } else if (dayOfWeek === 6) {
-      // 토요일
-      return isSameMonth ? "blue" : "rgba(0,255,255,0.7)";
-    } else {
-      // 평일
-      return isSameMonth ? "black" : "gray";
-    }
-  };
-
   return (
     <CalendarSection>
       <CalendarWrapper>
-        <h2>CALENDAR</h2>
-        <h2>
-          {calendarState.startDate.getFullYear()}년{" "}
-          {calendarState.startDate.getMonth() + 1}월
-        </h2>
-        <button onClick={() => onMonthChange(1)}>up</button>
-        <button onClick={() => onMonthChange(-1)}>down</button>
+        <h1>CALENDAR</h1>
+
+        <MonthYearContainer>
+          <button onClick={() => onMonthChange(-1)}>
+            <img src="/assets/rightarrow_blue.svg" className="down" />
+          </button>
+          <h2>
+            {months[calendarState.startDate.getMonth()]},{" "}
+            {calendarState.startDate.getFullYear()}
+          </h2>
+          <button onClick={() => onMonthChange(1)}>
+            <img src="/assets/rightarrow_blue.svg" className="up" />
+          </button>
+        </MonthYearContainer>
+
         <GridContainer>
           {Array.from({ length: col }, (_, index) => {
             return <WeekDayCell key={index}> {days[index]} </WeekDayCell>;
@@ -207,7 +250,10 @@ const Calendar = () => {
                 key={index}
                 dateObj={calendarState.dates[index]}
                 timetables={monthTT[index]}
-                color={getColor(calendarState.dates[index])}
+                isSameMonth={
+                  calendarState.dates[index].getMonth() ===
+                  calendarState.startDate.getMonth()
+                }
               />
             );
           })}

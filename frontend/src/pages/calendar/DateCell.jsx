@@ -6,13 +6,18 @@ import DetailedDate from "./detailedDate";
 
 const DateCellContainer = styled.div`
   h2 {
-    font-size: 1rem;
+    font-size: 1.1rem;
+    font-weight: 500;
     margin: 0px;
     margin-bottom: 5px;
   }
-  border: solid 2px red;
-  padding: 5px;
-  color: ${({ $color }) => $color};
+  padding: 0.6rem;
+  border-right: 1px solid #033148;
+  border-bottom: 1px solid #033148;
+  background-color: ${({ $isSameMonth }) =>
+    $isSameMonth ? "#fff" : "#EFE7D1"};
+
+  color: rgba(0, 0, 0, ${({ $isSameMonth }) => ($isSameMonth ? "1" : "0.4")});
 `;
 
 const TimeTableContainer = styled.div`
@@ -23,7 +28,7 @@ const TimeTableContainer = styled.div`
   text-overflow: ellipsis;
 `;
 
-const DateCell = ({ dateObj, timetables, color }) => {
+const DateCell = ({ dateObj, timetables, isSameMonth }) => {
   const date = new Date(dateObj);
   const today = new Date();
 
@@ -35,8 +40,8 @@ const DateCell = ({ dateObj, timetables, color }) => {
   return (
     <>
       <DateCellContainer
-        $color={color}
         onClick={() => setIsDetailedDateOpen(true)}
+        $isSameMonth={isSameMonth}
       >
         <h2>{date.getDate()}</h2>
 
