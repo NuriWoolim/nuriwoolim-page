@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { TimeTableAPI } from "../../apis/common";
 import CustomModal from "../CustomModal";
 import DetailedDate from "./detailedDate";
+import { TTColors } from "../../data/CalendarData";
 
 const DateCellContainer = styled.div`
   h2 {
@@ -21,11 +22,54 @@ const DateCellContainer = styled.div`
 `;
 
 const TimeTableContainer = styled.div`
-  border: solid 2px green;
+  height: 1.8rem;
+  width: 100%;
+
+  display: flex;
   padding: 2px;
-  white-space: nowrap; /* 줄바꿈 안 함 */
-  overflow: hidden; /* 넘친 부분 숨김 */
-  text-overflow: ellipsis;
+  gap: 0.35rem;
+  box-sizing: border-box;
+
+  font-family: "Pretendard";
+  font-size: 0.81rem;
+
+  .time {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1 0 0;
+    padding-left: 0.3rem;
+    padding-right: 0.3rem;
+
+    text-align: center;
+    font-weight: 900;
+    border: none;
+    border-radius: 2px;
+    background-color: ${(props) => props.$color1};
+    color: ${(props) => props.$color2};
+    white-space: nowrap; /* 줄바꿈 안 함 */
+    overflow: hidden; /* 넘친 부분 숨김 */
+    text-overflow: ellipsis;
+  }
+
+  .title {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 2 0 0;
+    padding-left: 0.3rem;
+    padding-right: 0.3rem;
+
+    text-align: center;
+    font-weight: 700;
+    border: none;
+    border-radius: 2px;
+    background-color: ${(props) => props.$color2};
+    color: ${(props) => props.$color1};
+    white-space: nowrap; /* 줄바꿈 안 함 */
+    overflow: hidden; /* 넘친 부분 숨김 */
+    text-overflow: ellipsis;
+  }
 `;
 
 const DateCell = ({ dateObj, timetables, isSameMonth }) => {
@@ -47,8 +91,13 @@ const DateCell = ({ dateObj, timetables, isSameMonth }) => {
 
         {timetables
           ? timetables.slice(0, 2).map((timetable, index) => (
-              <TimeTableContainer key={index}>
-                {timetable.start.split("T")[1]} {timetable.title}
+              <TimeTableContainer
+                key={index}
+                $color1={TTColors[parseInt(timetable.color)][0]}
+                $color2={TTColors[parseInt(timetable.color)][1]}
+              >
+                <div className="time">{timetable.start.split("T")[1]}</div>
+                <div className="title">{timetable.title}</div>
               </TimeTableContainer>
             ))
           : null}

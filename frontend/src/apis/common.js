@@ -16,7 +16,7 @@ export const TimeTableAPI = {
         title: "로켓트",
         team: "진석팀",
         description: "보컬 없는 합주 준사운드에서",
-        color: "#fbe328ff",
+        color: 1,
         start: "2025-8-14T16:00", //"2023-12-25T16:00"
         end: "2025-8-14T18:00", //"2023-12-25T18:00"
       },
@@ -36,7 +36,7 @@ export const TimeTableAPI = {
             title: "로켓트",
             team: "진석팀",
             description: "보컬 없는 합주 준사운드에서",
-            color: "#fbe328ff",
+            color: "0",
             start: "2025-8-14T16:00", //"2023-12-25T16:00"
             end: "2025-8-14T18:00", //"2023-12-25T18:00"
           },
@@ -45,7 +45,7 @@ export const TimeTableAPI = {
             title: "사랑하긴했었나요스텨가는인연이었나요",
             team: "지은팀",
             description: "보컬 없는 합주 준사운드에서 ㅣ안ㄹㄴㅁ아ㅣㅜ러물",
-            color: "#43f932ff",
+            color: "1",
             start: "2025-8-14T10:00", //"2023-12-25T16:00"
             end: "2025-8-14T12:00", //"2023-12-25T18:00"
           },
@@ -63,7 +63,7 @@ export const TimeTableAPI = {
             title: "마지막 편지",
             team: "동혁팀",
             description: "보컬 없는 합주 준사운드에서 ㅣ안ㄹㄴㅁ아ㅣㅜ러물",
-            color: "#f53939ff",
+            color: "2",
             start: "2025-8-16T20:00", //"2023-12-25T16:00"
             end: "2025-8-16T22:00", //"2023-12-25T18:00"
           },
