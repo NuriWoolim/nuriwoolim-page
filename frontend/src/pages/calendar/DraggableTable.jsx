@@ -4,8 +4,8 @@ import _ from "lodash";
 
 const GridContainer = styled.div`
   display: grid;
-  grid-template-columns: repeat(${(props) => props.$length}, 1fr);
-  grid-template-rows: 100px;
+  grid-template-rows: repeat(${(props) => props.$length}, 2rem);
+  grid-template-columns: 200px;
   border: solid 1px black;
   /* overflow: hidden; */
 `;
@@ -28,7 +28,7 @@ const TTTitleContainer = styled.div`
   position: absolute;
   top: 0;
   display: grid;
-  grid-template-rows: 100px;
+  grid-template-columns: 200px;
   border: solid 1px black;
 
   background: transparent;
@@ -71,7 +71,10 @@ const DraggableTable = ({
   useEffect(() => {
     let newCells = [...cells];
     for (let i = 0; i < times.length; i++) {
-      if (newCells[i] === 1) newCells[i] = null;
+      newCells[i] = {
+        ...newCells[i],
+        isSelected: false,
+      };
     }
     setCells(newCells);
   }, [enableChange]);
@@ -93,7 +96,10 @@ const DraggableTable = ({
         const newSelected = [...prevSelected];
 
         for (let j = startidx; j < endidx; j++) {
-          newSelected[j] = timeTables.data[i];
+          newSelected[j] = {
+            ...newSelected[j],
+            tt: timeTables.data[i],
+          };
         }
         return newSelected;
       });
@@ -108,20 +114,19 @@ const DraggableTable = ({
     let cellData = [];
 
     for (let i = 0; i < times.length; i++) {
-      if (i === 0 || cells[i] === prev) cnt++;
+      if (i === 0 || cells[i].tt === prev) cnt++;
       else {
-        cssstr += String(cnt) + "." + String(cnt) + "fr ";
+        cssstr += String(cnt * 2) + "rem ";
 
         if (prev === null) cellData.push(null);
         else cellData.push({ title: prev.title, team: prev.team });
         cnt = 1;
       }
-      prev = cells[i];
+      prev = cells[i].tt;
     }
     if (prev === null) cellData.push(null);
     else cellData.push({ title: prev.title, team: prev.team });
-    cssstr += String(cnt) + "." + String(cnt) + "fr ";
-
+    cssstr += String(cnt * 2) + "rem ";
     setTTTStyle(cssstr);
     setTTTCells(cellData);
   }, [cells]);
@@ -136,13 +141,12 @@ const DraggableTable = ({
     setCells((prevSelected) => {
       const newSelected = [...prevSelected];
 
-      if (newSelected[col] === 1 || newSelected[col] === null) {
-        if (newSelected[col] === null) newSelected[col] = 1;
-        else newSelected[col] = null;
-      }
+      newSelected[col] = {
+        ...newSelected[col],
+        isSelected: !newSelected[col].isSelected,
+      };
       return newSelected;
     });
-
     setIsTouched(col);
   }, []);
 
@@ -167,7 +171,7 @@ const DraggableTable = ({
       const st_col = isTouched;
 
       let add_dates = true;
-      if (cells[st_col] === null) add_dates = false;
+      if (cells[st_col].isSelected === false) add_dates = false;
 
       if (target.getAttribute("data-key") == null) return;
       const cur_col = +target.getAttribute("data-key");
@@ -182,13 +186,15 @@ const DraggableTable = ({
 
       for (let c = minCol; c <= maxCol; c++) {
         if (c == st_col) continue;
-        if (newSelected[c] !== 1 && newSelected[c] !== null) continue;
-        if (add_dates) newSelected[c] = 1;
-        else newSelected[c] = null;
+
+        if (add_dates) newSelected[c].isSelected = true;
+        else newSelected[c].isSelected = false;
       }
       //   console.log(st_col, cur_col);
 
       setCells(newSelected);
+
+      console.log(newSelected);
     }, 75),
     [isTouched]
   );
@@ -199,16 +205,19 @@ const DraggableTable = ({
       document.addEventListener("touchmove", preventScroll, { passive: false });
       document.addEventListener("touchmove", handleTouchMove);
       document.addEventListener("mousemove", handleTouchMove);
+      //   document.addEventListener("pointerup", handleTouchEnd);
     } else {
       document.removeEventListener("touchmove", preventScroll);
       document.removeEventListener("touchmove", handleTouchMove);
-      document.addEventListener("mousemove", handleTouchMove);
+      document.removeEventListener("mousemove", handleTouchMove);
+      //   document.removeEventListener("pointerup", handleTouchEnd);
     }
 
     return () => {
       document.removeEventListener("touchmove", preventScroll);
       document.removeEventListener("touchmove", handleTouchMove);
       document.removeEventListener("mousemove", handleTouchMove);
+      //   document.removeEventListener("pointerup", handleTouchEnd);
     };
   }, [isTouched]);
   return (
@@ -226,16 +235,15 @@ const DraggableTable = ({
               enableChange
                 ? undefined
                 : () => {
-                    if (cells[index] !== null && cells[index] !== 1)
-                      return setSelectedTT(cells[index]);
+                    if (cells[index].tt !== null)
+                      return setSelectedTT(cells[index].tt);
                   }
             }
             $color={
-              cells[index] === null
-                ? "white"
-                : cells[index] === 1
-                ? "green"
-                : cells[index]?.color ?? "white"
+              cells[index]?.isSelected === false ? "white" : "green"
+              // : cells[index] === 1
+              // ? "green"
+              // : cells[index]?.color ?? "white"
             }
           >
             {String(time.getHours()).padStart(2, "0")}:
@@ -243,10 +251,10 @@ const DraggableTable = ({
           </TableCell>
         ))}
       </GridContainer>
-      <TTTitleContainer
+      {/* <TTTitleContainer
         id="TTTitleContainer"
         style={{
-          gridTemplateColumns: TTTStyle,
+          gridTemplateRows: TTTStyle,
         }}
       >
         {TTTCells.map((cell, index) => (
@@ -255,7 +263,7 @@ const DraggableTable = ({
             <div>{TTTCells[index] === null ? null : TTTCells[index].team}</div>
           </TTTCell>
         ))}
-      </TTTitleContainer>
+      </TTTitleContainer> */}
     </Wrapper>
   );
 };

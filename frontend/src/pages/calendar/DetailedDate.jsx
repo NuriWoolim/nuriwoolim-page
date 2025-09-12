@@ -39,7 +39,10 @@ const DetailedDate = ({ dateObj }) => {
 
   // 드래그테이블의 상태
   const [cells, setCells] = useState(
-    Array.from({ length: times.length }, () => null)
+    Array.from({ length: times.length }, () => ({
+      isSelected: false,
+      tt: null,
+    }))
   );
 
   // 현재 선택된 타임테이블
