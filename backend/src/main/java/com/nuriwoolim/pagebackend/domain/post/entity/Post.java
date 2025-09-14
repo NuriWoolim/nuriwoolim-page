@@ -1,6 +1,8 @@
-package com.nuriwoolim.pagebackend.domain;
+package com.nuriwoolim.pagebackend.domain.post.entity;
 
 import com.nuriwoolim.pagebackend.core.BaseEntity;
+import com.nuriwoolim.pagebackend.domain.Comment;
+import com.nuriwoolim.pagebackend.domain.board.entity.Board;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
