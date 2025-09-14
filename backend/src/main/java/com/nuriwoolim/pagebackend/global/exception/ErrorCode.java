@@ -49,7 +49,11 @@ public enum ErrorCode {
      */
     DATA_CONFLICT(HttpStatus.CONFLICT, "적절하지 않은 데이터입니다."),
     USERNAME_CONFLICT(HttpStatus.CONFLICT, "존재하는 회원 이름입니다."),
+<<<<<<< HEAD
     BOARD_TITLE_CONFLICT(HttpStatus.CONFLICT, "이미 존재하는 게시판입니다."),
+=======
+    BOARD_TITLE_CONFLICT(HttpStatus.CONFLICT, "이미 존재하는 개시판입니다."),
+>>>>>>> 488027a (feat: 게시판 CRUD 구현)
 
     /*
      * 500 INTERNAL_SERVER_ERROR: 내부 서버 오류
