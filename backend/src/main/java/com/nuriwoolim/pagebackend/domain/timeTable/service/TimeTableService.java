@@ -43,10 +43,10 @@ public class TimeTableService {
             throw ErrorCode.BAD_REQUEST.toException("시간이 잘못되었습니다.");
         }
         // 분 이하 단위가 있는 경우
-        if (start.getMinute() != 0 ||
+        if (start.getMinute() % 30 != 0 ||
             start.getSecond() != 0 ||
             start.getNano() != 0 ||
-            end.getMinute() != 0 ||
+            end.getMinute() % 30 != 0 ||
             end.getSecond() != 0 ||
             end.getNano() != 0) {
             throw ErrorCode.BAD_REQUEST.toException("시간이 잘못되었습니다.");
