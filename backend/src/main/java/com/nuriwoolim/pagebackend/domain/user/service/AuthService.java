@@ -86,11 +86,6 @@ public class AuthService {
             throw ErrorCode.INVALID_TOKEN.toException();
         }
 
-        String email = jwtTokenProvider.getSubject(resendToken);
-        if (userRepository.existsByEmail(email)) {
-            throw ErrorCode.DATA_CONFLICT.toException();
-        }
-
         EmailVerification emailVerification = emailVerificationRepository.findByResendToken(
                 resendToken)
             .orElseThrow(ErrorCode.USER_NOT_FOUND::toException);

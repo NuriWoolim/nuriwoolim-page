@@ -39,7 +39,7 @@ public class AuthController {
     public ResponseEntity<Void> verifyEmail(@RequestParam String email, @RequestParam String code) {
         authService.verifyEmail(email, code);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/send-verification")
