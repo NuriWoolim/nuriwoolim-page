@@ -17,23 +17,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @AllArgsConstructor
-public class PendingUser extends BaseEntity {
+public class EmailVerification extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 20)
-    private String name;
-
     @Column(nullable = false, unique = true, length = 50)
     private String email;
 
     @Column(nullable = false)
-    private String password;
-
-    @Column(nullable = false, unique = true)
-    private String token;
+    private String code;
 
     @Column(nullable = false)
     private String resendToken;
@@ -41,8 +35,8 @@ public class PendingUser extends BaseEntity {
     @Column(nullable = false)
     private int resendCount = 0;
 
-    public void updateToken(String token) {
-        this.token = token;
+    public void updateCode(String code) {
+        this.code = code;
     }
 
     public void countResend() {

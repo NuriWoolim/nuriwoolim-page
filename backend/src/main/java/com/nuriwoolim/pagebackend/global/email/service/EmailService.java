@@ -22,16 +22,15 @@ public class EmailService {
     private String frontUrl;
 
     @Async
-    public void sendVerificationEmail(String to, String token) {
+    public void sendVerificationEmail(String to, String code) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setTo(to);
-            helper.setSubject("[누리울림] 이메일 인증을 완료해주세요");
+            helper.setSubject("[누리울림] 이메일 인증 코드를 확인해주세요");
 
-            String verificationUrl = frontUrl + "/auth/verify-email?token=" + token;
-            String htmlContent = buildEmailContent(verificationUrl);
+            String htmlContent = buildEmailContent(code);
 
             helper.setText(htmlContent, true);
 
@@ -43,7 +42,7 @@ public class EmailService {
         }
     }
 
-    private String buildEmailContent(String verificationUrl) {
+    private String buildEmailContent(String code) {
         return String.format(
             "<!DOCTYPE html>" +
                 "<html lang='ko'>" +
@@ -83,7 +82,7 @@ public class EmailService {
                 +
 
                 "<!-- Subtitle -->" +
-                "<p style='text-align: center; color: #8d5524; font-size: 18px; margin: 0 0 40px 0; line-height: 1.6;'>누리울림 밴드 동아리 가입을 완료하기 위해<br>이메일 인증을 진행해주세요</p>"
+                "<p style='text-align: center; color: #8d5524; font-size: 18px; margin: 0 0 40px 0; line-height: 1.6;'>누리울림 밴드 동아리 가입을 완료하기 위해<br>아래 인증 코드를 입력해주세요</p>"
                 +
 
                 "<!-- Content -->" +
@@ -92,25 +91,29 @@ public class EmailService {
                 "<p style='color: #6f4e37; font-size: 16px; line-height: 1.7; margin: 0;'>안녕하세요! 🎸<br><br>"
                 +
                 "누리울림 밴드 동아리에 가입해주셔서 감사합니다!<br>" +
-                "아래 버튼을 클릭하여 이메일 인증을 완료하시면 함께 음악을 만들어갈 수 있습니다.</p>" +
+                "아래 인증 코드를 입력하여 이메일 인증을 완료하시면 함께 음악을 만들어갈 수 있습니다.</p>" +
                 "</div>" +
 
-                "<!-- CTA Button -->" +
+                "<!-- Verification Code -->" +
                 "<div style='text-align: center; margin: 40px 0;'>" +
-                "<a href='%s' style='display: inline-block; background: linear-gradient(135deg, #ffd54f 0%%, #f4a261 100%%); color: white; text-decoration: none; padding: 18px 40px; border-radius: 50px; font-size: 18px; font-weight: 600; letter-spacing: 0.5px; box-shadow: 0 10px 30px rgba(255, 213, 79, 0.5); transition: all 0.3s ease; text-shadow: 0 1px 2px rgba(0,0,0,0.1);'>"
+                "<div style='background: linear-gradient(135deg, #ffd54f 0%%, #f4a261 100%%); color: white; display: inline-block; padding: 25px 50px; border-radius: 15px; box-shadow: 0 10px 30px rgba(255, 213, 79, 0.5);'>"
                 +
-                "🎵 이메일 인증하기" +
-                "</a>" +
+                "<p style='margin: 0 0 10px 0; font-size: 14px; font-weight: 500; opacity: 0.9;'>인증 코드</p>"
+                +
+                "<div style='font-size: 36px; font-weight: 700; letter-spacing: 8px; font-family: monospace; text-shadow: 0 1px 2px rgba(0,0,0,0.2);'>%s</div>"
+                +
+                "</div>" +
                 "</div>" +
 
-                "<!-- Alternative Link -->" +
+                "<!-- Instructions -->" +
                 "<div style='background: #fef7e0; border-radius: 10px; padding: 20px; margin-top: 30px; border: 1px solid #fff4c4;'>"
                 +
-                "<p style='color: #8d5524; font-size: 14px; margin: 0 0 10px 0; font-weight: 600;'>버튼이 작동하지 않나요?</p>"
+                "<p style='color: #8d5524; font-size: 14px; margin: 0 0 10px 0; font-weight: 600;'>📝 인증 코드 입력 방법</p>"
                 +
-                "<p style='color: #a0673b; font-size: 13px; margin: 0; word-break: break-all; line-height: 1.5;'>아래 링크를 복사하여 브라우저에 직접 붙여넣어 주세요:<br>"
+                "<p style='color: #a0673b; font-size: 13px; margin: 0; line-height: 1.5;'>1. 회원가입 페이지로 돌아가세요<br>"
                 +
-                "<span style='color: #f4a261; font-family: monospace;'>%s</span></p>" +
+                "2. 위의 6자리 인증 코드를 정확히 입력해주세요<br>" +
+                "3. '인증 확인' 버튼을 클릭하세요</p>" +
                 "</div>" +
 
                 "</div>" +
@@ -119,7 +122,7 @@ public class EmailService {
                 "<div style='text-align: center; color: #8d5524; font-size: 14px;'>" +
                 "<div style='background: rgba(255, 255, 255, 0.7); border-radius: 15px; padding: 25px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 213, 79, 0.3);'>"
                 +
-                "<p style='margin: 0 0 10px 0;'>⏰ <strong>이 링크는 10분 후에 만료됩니다</strong></p>" +
+                "<p style='margin: 0 0 10px 0;'>⏰ <strong>이 인증 코드는 10분 후에 만료됩니다</strong></p>" +
                 "<p style='margin: 0; font-size: 13px; opacity: 0.8;'>🎼 함께 만들어갈 음악이 기대됩니다! 문의사항이 있으시면 고객센터로 연락해주세요.</p>"
                 +
                 "</div>" +
@@ -128,7 +131,7 @@ public class EmailService {
                 "</div>" +
                 "</body>" +
                 "</html>",
-            verificationUrl, verificationUrl
+            code
         );
     }
 }
