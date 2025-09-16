@@ -72,6 +72,11 @@ public class AuthService {
         String code = CodeGenerator.generateCode();
         String resendToken = jwtTokenProvider.issueEmailToken(email);
 
+        if (emailVerificationRepository.existsByEmail(email)) {
+            emailVerificationRepository.deleteByEmail(email);
+            emailVerificationRepository.flush();
+        }
+
         EmailVerification emailVerification = emailVerificationRepository.save(
             UserMapper.toEmailCode(email, code, resendToken));
         emailService.sendVerificationEmail(email, code);
@@ -106,7 +111,7 @@ public class AuthService {
     @Transactional
     public void verifyEmail(String email, String code) {
         if (userRepository.existsByEmail(email)) {
-            throw ErrorCode.DATA_CONFLICT.toException();
+            throw ErrorCode.DATA_CONFLICT.toException("이미 존재하는 사용자입니다.");
         }
         Optional<EmailVerification> emailVerification = emailVerificationRepository.findByEmail(
             email);
