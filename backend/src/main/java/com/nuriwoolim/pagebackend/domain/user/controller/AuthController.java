@@ -29,17 +29,23 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<VerificationResendResponse> signup(
+    public ResponseEntity<Void> signup(
         @Valid @RequestBody UserSignupRequest userSignupRequest) {
-        VerificationResendResponse response = authService.signUp(userSignupRequest);
-        return ResponseEntity.ok(response);
+        authService.signUp(userSignupRequest);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/verify-email")
-    public ResponseEntity<Void> verifyEmail(@RequestParam String token) {
-        authService.verifyEmail(token);
+    public ResponseEntity<Void> verifyEmail(@RequestParam String email, @RequestParam String code) {
+        authService.verifyEmail(email, code);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/send-verification")
+    public ResponseEntity<VerificationResendResponse> sendVerification(@RequestParam String email) {
+        VerificationResendResponse response = authService.sendVerificationEmail(email);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/resend-verification")

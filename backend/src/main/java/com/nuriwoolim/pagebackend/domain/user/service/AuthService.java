@@ -9,10 +9,11 @@ import com.nuriwoolim.pagebackend.domain.user.dto.LoginRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.TokenPair;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserSignupRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.VerificationResendResponse;
-import com.nuriwoolim.pagebackend.domain.user.entity.PendingUser;
+import com.nuriwoolim.pagebackend.domain.user.entity.EmailVerification;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
-import com.nuriwoolim.pagebackend.domain.user.repository.PendingUserRepository;
+import com.nuriwoolim.pagebackend.domain.user.repository.EmailVerificationRepository;
 import com.nuriwoolim.pagebackend.domain.user.repository.UserRepository;
+import com.nuriwoolim.pagebackend.domain.user.util.CodeGenerator;
 import com.nuriwoolim.pagebackend.domain.user.util.UserMapper;
 import com.nuriwoolim.pagebackend.global.email.service.EmailService;
 import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
@@ -32,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final PendingUserRepository pendingUserRepository;
+    private final EmailVerificationRepository emailVerificationRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final JwtTokenProvider jwtTokenProvider;
@@ -43,25 +44,38 @@ public class AuthService {
     private int resendLimit;
 
     @Transactional
-    public VerificationResendResponse signUp(UserSignupRequest userSignupRequest) {
+    public void signUp(UserSignupRequest userSignupRequest) {
         if (userRepository.existsByEmail(userSignupRequest.email())) {
             throw ErrorCode.DATA_CONFLICT.toException();
         }
-        if (pendingUserRepository.existsByEmail(userSignupRequest.email())) {
-            pendingUserRepository.deleteByEmail(userSignupRequest.email());
-            pendingUserRepository.flush();
+        Optional<EmailVerification> emailVerification = emailVerificationRepository.findByEmail(
+            userSignupRequest.email());
+        if (emailVerification.isEmpty()) {
+            throw ErrorCode.DATA_NOT_FOUND.toException();
+        }
+        if (!emailVerification.get().getCode().equals(userSignupRequest.code())) {
+            throw ErrorCode.INVALID_EMAIL_CODE.toException();
         }
 
+        emailVerificationRepository.deleteByEmail(userSignupRequest.email());
+        emailVerificationRepository.flush();
+
         String encodedPassword = passwordEncoder.encode(userSignupRequest.password());
-        String token = jwtTokenProvider.issueEmailToken(userSignupRequest.email());
-        String resendToken = jwtTokenProvider.issueEmailToken(userSignupRequest.email());
 
-        PendingUser pendingUser = UserMapper.fromUserCreateRequest(userSignupRequest,
-            encodedPassword, token, resendToken);
+        User user = UserMapper.fromUserSignupRequest(userSignupRequest, encodedPassword);
 
-        emailService.sendVerificationEmail(pendingUser.getEmail(), token);
+        userRepository.save(user);
+    }
 
-        return UserMapper.toVerificationResendResponse(pendingUserRepository.save(pendingUser));
+    @Transactional
+    public VerificationResendResponse sendVerificationEmail(String email) {
+        String code = CodeGenerator.generateCode();
+        String resendToken = jwtTokenProvider.issueEmailToken(email);
+
+        EmailVerification emailVerification = emailVerificationRepository.save(
+            UserMapper.toEmailCode(email, code, resendToken));
+        emailService.sendVerificationEmail(email, code);
+        return UserMapper.toVerificationResendResponse(emailVerification);
     }
 
     @Transactional
@@ -77,42 +91,36 @@ public class AuthService {
             throw ErrorCode.DATA_CONFLICT.toException();
         }
 
-        PendingUser pendingUser = pendingUserRepository.findByResendToken(resendToken)
+        EmailVerification emailVerification = emailVerificationRepository.findByResendToken(
+                resendToken)
             .orElseThrow(ErrorCode.USER_NOT_FOUND::toException);
 
-        if (pendingUser.getResendCount() >= resendLimit) {
+        if (emailVerification.getResendCount() >= resendLimit) {
             throw ErrorCode.TOO_MANY_RESEND.toException();
         }
 
-        String newToken = jwtTokenProvider.issueEmailToken(pendingUser.getEmail());
-        pendingUser.updateToken(newToken);
-        pendingUser.countResend();
+        String newCode = CodeGenerator.generateCode();
+        emailVerification.updateCode(newCode);
+        emailVerification.countResend();
 
-        emailService.sendVerificationEmail(pendingUser.getEmail(), newToken);
+        emailService.sendVerificationEmail(emailVerification.getEmail(), newCode);
 
-        return UserMapper.toVerificationResendResponse(pendingUser);
+        return UserMapper.toVerificationResendResponse(emailVerification);
     }
 
     @Transactional
-    public void verifyEmail(String token) {
-        try {
-            jwtTokenProvider.validate(token);
-        } catch (JwtException e) {
-            throw ErrorCode.INVALID_TOKEN.toException();
-        }
-
-        String email = jwtTokenProvider.getSubject(token);
+    public void verifyEmail(String email, String code) {
         if (userRepository.existsByEmail(email)) {
             throw ErrorCode.DATA_CONFLICT.toException();
         }
-        Optional<PendingUser> pendingUser = pendingUserRepository.findByToken(token);
-        if (pendingUser.isEmpty()) {
-            throw ErrorCode.USER_NOT_FOUND.toException();
+        Optional<EmailVerification> emailVerification = emailVerificationRepository.findByEmail(
+            email);
+        if (emailVerification.isEmpty()) {
+            throw ErrorCode.DATA_NOT_FOUND.toException();
         }
-
-        User user = UserMapper.fromPendingUser(pendingUser.get());
-        userRepository.save(user);
-        pendingUserRepository.delete(pendingUser.get());
+        if (!emailVerification.get().getCode().equals(code)) {
+            throw ErrorCode.INVALID_EMAIL_CODE.toException();
+        }
     }
 
     @Transactional
