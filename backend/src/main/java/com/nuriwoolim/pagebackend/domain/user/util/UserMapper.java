@@ -1,9 +1,7 @@
 package com.nuriwoolim.pagebackend.domain.user.util;
 
 import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
-import com.nuriwoolim.pagebackend.domain.user.dto.UserSignupRequest;
-import com.nuriwoolim.pagebackend.domain.user.dto.VerificationResendResponse;
-import com.nuriwoolim.pagebackend.domain.user.entity.PendingUser;
+import com.nuriwoolim.pagebackend.domain.user.entity.EmailVerification;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -22,30 +20,11 @@ public class UserMapper {
             .build();
     }
 
-    public static PendingUser fromUserCreateRequest(final UserSignupRequest userSignupRequest,
-        final String encodedPassword, String token, String resendToken) {
-        return PendingUser.builder()
-            .name(userSignupRequest.name())
-            .email(userSignupRequest.email())
-            .password(encodedPassword)
-            .token(token)
+    public static EmailVerification toEmailCode(String email, String code, String resendToken) {
+        return EmailVerification.builder()
+            .email(email)
+            .code(code)
             .resendToken(resendToken)
-            .build();
-    }
-
-    public static User fromPendingUser(final PendingUser pendingUser) {
-        return User.builder()
-            .name(pendingUser.getName())
-            .email(pendingUser.getEmail())
-            .password(pendingUser.getPassword())
-            .build();
-    }
-
-    public static VerificationResendResponse toVerificationResendResponse(
-        final PendingUser pendingUser) {
-        return VerificationResendResponse.builder()
-            .resendToken(pendingUser.getResendToken())
-            .resendCount(pendingUser.getResendCount())
             .build();
     }
 }
