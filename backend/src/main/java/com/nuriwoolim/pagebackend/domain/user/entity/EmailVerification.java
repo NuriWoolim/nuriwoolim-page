@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,7 +34,15 @@ public class EmailVerification extends BaseEntity {
     private String resendToken;
 
     @Column(nullable = false)
+    @Builder.Default
     private int resendCount = 0;
+
+    @Builder.Default
+    private LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(5);
+
+    public boolean isExpired() {
+        return LocalDateTime.now().isAfter(expiresAt);
+    }
 
     public void updateCode(String code) {
         this.code = code;
@@ -43,3 +52,8 @@ public class EmailVerification extends BaseEntity {
         this.resendCount++;
     }
 }
+
+
+
+
+
