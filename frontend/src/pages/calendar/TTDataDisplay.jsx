@@ -2,7 +2,7 @@ import { React, useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import styled from "styled-components";
 import { HexColorPicker } from "react-colorful";
-import { READ, UPDATE, CREATE } from "./detailedDate";
+import { READ, UPDATE, CREATE, TIMELIMIT } from "./detailedDate";
 
 const TTDDContainer = styled.div`
   width: 100%;
@@ -203,6 +203,29 @@ const CreateMode = ({ setDataMode, cells, times }) => {
 };
 
 const TTDataDisplay = ({ selectedTT, dataMode, setDataMode, cells, times }) => {
+  const isSelectedError = () => {
+    let selectedCnt = 0,
+      first = 0,
+      err = 0;
+    cells.map((cell, i) => {
+      // 선택한 자리에 타임테이블 존재하면 에러
+      if (cell.tt !== null && cell.isSelected === true) err = 1;
+
+      if (cell.isSelected === true) selectedCnt += 1;
+
+      if (
+        cell.isSelected === true &&
+        (i == 0 || cells[i - 1].isSelected === false)
+      )
+        first += 1;
+    });
+    // 최대 시간 제한
+    if (selectedCnt > TIMELIMIT) err = 1;
+    // 연속적이어야함, 최소 하나 선택해야함
+    if (first != 1) err = 1;
+
+    return err;
+  };
   return (
     <TTDDContainer>
       {dataMode === CREATE ? (
@@ -217,8 +240,14 @@ const TTDataDisplay = ({ selectedTT, dataMode, setDataMode, cells, times }) => {
           selectedTT={selectedTT}
         />
       )}
-      {dataMode !== CREATE && (
-        <button onClick={() => setDataMode(CREATE)}>일정 추가</button>
+      {selectedTT === null && isSelectedError() === 0 && (
+        <button
+          onClick={() => {
+            setDataMode(CREATE);
+          }}
+        >
+          일정 추가
+        </button>
       )}
     </TTDDContainer>
   );

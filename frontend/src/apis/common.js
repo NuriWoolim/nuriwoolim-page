@@ -36,7 +36,7 @@ export const TimeTableAPI = {
             title: "로켓트",
             team: "진석팀",
             description: "보컬 없는 합주 준사운드에서",
-            color: "0",
+            color: "4",
             start: "2025-8-14T16:00", //"2023-12-25T16:00"
             end: "2025-8-14T18:00", //"2023-12-25T18:00"
           },
@@ -54,7 +54,7 @@ export const TimeTableAPI = {
             title: "게와수돗물",
             team: "호정팀",
             description: "끝나고 회식하죠",
-            color: "#2567ffff",
+            color: "5",
             start: "2025-8-14T12:00", //"2023-12-25T16:00"
             end: "2025-8-14T13:30", //"2023-12-25T18:00"
           },

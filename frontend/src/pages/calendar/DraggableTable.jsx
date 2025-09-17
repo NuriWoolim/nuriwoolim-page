@@ -1,6 +1,7 @@
 import { React, useState, useEffect, useCallback } from "react";
 import styled from "styled-components";
 import _ from "lodash";
+import { TTColors } from "../../data/CalendarData";
 
 const GridContainer = styled.div`
   display: grid;
@@ -14,10 +15,17 @@ const TableCell = styled.div`
   /* box-sizing: border-box; */
   cursor: pointer;
 
-  font-size: 0.8rem;
+  color: #486284;
+  font-family: Pretendard;
+  font-size: 0.9rem;
+  font-style: normal;
+  font-weight: 800;
+  line-height: normal;
+  letter-spacing: -1.25px;
+
   overflow: hidden;
   text-overflow: clip;
-  /* border-right: solid 1px #ccc; */
+  border-bottom: solid 0.5px #acbeff;
 
   background-color: ${(props) => props.$color};
 
@@ -52,6 +60,22 @@ const TTTCell = styled.div`
   }
 `;
 
+const TTTInnerBlock = styled.div`
+  padding: 10px;
+  margin-left: 1.5rem;
+  width: 60%;
+  height: 60%;
+
+  pointer-events: ${(props) => (props.$isTouched === -1 ? "auto" : "none")};
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  border-radius: 2px;
+  background-color: ${(props) => props.$color1};
+  color: ${(props) => props.$color2};
+`;
 const Wrapper = styled.div`
   position: relative;
 `;
@@ -68,7 +92,7 @@ const DraggableTable = ({
   const [TTTCells, setTTTCells] = useState([]);
   const [TTTStyle, setTTTStyle] = useState("");
 
-  useEffect(() => {
+  const clearCells = () => {
     let newCells = [...cells];
     for (let i = 0; i < times.length; i++) {
       newCells[i] = {
@@ -77,7 +101,8 @@ const DraggableTable = ({
       };
     }
     setCells(newCells);
-  }, [enableChange]);
+  };
+  useEffect(clearCells, []);
 
   // cells를 채워주는 useEffect
   const initTable = useEffect(() => {
@@ -119,13 +144,13 @@ const DraggableTable = ({
         cssstr += String(cnt * 2) + "rem ";
 
         if (prev === null) cellData.push(null);
-        else cellData.push({ title: prev.title, team: prev.team });
+        else cellData.push({ ...prev });
         cnt = 1;
       }
       prev = cells[i].tt;
     }
     if (prev === null) cellData.push(null);
-    else cellData.push({ title: prev.title, team: prev.team });
+    else cellData.push({ ...prev });
     cssstr += String(cnt * 2) + "rem ";
     setTTTStyle(cssstr);
     setTTTCells(cellData);
@@ -133,6 +158,9 @@ const DraggableTable = ({
 
   const handleTouchStart = useCallback((e) => {
     // if (isTouched != -1) return;
+
+    // 표시하는 일정 없애버리기
+    setSelectedTT(null);
     const target = e.target.closest("div[data-key]");
     if (!target) return;
 
@@ -141,6 +169,14 @@ const DraggableTable = ({
     setCells((prevSelected) => {
       const newSelected = [...prevSelected];
 
+      // 처음 눌렀을 때 초기화 하는 동작을 없애려면 아래 블록 주석처리.
+      for (let i = 0; i < times.length; i++) {
+        newSelected[i] = {
+          ...newSelected[i],
+          isSelected: false,
+        };
+      }
+      //
       newSelected[col] = {
         ...newSelected[col],
         isSelected: !newSelected[col].isSelected,
@@ -148,10 +184,11 @@ const DraggableTable = ({
       return newSelected;
     });
     setIsTouched(col);
+    console.log("start");
   }, []);
 
   const handleTouchEnd = useCallback(() => {
-    // console.log("start");
+    console.log("end");
 
     setIsTouched(-1);
   }, []);
@@ -179,22 +216,20 @@ const DraggableTable = ({
       // console.log(cur_col, lastTouchedCol)
       //////////
 
-      const newSelected = [...cells];
+      //   console.log(cells);
+      let newSelected = [...cells];
 
       const minCol = Math.min(st_col, cur_col);
       const maxCol = Math.max(st_col, cur_col);
 
       for (let c = minCol; c <= maxCol; c++) {
-        if (c == st_col) continue;
-
-        if (add_dates) newSelected[c].isSelected = true;
-        else newSelected[c].isSelected = false;
+        if (c === st_col) continue;
+        newSelected[c] = { ...newSelected[c], isSelected: add_dates };
       }
-      //   console.log(st_col, cur_col);
 
       setCells(newSelected);
 
-      console.log(newSelected);
+      //   console.log(newSelected);
     }, 75),
     [isTouched]
   );
@@ -231,16 +266,8 @@ const DraggableTable = ({
           <TableCell
             key={index}
             data-key={index}
-            onClick={
-              enableChange
-                ? undefined
-                : () => {
-                    if (cells[index].tt !== null)
-                      return setSelectedTT(cells[index].tt);
-                  }
-            }
             $color={
-              cells[index]?.isSelected === false ? "white" : "green"
+              cells[index]?.isSelected === false ? "white" : "#FFF7E2;"
               // : cells[index] === 1
               // ? "green"
               // : cells[index]?.color ?? "white"
@@ -251,7 +278,7 @@ const DraggableTable = ({
           </TableCell>
         ))}
       </GridContainer>
-      {/* <TTTitleContainer
+      <TTTitleContainer
         id="TTTitleContainer"
         style={{
           gridTemplateRows: TTTStyle,
@@ -259,11 +286,33 @@ const DraggableTable = ({
       >
         {TTTCells.map((cell, index) => (
           <TTTCell key={index}>
-            <div>{TTTCells[index] === null ? null : TTTCells[index].title}</div>
-            <div>{TTTCells[index] === null ? null : TTTCells[index].team}</div>
+            {TTTCells[index] !== null && (
+              <TTTInnerBlock
+                onClick={() => {
+                  if (enableChange) clearCells();
+                  return setSelectedTT(TTTCells[index]);
+                }}
+                $color1={
+                  TTColors[parseInt(TTTCells[index].color)]?.[0] ??
+                  TTColors[0][0]
+                }
+                $color2={
+                  TTColors[parseInt(TTTCells[index].color)]?.[1] ??
+                  TTColors[0][1]
+                }
+                $isTouched={isTouched}
+              >
+                <div>
+                  {TTTCells[index] === null ? null : TTTCells[index].title}
+                </div>
+                <div>
+                  {TTTCells[index] === null ? null : TTTCells[index].team}
+                </div>
+              </TTTInnerBlock>
+            )}
           </TTTCell>
         ))}
-      </TTTitleContainer> */}
+      </TTTitleContainer>
     </Wrapper>
   );
 };

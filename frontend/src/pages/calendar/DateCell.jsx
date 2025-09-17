@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { React, useState, useRef } from "react";
 import styled from "styled-components";
 import { TimeTableAPI } from "../../apis/common";
 import CustomModal from "../CustomModal";
@@ -72,6 +72,27 @@ const TimeTableContainer = styled.div`
   }
 `;
 
+const Overlay = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+`;
+
+const DropdownContainer = styled.div`
+  position: fixed;
+  z-index: 20;
+  background: white;
+  box-shadow: 4px 4px 18px rgba(0, 0, 0, 0.6);
+  min-width: 300px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow: auto;
+
+  left: ${(props) => props.$x}px;
+  top: ${(props) => props.$y}px;
+  transform: translate(-50%, -50%);
+`;
+
 const DateCell = ({ dateObj, timetables, isSameMonth }) => {
   const date = new Date(dateObj);
   const today = new Date();
@@ -80,12 +101,30 @@ const DateCell = ({ dateObj, timetables, isSameMonth }) => {
   const [loading, setLoading] = useState(true);
 
   const [isDetailedDateOpen, setIsDetailedDateOpen] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({ x: 0, y: 0 });
+  const divRef = useRef(null);
+
+  // 드롭다운 열기 함수 (dateObj를 클릭할 때 호출)
+  const openDetailedDate = (event) => {
+    const rect = divRef.current.getBoundingClientRect();
+    setDropdownPosition({
+      x: rect.left + rect.width / 2,
+      y: window.innerHeight / 2,
+    });
+    setIsDetailedDateOpen(true);
+  };
+
+  // 드롭다운 닫기
+  const closeDetailedDate = () => {
+    setIsDetailedDateOpen(false);
+  };
 
   return (
     <>
       <DateCellContainer
-        onClick={() => setIsDetailedDateOpen(true)}
+        onClick={openDetailedDate}
         $isSameMonth={isSameMonth}
+        ref={divRef}
       >
         <h2>{date.getDate()}</h2>
 
@@ -107,12 +146,12 @@ const DateCell = ({ dateObj, timetables, isSameMonth }) => {
         )}
       </DateCellContainer>
 
-      <CustomModal
-        isOpen={isDetailedDateOpen}
-        onRequestClose={() => setIsDetailedDateOpen(false)}
-      >
-        <DetailedDate dateObj={dateObj} />
-      </CustomModal>
+      {isDetailedDateOpen && <Overlay onClick={closeDetailedDate} />}
+      {isDetailedDateOpen && (
+        <DropdownContainer $x={dropdownPosition.x} $y={dropdownPosition.y}>
+          <DetailedDate dateObj={dateObj} />
+        </DropdownContainer>
+      )}
     </>
   );
 };
