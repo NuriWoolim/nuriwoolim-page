@@ -6,20 +6,15 @@ import com.nuriwoolim.pagebackend.core.jwt.util.JwtTokenProvider;
 import com.nuriwoolim.pagebackend.core.security.CustomUserDetails;
 import com.nuriwoolim.pagebackend.domain.user.dto.LoginDTO;
 import com.nuriwoolim.pagebackend.domain.user.dto.LoginRequest;
+import com.nuriwoolim.pagebackend.domain.user.dto.PasswordResetRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.TokenPair;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserSignupRequest;
-import com.nuriwoolim.pagebackend.domain.user.dto.VerificationResendResponse;
-import com.nuriwoolim.pagebackend.domain.user.entity.PendingUser;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
-import com.nuriwoolim.pagebackend.domain.user.repository.PendingUserRepository;
 import com.nuriwoolim.pagebackend.domain.user.repository.UserRepository;
 import com.nuriwoolim.pagebackend.domain.user.util.UserMapper;
-import com.nuriwoolim.pagebackend.global.email.service.EmailService;
 import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
-import io.jsonwebtoken.JwtException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -32,87 +27,33 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final PendingUserRepository pendingUserRepository;
     private final PasswordEncoder passwordEncoder;
-    private final EmailService emailService;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenRepository refreshTokenRepository;
-
-    @Value("${custom.resendLimit}")
-    private int resendLimit;
+    private final UserService userService;
+    private final EmailVerificationService emailVerificationService;
 
     @Transactional
-    public VerificationResendResponse signUp(UserSignupRequest userSignupRequest) {
-        if (userRepository.existsByEmail(userSignupRequest.email())) {
-            throw ErrorCode.DATA_CONFLICT.toException();
-        }
-        if (pendingUserRepository.existsByEmail(userSignupRequest.email())) {
-            pendingUserRepository.deleteByEmail(userSignupRequest.email());
-            pendingUserRepository.flush();
-        }
+    public void signUp(UserSignupRequest userSignupRequest) {
+        checkEmail(userSignupRequest.email());
+
+        emailVerificationService.verifyEmail(userSignupRequest.email(), userSignupRequest.code());
+
+        emailVerificationService.deleteVerification(userSignupRequest.email());
 
         String encodedPassword = passwordEncoder.encode(userSignupRequest.password());
-        String token = jwtTokenProvider.issueEmailToken(userSignupRequest.email());
-        String resendToken = jwtTokenProvider.issueEmailToken(userSignupRequest.email());
 
-        PendingUser pendingUser = UserMapper.fromUserCreateRequest(userSignupRequest,
-            encodedPassword, token, resendToken);
+        User user = UserMapper.fromUserSignupRequest(userSignupRequest, encodedPassword);
 
-        emailService.sendVerificationEmail(pendingUser.getEmail(), token);
-
-        return UserMapper.toVerificationResendResponse(pendingUserRepository.save(pendingUser));
-    }
-
-    @Transactional
-    public VerificationResendResponse resendVerificationEmail(String resendToken) {
-        try {
-            jwtTokenProvider.validate(resendToken);
-        } catch (JwtException e) {
-            throw ErrorCode.INVALID_TOKEN.toException();
-        }
-
-        String email = jwtTokenProvider.getSubject(resendToken);
-        if (userRepository.existsByEmail(email)) {
-            throw ErrorCode.DATA_CONFLICT.toException();
-        }
-
-        PendingUser pendingUser = pendingUserRepository.findByResendToken(resendToken)
-            .orElseThrow(ErrorCode.USER_NOT_FOUND::toException);
-
-        if (pendingUser.getResendCount() >= resendLimit) {
-            throw ErrorCode.TOO_MANY_RESEND.toException();
-        }
-
-        String newToken = jwtTokenProvider.issueEmailToken(pendingUser.getEmail());
-        pendingUser.updateToken(newToken);
-        pendingUser.countResend();
-
-        emailService.sendVerificationEmail(pendingUser.getEmail(), newToken);
-
-        return UserMapper.toVerificationResendResponse(pendingUser);
-    }
-
-    @Transactional
-    public void verifyEmail(String token) {
-        try {
-            jwtTokenProvider.validate(token);
-        } catch (JwtException e) {
-            throw ErrorCode.INVALID_TOKEN.toException();
-        }
-
-        String email = jwtTokenProvider.getSubject(token);
-        if (userRepository.existsByEmail(email)) {
-            throw ErrorCode.DATA_CONFLICT.toException();
-        }
-        Optional<PendingUser> pendingUser = pendingUserRepository.findByToken(token);
-        if (pendingUser.isEmpty()) {
-            throw ErrorCode.USER_NOT_FOUND.toException();
-        }
-
-        User user = UserMapper.fromPendingUser(pendingUser.get());
         userRepository.save(user);
-        pendingUserRepository.delete(pendingUser.get());
+    }
+
+    @Transactional
+    public void checkEmail(String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw ErrorCode.DATA_CONFLICT.toException("이미 존재하는 사용자입니다.");
+        }
     }
 
     @Transactional
@@ -178,5 +119,16 @@ public class AuthService {
             throw ErrorCode.INVALID_TOKEN.toException();
         }
         refreshTokenRepository.deleteByToken(refreshToken);
+    }
+
+    @Transactional
+    public void resetPassword(PasswordResetRequest request) {
+        User user = userService.getUserByEmail(request.email());
+        emailVerificationService.verifyEmail(request.email(), request.code());
+
+        String encodedPassword = passwordEncoder.encode(request.password());
+        user.updatePassword(encodedPassword);
+
+        emailVerificationService.deleteVerification(user.getEmail());
     }
 }

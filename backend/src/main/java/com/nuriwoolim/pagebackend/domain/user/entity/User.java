@@ -16,8 +16,10 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -34,6 +36,11 @@ import org.hibernate.annotations.SQLRestriction;
 @Builder
 @AllArgsConstructor
 @SQLRestriction("deleted = false")
+@Table(
+    indexes = {
+        @Index(name = "idx_user_email", columnList = "email")
+    }
+)
 public class User extends BaseEntity {
 
     @Id
@@ -82,4 +89,8 @@ public class User extends BaseEntity {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Setter
     private RefreshToken refreshToken;
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
 }

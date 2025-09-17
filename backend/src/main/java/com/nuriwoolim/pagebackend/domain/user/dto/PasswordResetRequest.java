@@ -5,12 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 
-
 @Builder
-public record UserSignupRequest(
-    @NotBlank
-    String name,
-
+public record PasswordResetRequest(
     @Email
     @NotBlank
     String email,
@@ -21,7 +17,6 @@ public record UserSignupRequest(
     String password,
 
     @NotBlank
-    String code
-) {
+    String code) {
 
 }
