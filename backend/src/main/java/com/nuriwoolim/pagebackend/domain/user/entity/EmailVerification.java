@@ -30,25 +30,10 @@ public class EmailVerification extends BaseEntity {
     @Column(nullable = false)
     private String code;
 
-    @Column(nullable = false)
-    private String resendToken;
-
-    @Column(nullable = false)
-    @Builder.Default
-    private int resendCount = 0;
-
     private LocalDateTime expiresAt;
 
     public boolean isExpired() {
         return LocalDateTime.now().isAfter(expiresAt);
-    }
-
-    public void updateCode(String code) {
-        this.code = code;
-    }
-
-    public void countResend() {
-        this.resendCount++;
     }
 
     public void setExpiresAt(int minutes) {

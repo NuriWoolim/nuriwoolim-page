@@ -2,7 +2,6 @@ package com.nuriwoolim.pagebackend.domain.user.util;
 
 import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserSignupRequest;
-import com.nuriwoolim.pagebackend.domain.user.dto.VerificationResendResponse;
 import com.nuriwoolim.pagebackend.domain.user.entity.EmailVerification;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import lombok.AccessLevel;
@@ -31,19 +30,10 @@ public class UserMapper {
             .build();
     }
 
-    public static EmailVerification toEmailCode(String email, String code, String resendToken) {
+    public static EmailVerification toEmailVerification(String email, String code) {
         return EmailVerification.builder()
             .email(email)
             .code(code)
-            .resendToken(resendToken)
-            .build();
-    }
-
-    public static VerificationResendResponse toVerificationResendResponse(
-        EmailVerification emailVerification) {
-        return VerificationResendResponse.builder()
-            .resendToken(emailVerification.getResendToken())
-            .resendCount(emailVerification.getResendCount())
             .build();
     }
 }
