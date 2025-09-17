@@ -10,7 +10,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update # TODO: 나중에 validate로 변경
 
   mail:
     host: smtp.gmail.com

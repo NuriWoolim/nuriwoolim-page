@@ -6,6 +6,7 @@ import com.nuriwoolim.pagebackend.core.jwt.util.JwtTokenProvider;
 import com.nuriwoolim.pagebackend.core.security.CustomUserDetails;
 import com.nuriwoolim.pagebackend.domain.user.dto.LoginDTO;
 import com.nuriwoolim.pagebackend.domain.user.dto.LoginRequest;
+import com.nuriwoolim.pagebackend.domain.user.dto.PasswordResetRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.TokenPair;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserSignupRequest;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
@@ -30,13 +31,13 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserService userService;
     private final EmailVerificationService emailVerificationService;
 
     @Transactional
     public void signUp(UserSignupRequest userSignupRequest) {
-        if (userRepository.existsByEmail(userSignupRequest.email())) {
-            throw ErrorCode.DATA_CONFLICT.toException();
-        }
+        checkEmail(userSignupRequest.email());
+
         emailVerificationService.verifyEmail(userSignupRequest.email(), userSignupRequest.code());
 
         emailVerificationService.deleteVerification(userSignupRequest.email());
@@ -118,5 +119,16 @@ public class AuthService {
             throw ErrorCode.INVALID_TOKEN.toException();
         }
         refreshTokenRepository.deleteByToken(refreshToken);
+    }
+
+    @Transactional
+    public void resetPassword(PasswordResetRequest request) {
+        User user = userService.getUserByEmail(request.email());
+        emailVerificationService.verifyEmail(request.email(), request.code());
+
+        String encodedPassword = passwordEncoder.encode(request.password());
+        user.updatePassword(encodedPassword);
+
+        emailVerificationService.deleteVerification(user.getEmail());
     }
 }

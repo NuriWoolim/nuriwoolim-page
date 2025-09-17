@@ -3,6 +3,7 @@ package com.nuriwoolim.pagebackend.domain.user.controller;
 import com.nuriwoolim.pagebackend.core.jwt.util.TokenResponseHandler;
 import com.nuriwoolim.pagebackend.domain.user.dto.LoginDTO;
 import com.nuriwoolim.pagebackend.domain.user.dto.LoginRequest;
+import com.nuriwoolim.pagebackend.domain.user.dto.PasswordResetRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.TokenPair;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserSignupRequest;
@@ -100,6 +101,11 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    //TODO: 1. 비밀번호 찾기 메일 전송, 2. 비밀번호 찾기 메일 재전송, 3. 비밀번호 재설정
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@RequestBody @Valid PasswordResetRequest request) {
+        authService.resetPassword(request);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 
 }

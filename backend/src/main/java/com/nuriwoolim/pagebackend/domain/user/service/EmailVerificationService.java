@@ -75,7 +75,7 @@ public class EmailVerificationService {
         Optional<EmailVerification> emailVerification = emailVerificationRepository.findByEmail(
             email);
         if (emailVerification.isEmpty()) {
-            throw ErrorCode.DATA_NOT_FOUND.toException();
+            throw ErrorCode.DATA_NOT_FOUND.toException("인증 정보가 없습니다.");
         }
 
         EmailVerification verification = emailVerification.get();
