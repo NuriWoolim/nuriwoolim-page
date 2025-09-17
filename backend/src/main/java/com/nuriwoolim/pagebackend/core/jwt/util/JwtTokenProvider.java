@@ -32,25 +32,12 @@ public class JwtTokenProvider {
         );
     }
 
-    public String issueEmailToken(String email) {
-        return issue(email, jwtConfig.expire().email());
-    }
-
     public String issueAccessToken(User user) {
         return issue(user, jwtConfig.expire().access());
     }
 
     public String issueRefreshToken(User user) {
         return issue(user, jwtConfig.expire().refresh());
-    }
-
-    private String issue(String email, Long expTime) {
-        return Jwts.builder()
-            .subject(email)
-            .issuedAt(new Date())
-            .expiration(new Date(new Date().getTime() + expTime))
-            .signWith(getSecretKey(), macAlgorithm)
-            .compact();
     }
 
     private String issue(User user, Long expTime) {
@@ -92,10 +79,5 @@ public class JwtTokenProvider {
             .email(email)
             .type(type)
             .build();
-    }
-
-    public String getSubject(String token) {
-        Jws<Claims> claimsJws = getJwtParser().parseSignedClaims(token);
-        return claimsJws.getPayload().getSubject();
     }
 }

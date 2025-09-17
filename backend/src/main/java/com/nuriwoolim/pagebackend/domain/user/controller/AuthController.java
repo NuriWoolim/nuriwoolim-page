@@ -7,7 +7,6 @@ import com.nuriwoolim.pagebackend.domain.user.dto.PasswordResetRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.TokenPair;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserSignupRequest;
-import com.nuriwoolim.pagebackend.domain.user.dto.VerificationResendResponse;
 import com.nuriwoolim.pagebackend.domain.user.service.AuthService;
 import com.nuriwoolim.pagebackend.domain.user.service.EmailVerificationService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -88,17 +87,9 @@ public class AuthController {
     }
 
     @GetMapping("/send-verification")
-    public ResponseEntity<VerificationResendResponse> sendVerification(@RequestParam String email) {
-        VerificationResendResponse response = emailVerificationService.sendVerificationEmail(email);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/resend-verification")
-    public ResponseEntity<VerificationResendResponse> resendVerification(
-        @RequestParam String resendToken) {
-        VerificationResendResponse response = emailVerificationService.resendVerificationEmail(
-            resendToken);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<Void> sendVerification(@RequestParam String email) {
+        emailVerificationService.sendVerificationEmail(email);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PostMapping("/reset-password")
