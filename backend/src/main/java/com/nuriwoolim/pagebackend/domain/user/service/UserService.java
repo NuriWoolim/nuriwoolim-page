@@ -34,6 +34,12 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+            .orElseThrow(ErrorCode.USER_NOT_FOUND::toException);
+    }
+
+    @Transactional(readOnly = true)
     public boolean isManager(Long userId) {
         User user = getUserById(userId);
         return user.getType() == UserType.ADMIN || user.getType() == UserType.MANAGER;

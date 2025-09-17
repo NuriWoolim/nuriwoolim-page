@@ -16,6 +16,8 @@ public enum ErrorCode {
     ROLE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "역할이 올바르지 않습니다."),
     PASSWORD_BAD_REQUEST(HttpStatus.BAD_REQUEST, "비밀번호가 올바르지 않습니다."),
     TOO_MANY_RESEND(HttpStatus.BAD_REQUEST, "인증 메일 재전송 요청이 너무 많습니다."),
+    INVALID_EMAIL_CODE(HttpStatus.BAD_REQUEST, "이메일 인증 코드가 적절하지 않습니다"),
+    EXPIRED_EMAIL_CODE(HttpStatus.BAD_REQUEST, "이메일 인증 코드가 만료되었습니다."),
 
     /*
      *  401 Unauthroized

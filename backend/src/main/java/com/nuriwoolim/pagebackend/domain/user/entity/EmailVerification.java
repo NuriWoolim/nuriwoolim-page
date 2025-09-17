@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,35 +18,45 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @AllArgsConstructor
-public class PendingUser extends BaseEntity {
+public class EmailVerification extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 20)
-    private String name;
-
     @Column(nullable = false, unique = true, length = 50)
     private String email;
 
     @Column(nullable = false)
-    private String password;
-
-    @Column(nullable = false, unique = true)
-    private String token;
+    private String code;
 
     @Column(nullable = false)
     private String resendToken;
 
     @Column(nullable = false)
+    @Builder.Default
     private int resendCount = 0;
 
-    public void updateToken(String token) {
-        this.token = token;
+    private LocalDateTime expiresAt;
+
+    public boolean isExpired() {
+        return LocalDateTime.now().isAfter(expiresAt);
+    }
+
+    public void updateCode(String code) {
+        this.code = code;
     }
 
     public void countResend() {
         this.resendCount++;
     }
+
+    public void setExpiresAt(int minutes) {
+        expiresAt = LocalDateTime.now().plusMinutes(minutes);
+    }
 }
+
+
+
+
+
