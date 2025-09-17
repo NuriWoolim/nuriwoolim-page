@@ -38,9 +38,8 @@ custom:
     expire:
       access: 3600_000 #1시간
       refresh: 259200_000 #3일
-      email: 600_000 # 10분
     secret-key: Q04DkgiuhVJ9fTCrBGTBJL4rr26mzP1czFELe7L74xB7Z+TOIt3KjGpzH4CTax5lzlqlJcCIpKzNf/g+59AWrA==
-  resendLimit: 5
+  resendTime: 30 #30초
   verificationExpires: 10
   cors:
     origins: ${PRIVATE_ORIGINS}

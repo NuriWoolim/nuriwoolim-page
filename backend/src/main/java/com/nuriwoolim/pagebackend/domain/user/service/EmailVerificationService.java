@@ -1,14 +1,11 @@
 package com.nuriwoolim.pagebackend.domain.user.service;
 
-import com.nuriwoolim.pagebackend.core.jwt.util.JwtTokenProvider;
-import com.nuriwoolim.pagebackend.domain.user.dto.VerificationResendResponse;
 import com.nuriwoolim.pagebackend.domain.user.entity.EmailVerification;
 import com.nuriwoolim.pagebackend.domain.user.repository.EmailVerificationRepository;
 import com.nuriwoolim.pagebackend.domain.user.util.CodeGenerator;
 import com.nuriwoolim.pagebackend.domain.user.util.UserMapper;
 import com.nuriwoolim.pagebackend.global.email.service.EmailService;
 import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
-import io.jsonwebtoken.JwtException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -24,54 +21,31 @@ import org.springframework.transaction.annotation.Transactional;
 public class EmailVerificationService {
 
     private final EmailVerificationRepository emailVerificationRepository;
-    private final JwtTokenProvider jwtTokenProvider;
     private final EmailService emailService;
-    @Value("${custom.resendLimit}")
-    private int resendLimit;
+
+    @Value("${custom.resendTime}")
+    private int resendTime;
 
     @Value("${custom.verificationExpires}")
     private int verificationExpires;
 
     @Transactional
-    public VerificationResendResponse sendVerificationEmail(String email) {
+    public void sendVerificationEmail(String email) {
         String code = CodeGenerator.generateCode();
-        String resendToken = jwtTokenProvider.issueEmailToken(email);
+        Optional<EmailVerification> optional = emailVerificationRepository.findByEmail(email);
 
-        if (emailVerificationRepository.existsByEmail(email)) {
+        if (optional.isPresent()) {
+            if (LocalDateTime.now()
+                .isBefore(optional.get().getCreatedAt().plusSeconds(resendTime))) {
+                throw ErrorCode.TOO_MANY_RESEND.toException();
+            }
             emailVerificationRepository.deleteByEmail(email);
             emailVerificationRepository.flush();
         }
-        EmailVerification emailVerification = UserMapper.toEmailCode(email, code, resendToken);
+        EmailVerification emailVerification = UserMapper.toEmailVerification(email, code);
         emailVerification.setExpiresAt(verificationExpires);
-        EmailVerification saved = emailVerificationRepository.save(emailVerification);
+        emailVerificationRepository.save(emailVerification);
         emailService.sendVerificationEmail(email, code);
-        return UserMapper.toVerificationResendResponse(saved);
-    }
-
-    @Transactional
-    public VerificationResendResponse resendVerificationEmail(String resendToken) {
-        try {
-            jwtTokenProvider.validate(resendToken);
-        } catch (JwtException e) {
-            throw ErrorCode.INVALID_TOKEN.toException();
-        }
-
-        EmailVerification emailVerification = emailVerificationRepository.findByResendToken(
-                resendToken)
-            .orElseThrow(ErrorCode.USER_NOT_FOUND::toException);
-
-        if (emailVerification.getResendCount() >= resendLimit) {
-            throw ErrorCode.TOO_MANY_RESEND.toException();
-        }
-
-        String newCode = CodeGenerator.generateCode();
-        emailVerification.updateCode(newCode);
-        emailVerification.countResend();
-        emailVerification.setExpiresAt(verificationExpires);
-
-        emailService.sendVerificationEmail(emailVerification.getEmail(), newCode);
-
-        return UserMapper.toVerificationResendResponse(emailVerification);
     }
 
     @Transactional
