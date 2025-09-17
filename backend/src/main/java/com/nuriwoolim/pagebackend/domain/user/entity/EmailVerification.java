@@ -46,6 +46,7 @@ public class EmailVerification extends BaseEntity {
 
     public void updateCode(String code) {
         this.code = code;
+        expiresAt = LocalDateTime.now().plusMinutes(5);
     }
 
     public void countResend() {
