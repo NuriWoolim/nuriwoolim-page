@@ -21,6 +21,6 @@ public interface EmailVerificationRepository extends JpaRepository<EmailVerifica
     Optional<EmailVerification> findByResendToken(String resendToken);
 
     @Modifying
-    @Query("DELETE FROM EmailVerification e WHERE e.expiresAt < :expirationTime")
+    @Query("DELETE FROM EmailVerification e WHERE e.expiresAt < :expirationTime OR e.expiresAt is null ")
     int deleteByExpiresAtBefore(@Param("expirationTime") LocalDateTime expirationTime);
 }

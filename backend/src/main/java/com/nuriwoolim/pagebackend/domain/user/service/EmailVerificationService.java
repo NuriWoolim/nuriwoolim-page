@@ -29,6 +29,9 @@ public class EmailVerificationService {
     @Value("${custom.resendLimit}")
     private int resendLimit;
 
+    @Value("${custom.verificationExpires}")
+    private int verificationExpires;
+
     @Transactional
     public VerificationResendResponse sendVerificationEmail(String email) {
         String code = CodeGenerator.generateCode();
@@ -38,11 +41,11 @@ public class EmailVerificationService {
             emailVerificationRepository.deleteByEmail(email);
             emailVerificationRepository.flush();
         }
-
-        EmailVerification emailVerification = emailVerificationRepository.save(
-            UserMapper.toEmailCode(email, code, resendToken));
+        EmailVerification emailVerification = UserMapper.toEmailCode(email, code, resendToken);
+        emailVerification.setExpiresAt(verificationExpires);
+        EmailVerification saved = emailVerificationRepository.save(emailVerification);
         emailService.sendVerificationEmail(email, code);
-        return UserMapper.toVerificationResendResponse(emailVerification);
+        return UserMapper.toVerificationResendResponse(saved);
     }
 
     @Transactional
@@ -64,6 +67,7 @@ public class EmailVerificationService {
         String newCode = CodeGenerator.generateCode();
         emailVerification.updateCode(newCode);
         emailVerification.countResend();
+        emailVerification.setExpiresAt(verificationExpires);
 
         emailService.sendVerificationEmail(emailVerification.getEmail(), newCode);
 
