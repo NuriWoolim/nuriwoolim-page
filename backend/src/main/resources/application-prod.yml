@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: backend
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://db:3306/${DB_NAME}?serverTimezone=Asia/Seoul
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update # TODO: 나중에 validate로 변경
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+logging:
+  config: classpath:logback-spring-prod.xml
+
+springdoc:
+  swagger-ui:
+    with-credentials: true
+    url: /api/v3/api-docs
+    config-url: /api/v3/api-docs/swagger-config
+
+custom:
+  jwt:
+    expire:
+      access: 3600_000 #1시간
+      refresh: 259200_000 #3일
+      email: 600_000 # 10분
+    secret-key: ${SECRET_KEY}
+  resendTime: 30
+  verificationExpires: 10
+  cors:
+    origins: ${PRIVATE_ORIGINS}

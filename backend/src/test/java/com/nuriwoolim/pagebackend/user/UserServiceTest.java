@@ -1,9 +1,17 @@
 package com.nuriwoolim.pagebackend.user;
 
-import com.nuriwoolim.pagebackend.user.dto.UserCreateRequest;
-import com.nuriwoolim.pagebackend.user.dto.UserUpdateRequest;
-import com.nuriwoolim.pagebackend.util.exception.CustomException;
-import com.nuriwoolim.pagebackend.util.exception.ErrorCode;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
+import com.nuriwoolim.pagebackend.domain.user.entity.User;
+import com.nuriwoolim.pagebackend.domain.user.repository.UserRepository;
+import com.nuriwoolim.pagebackend.domain.user.service.UserService;
+import com.nuriwoolim.pagebackend.global.exception.CustomException;
+import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,17 +19,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @DisplayName("UserService")
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
+
     @InjectMocks
     private UserService userService;
 
@@ -31,14 +32,13 @@ class UserServiceTest {
     @Test
     @DisplayName("유저 Read -> 성공")
     public void findUserById() {
-        User user = User.builder().id(1L).username("username").build();
+        User user = User.builder().id(1L).name("username").build();
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        User findUser = userService.findById(1L);
+        UserResponse findUser = userService.findById(1L);
 
-        assertThat(findUser).isEqualTo(user);
-        assertThat(findUser.getUsername()).isEqualTo("username");
-        assertThat(findUser.getId()).isEqualTo(1L);
+        assertThat(findUser.name()).isEqualTo("username");
+        assertThat(findUser.id()).isEqualTo(1L);
     }
 
     @Test
@@ -46,28 +46,11 @@ class UserServiceTest {
     public void findUserByIdFailure() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
         assertThatThrownBy(() ->
-                userService.findById(1L))
-                .isInstanceOf(CustomException.class)
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.USER_NOT_FOUND);
+            userService.findById(1L))
+            .isInstanceOf(CustomException.class)
+            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.USER_NOT_FOUND);
 
 
-    }
-
-    @Test
-    @DisplayName("유저 Create -> 성공")
-    public void createUser() {
-        UserCreateRequest userCreateRequest = new UserCreateRequest();
-        userCreateRequest.setUsername("username");
-        userCreateRequest.setPassword("password");
-        userCreateRequest.setEmail("email@email.com");
-        userCreateRequest.setNickname("nickname");
-
-        User user = User.of(userCreateRequest);
-
-        when(userRepository.save(any())).thenAnswer(i -> i.getArgument(0));
-        User savedUser = userService.create(userCreateRequest);
-
-        assertThat(savedUser).usingRecursiveComparison().isEqualTo(user);
     }
 
     @Test
@@ -75,29 +58,5 @@ class UserServiceTest {
     public void deleteUserById() {
         userService.delete(1L);
         verify(userRepository).deleteById(1L);
-    }
-
-    @Test
-    @DisplayName("update")
-    public void update() {
-        // given
-        User existing = User.builder().id(1L).nickname("nick").year(0).password("password").email("email@email.com").build();
-        UserUpdateRequest userUpdateRequest = new UserUpdateRequest();
-        userUpdateRequest.setNickname("nick2");
-        userUpdateRequest.setType(UserType.MEMBER);
-        userUpdateRequest.setYear(1);
-        userUpdateRequest.setPassword("password2");
-        userUpdateRequest.setEmail("email2@email.com");
-        User updated = User.builder().id(1L).nickname("nick2").year(1).password("password2").email("email2@email.com")
-                .type(UserType.MEMBER).build();
-
-        when(userRepository.findById(1L)).thenReturn(Optional.of(existing));
-        when(userRepository.save(any())).thenAnswer(i -> i.getArgument(0));
-
-        // when
-        User result = userService.update(1L, userUpdateRequest);
-
-        // then
-        assertThat(result).usingRecursiveComparison().isEqualTo(updated);
     }
 }
