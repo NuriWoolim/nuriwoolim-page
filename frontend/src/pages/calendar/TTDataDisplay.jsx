@@ -1,15 +1,52 @@
 import { React, useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import styled from "styled-components";
-import { HexColorPicker } from "react-colorful";
+import { CirclePicker } from "react-color";
 import { READ, UPDATE, CREATE, TIMELIMIT } from "./detailedDate";
+import { TTColors } from "../../data/CalendarData";
 
 const TTDDContainer = styled.div`
-  width: 100%;
-  height: 400px;
+  min-width: 34rem;
   border: solid 1px black;
+  background: #fff7e2;
 `;
 
+const TextInput = styled.input`
+  border: none;
+  box-shadow: 1px 1px 4.1px 0 rgba(72, 98, 132, 0.2) inset;
+  width: 23rem;
+  height: 3rem;
+
+  margin: 0.5rem 1rem;
+`;
+
+const Form = styled.form`
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  justify-content: space-evenly;
+  align-items: center;
+`;
+
+const FormElement = styled.div`
+  display: flex;
+  flex-direction: column;
+  label {
+    color: #486284;
+
+    font-family: Pretendard;
+    font-size: 1.5rem;
+    font-style: normal;
+    font-weight: 900;
+    line-height: normal;
+  }
+`;
+
+const StyledCirclePicker = styled(CirclePicker)`
+  margin: 0.5rem 1rem;
+  width: 23rem;
+`;
 function toLocalISOString(date) {
   const pad = (n) => String(n).padStart(2, "0");
 
@@ -88,21 +125,26 @@ const UpdateMode = ({ setDataMode, cells, times, selectedTT }) => {
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <Form onSubmit={handleSubmit(onSubmit)}>
         <div>
-          <input
+          <label for="title">곡명</label>
+          <TextInput
+            id="title"
             {...register("title", { required: "제목을 입력하세요" })}
-            placeholder="제목"
+            // placeholder="제목"
           />
         </div>
         <div>
-          <input
+          <label for="team">곡명</label>
+          <TextInput
+            id="team"
             {...register("team", { required: "제목을 입력하세요" })}
-            placeholder="팀"
+            // placeholder="팀"
           />
         </div>
         <div>
-          <input {...register("description")} placeholder="설명" />
+          <label for="description">설명</label>
+          <TextInput id="description" {...register("description")} />
         </div>
         <div>
           <Controller
@@ -119,7 +161,7 @@ const UpdateMode = ({ setDataMode, cells, times, selectedTT }) => {
             취소
           </button>
         </div>
-      </form>
+      </Form>
     </>
   );
 };
@@ -166,38 +208,51 @@ const CreateMode = ({ setDataMode, cells, times }) => {
   };
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit, onError)}>
-        <div>
-          <input
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <FormElement>
+          <label for="title">곡 이름</label>
+          <TextInput
+            id="title"
             {...register("title", { required: "제목을 입력하세요" })}
-            placeholder="제목"
+            // placeholder="제목"
           />
-        </div>
-        <div>
-          <input
-            {...register("team", { required: "팀명을 입력하세요" })}
-            placeholder="팀"
+        </FormElement>
+
+        <FormElement>
+          <label for="team">팀 이름</label>
+          <TextInput
+            id="team"
+            {...register("team", { required: "제목을 입력하세요" })}
+            // placeholder="팀"
           />
-        </div>
-        <div>
-          <input {...register("description")} placeholder="설명" />
-        </div>
-        <div>
+        </FormElement>
+
+        <FormElement>
+          <label for="description">설명</label>
+          <TextInput id="description" {...register("description")} />
+        </FormElement>
+        <FormElement>
+          <label>색 설정</label>
           <Controller
             name="color"
             control={control}
             render={({ field }) => (
-              <HexColorPicker color={field.value} onChange={field.onChange} />
+              <StyledCirclePicker
+                colors={TTColors.map((x) => x[0])}
+                color={field.value}
+                onChangeComplete={(c) => field.onChange(c.hex)}
+                circleSize={30}
+              />
             )}
           />
-        </div>
+        </FormElement>
         <div>
           <button type="submit">추가</button>
           <button type="button" onClick={() => setDataMode(READ)}>
             취소
           </button>
         </div>
-      </form>
+      </Form>
     </>
   );
 };

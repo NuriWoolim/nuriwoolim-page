@@ -6,7 +6,7 @@ import { TTColors } from "../../data/CalendarData";
 const GridContainer = styled.div`
   display: grid;
   grid-template-rows: repeat(${(props) => props.$length}, 2rem);
-  grid-template-columns: 200px;
+  grid-template-columns: 20rem;
   border: solid 1px black;
   /* overflow: hidden; */
 `;
@@ -36,7 +36,7 @@ const TTTitleContainer = styled.div`
   position: absolute;
   top: 0;
   display: grid;
-  grid-template-columns: 200px;
+  grid-template-columns: 20rem;
   border: solid 1px black;
 
   background: transparent;
@@ -75,6 +75,13 @@ const TTTInnerBlock = styled.div`
   border-radius: 2px;
   background-color: ${(props) => props.$color1};
   color: ${(props) => props.$color2};
+
+  font-family: Pretendard;
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 900;
+  line-height: normal;
+  letter-spacing: -0.9px;
 `;
 const Wrapper = styled.div`
   position: relative;

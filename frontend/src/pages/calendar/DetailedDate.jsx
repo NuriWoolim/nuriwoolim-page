@@ -23,6 +23,10 @@ const Bar = styled.div`
     margin-bottom: 0;
   }
 `;
+
+const ElementsContainer = styled.div`
+  display: flex;
+`;
 const DetailedDate = ({ dateObj }) => {
   const times = [];
   const tempDate = new Date(2004, 5, 11, 9, 0, 0);
@@ -73,22 +77,24 @@ const DetailedDate = ({ dateObj }) => {
           {dateObj.getMonth() + 1}/{dateObj.getDate()}
         </h1>
       </Bar>
-      <DraggableTable
-        times={times}
-        timeTables={timeTables}
-        enableChange={dataMode === READ}
-        setSelectedTT={setSelectedTT}
-        cells={cells}
-        setCells={setCells}
-      />
+      <ElementsContainer>
+        <DraggableTable
+          times={times}
+          timeTables={timeTables}
+          enableChange={dataMode === READ}
+          setSelectedTT={setSelectedTT}
+          cells={cells}
+          setCells={setCells}
+        />
 
-      <TTDataDisplay
-        selectedTT={selectedTT}
-        dataMode={dataMode}
-        setDataMode={setDataMode}
-        cells={cells}
-        times={times}
-      />
+        <TTDataDisplay
+          selectedTT={selectedTT}
+          dataMode={dataMode}
+          setDataMode={setDataMode}
+          cells={cells}
+          times={times}
+        />
+      </ElementsContainer>
     </DetailedDateContainer>
   );
 };

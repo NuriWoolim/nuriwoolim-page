@@ -84,8 +84,6 @@ const DropdownContainer = styled.div`
   background: white;
   box-shadow: 4px 4px 18px rgba(0, 0, 0, 0.6);
   min-width: 300px;
-  max-width: 90vw;
-  max-height: 80vh;
   overflow: auto;
 
   left: ${(props) => props.$x}px;
