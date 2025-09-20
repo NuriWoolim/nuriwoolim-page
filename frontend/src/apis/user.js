@@ -1,7 +1,6 @@
 import axios from "axios";
 import { getAuthAxios } from "./authAxios";
-
-const baseURL = "https://nuriwoolim.n-e.kr";
+const baseURL = import.meta.env.VITE_API_URL;
 
 export const signup = async (username, email, password, nickname) => {
   const result = await axios.post(`${baseURL}/api/auth/signup`, {

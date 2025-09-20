@@ -4,7 +4,7 @@ import { getNewRefreshToken } from "./user";
 export const getAuthAxios = () => {
   // Generate instance
   const authAxios = axios.create({
-    baseURL: "https://nuriwoolim.n-e.kr",
+    baseURL: import.meta.env.VITE_API_URL,
     withCredentials: false, // 일반 API 요청에는 RefreshToken 쿠키를 포함시키지 않을 것
   });
 
