@@ -2,7 +2,7 @@ import { React, useState, useRef } from "react";
 import styled from "styled-components";
 import { TimeTableAPI } from "../../apis/common";
 import CustomModal from "../CustomModal";
-import DetailedDate from "./detailedDate";
+import DetailedDate from "./DetailedDate";
 import { TTColors } from "../../data/CalendarData";
 
 const DateCellContainer = styled.div`
