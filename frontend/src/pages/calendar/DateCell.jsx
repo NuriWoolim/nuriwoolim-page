@@ -2,8 +2,8 @@ import { React, useState, useRef } from "react";
 import styled from "styled-components";
 import { TimeTableAPI } from "../../apis/common";
 import CustomModal from "../CustomModal";
-import DetailedDate from "./detailedDate";
-import { TTColors } from "../../data/CalendarData";
+import DetailedDate from "./DetailedDate";
+import { lighten } from "polished";
 
 const DateCellContainer = styled.div`
   h2 {
@@ -45,8 +45,8 @@ const TimeTableContainer = styled.div`
     font-weight: 900;
     border: none;
     border-radius: 2px;
-    background-color: ${(props) => props.$color1};
-    color: ${(props) => props.$color2};
+    background-color: ${(props) => props.$color};
+    color: ${(props) => lighten(0.5, props.$color)};
     white-space: nowrap; /* 줄바꿈 안 함 */
     overflow: hidden; /* 넘친 부분 숨김 */
     text-overflow: ellipsis;
@@ -64,8 +64,9 @@ const TimeTableContainer = styled.div`
     font-weight: 700;
     border: none;
     border-radius: 2px;
-    background-color: ${(props) => props.$color2};
-    color: ${(props) => props.$color1};
+
+    background-color: ${(props) => lighten(0.5, props.$color)};
+    color: ${({ $color }) => $color};
     white-space: nowrap; /* 줄바꿈 안 함 */
     overflow: hidden; /* 넘친 부분 숨김 */
     text-overflow: ellipsis;
@@ -128,11 +129,7 @@ const DateCell = ({ dateObj, timetables, isSameMonth }) => {
 
         {timetables
           ? timetables.slice(0, 2).map((timetable, index) => (
-              <TimeTableContainer
-                key={index}
-                $color1={TTColors[parseInt(timetable.color)][0]}
-                $color2={TTColors[parseInt(timetable.color)][1]}
-              >
+              <TimeTableContainer key={index} $color={"#" + timetable.color}>
                 <div className="time">{timetable.start.split("T")[1]}</div>
                 <div className="title">{timetable.title}</div>
               </TimeTableContainer>

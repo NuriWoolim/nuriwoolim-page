@@ -164,7 +164,8 @@ const Login = () => {
   const onClick = async () => {
     try {
       const result = await login(username, password);
-      localStorage.setItem("accessToken", result.accessToken);
+      // 아래 코드가 토큰을 undefined로 만들어버려서 일단 지움
+    //   localStorage.setItem("accessToken", result.accessToken);
       navigate("/");
     } catch (error) {
       setHasError(true);

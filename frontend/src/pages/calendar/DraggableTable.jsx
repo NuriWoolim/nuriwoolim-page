@@ -2,6 +2,7 @@ import { React, useState, useEffect, useCallback } from "react";
 import styled from "styled-components";
 import _ from "lodash";
 import { TTColors } from "../../data/CalendarData";
+import { lighten } from "polished";
 
 const GridContainer = styled.div`
   display: grid;
@@ -73,8 +74,8 @@ const TTTInnerBlock = styled.div`
   justify-content: center;
 
   border-radius: 2px;
-  background-color: ${(props) => props.$color1};
-  color: ${(props) => props.$color2};
+  background-color: ${(props) => props.$color};
+  color: ${(props) => lighten(0.5, props.$color)};
 
   font-family: Pretendard;
   font-size: 1rem;
@@ -299,14 +300,7 @@ const DraggableTable = ({
                   if (enableChange) clearCells();
                   return setSelectedTT(TTTCells[index]);
                 }}
-                $color1={
-                  TTColors[parseInt(TTTCells[index].color)]?.[0] ??
-                  TTColors[0][0]
-                }
-                $color2={
-                  TTColors[parseInt(TTTCells[index].color)]?.[1] ??
-                  TTColors[0][1]
-                }
+                $color={"#" + TTTCells[index].color ?? "#000000"}
                 $isTouched={isTouched}
               >
                 <div>

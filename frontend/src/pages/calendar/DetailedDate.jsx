@@ -27,9 +27,24 @@ const Bar = styled.div`
 const ElementsContainer = styled.div`
   display: flex;
 `;
+
+function toLocalISOString(date, type) {
+  const pad = (n) => String(n).padStart(2, "0");
+
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1); // 0부터 시작하니까 +1
+  const day = pad(date.getDate());
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+
+  if (type == 0) return `${year}-${month}-${day}T00:00`;
+  else return `${year}-${month}-${day}T23:59`;
+}
 const DetailedDate = ({ dateObj }) => {
   const times = [];
-  const tempDate = new Date(2004, 5, 11, 9, 0, 0);
+  const tempDate = new Date(dateObj);
+  tempDate.setHours(9);
+  tempDate.setMinutes(0);
   for (let i = 0; i < 26; i++) {
     times.push(new Date(tempDate));
     tempDate.setMinutes(tempDate.getMinutes() + 30);
@@ -43,11 +58,15 @@ const DetailedDate = ({ dateObj }) => {
 
   const callApi = async () => {
     try {
-      // 한달간 기간 설정
-      const result = await TimeTableAPI.getTimeTable();
-      const resultdata = result.data;
+      // 하루치
+      if (dateObj) {
+        const from = toLocalISOString(dateObj, 0);
+        const to = toLocalISOString(dateObj, 1);
+        const result = await TimeTableAPI.getTimeTable(from, to);
+        const resultdata = result.data;
 
-      setTimeTables(resultdata);
+        setTimeTables(resultdata);
+      }
     } catch (error) {
       console.log("getTimeTable error ", error);
     }

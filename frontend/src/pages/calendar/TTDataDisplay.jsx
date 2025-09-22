@@ -2,8 +2,10 @@ import { React, useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import styled from "styled-components";
 import { CirclePicker } from "react-color";
-import { READ, UPDATE, CREATE, TIMELIMIT } from "./detailedDate";
+import { READ, UPDATE, CREATE, TIMELIMIT } from "./DetailedDate";
 import { TTColors } from "../../data/CalendarData";
+
+import { TimeTableAPI } from "../../apis/common";
 
 const TTDDContainer = styled.div`
   min-width: 34rem;
@@ -171,15 +173,19 @@ const CreateMode = ({ setDataMode, cells, times }) => {
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      color: TTColors[0][0], // 첫 번째 색을 기본값으로
+    },
+  });
 
   const onSubmit = (data) => {
     let l = -1,
       r = -1,
       error = 0;
     for (let i = 0; i < times.length; i++) {
-      if (cells[i] === 1) {
-        if (i === 0 || cells[i - 1] !== 1) {
+      if (cells[i].isSelected === true) {
+        if (i === 0 || cells[i - 1].isSelected === false) {
           if (l !== -1) error = 1;
           l = i;
         }
@@ -196,15 +202,24 @@ const CreateMode = ({ setDataMode, cells, times }) => {
       ...data,
       start: toLocalISOString(times[l]),
       end: toLocalISOString(times[r + 1]),
+      color: data.color.slice(-6),
     };
 
     console.log(finaldata);
+
+    callCreateApi(finaldata);
 
     setDataMode(READ);
   };
 
   const onError = (errors) => {
     console.log("Cannot submit - validation errors:", errors);
+  };
+
+  const callCreateApi = async (finaldata) => {
+    const result = await TimeTableAPI.createTimeTable(finaldata);
+    console.log(result);
+    return;
   };
   return (
     <>
