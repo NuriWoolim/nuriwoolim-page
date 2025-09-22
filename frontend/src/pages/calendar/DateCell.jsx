@@ -92,7 +92,7 @@ const DropdownContainer = styled.div`
   transform: translate(-50%, -50%);
 `;
 
-const DateCell = ({ dateObj, timetables, isSameMonth }) => {
+const DateCell = ({ dateObj, timetables, isSameMonth, getMonthTimeTables }) => {
   const date = new Date(dateObj);
   const today = new Date();
 
@@ -130,7 +130,10 @@ const DateCell = ({ dateObj, timetables, isSameMonth }) => {
         {timetables
           ? timetables.slice(0, 2).map((timetable, index) => (
               <TimeTableContainer key={index} $color={"#" + timetable.color}>
-                <div className="time">{timetable.start.split("T")[1]}</div>
+                <div className="time">
+                  {timetable.start.split("T")[1].split(":")[0]}:
+                  {timetable.start.split("T")[1].split(":")[1]}
+                </div>
                 <div className="title">{timetable.title}</div>
               </TimeTableContainer>
             ))
@@ -144,7 +147,7 @@ const DateCell = ({ dateObj, timetables, isSameMonth }) => {
       {isDetailedDateOpen && <Overlay onClick={closeDetailedDate} />}
       {isDetailedDateOpen && (
         <DropdownContainer $x={dropdownPosition.x} $y={dropdownPosition.y}>
-          <DetailedDate dateObj={dateObj} />
+          <DetailedDate dateObj={dateObj} getMonthTimeTables={getMonthTimeTables} />
         </DropdownContainer>
       )}
     </>

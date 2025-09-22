@@ -30,7 +30,8 @@ export const TimeTableAPI = {
     return result;
   },
   getTimeTable: async (from, to) => {
-    const result = await api.get(`${baseURL}/api/timetables`, {
+    // get은 토큰 필요 없어서 auth 아닌 일반 axious로
+    const result = await axios.get(`${baseURL}/api/timetables`, {
       params: {
         from,
         to,

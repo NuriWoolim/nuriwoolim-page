@@ -270,6 +270,7 @@ const Calendar = () => {
                   calendarState.dates[index].getMonth() ===
                   calendarState.startDate.getMonth()
                 }
+                getMonthTimeTables={getTimeTables}
               />
             );
           })}

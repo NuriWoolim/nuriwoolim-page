@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { React } from "react";
 import { useForm, Controller } from "react-hook-form";
 import styled from "styled-components";
 import { CirclePicker } from "react-color";
@@ -167,7 +167,7 @@ const UpdateMode = ({ setDataMode, cells, times, selectedTT }) => {
     </>
   );
 };
-const CreateMode = ({ setDataMode, cells, times }) => {
+const CreateMode = ({ setDataMode, cells, callApi, times }) => {
   const {
     register,
     handleSubmit,
@@ -179,7 +179,7 @@ const CreateMode = ({ setDataMode, cells, times }) => {
     },
   });
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     let l = -1,
       r = -1,
       error = 0;
@@ -205,9 +205,22 @@ const CreateMode = ({ setDataMode, cells, times }) => {
       color: data.color.slice(-6),
     };
 
-    console.log(finaldata);
+    // console.log(finaldata);
 
-    callCreateApi(finaldata);
+    try {
+      const result = await TimeTableAPI.createTimeTable(finaldata);
+
+      callApi();
+
+      //   setCells((prevCells) =>
+      //     prevCells.map((cell, idx) =>
+      //       idx >= l && idx <= r ? { ...cell, tt: result.data } : cell
+      //     )
+      //   );
+    } catch (error) {
+      if (error.response)
+        console.error("응답 에러:", error.response.status, error.response.data);
+    }
 
     setDataMode(READ);
   };
@@ -216,11 +229,6 @@ const CreateMode = ({ setDataMode, cells, times }) => {
     console.log("Cannot submit - validation errors:", errors);
   };
 
-  const callCreateApi = async (finaldata) => {
-    const result = await TimeTableAPI.createTimeTable(finaldata);
-    console.log(result);
-    return;
-  };
   return (
     <>
       <Form onSubmit={handleSubmit(onSubmit)}>
@@ -272,7 +280,14 @@ const CreateMode = ({ setDataMode, cells, times }) => {
   );
 };
 
-const TTDataDisplay = ({ selectedTT, dataMode, setDataMode, cells, times }) => {
+const TTDataDisplay = ({
+  selectedTT,
+  dataMode,
+  setDataMode,
+  cells,
+  callApi,
+  times,
+}) => {
   const isSelectedError = () => {
     let selectedCnt = 0,
       first = 0,
@@ -299,7 +314,12 @@ const TTDataDisplay = ({ selectedTT, dataMode, setDataMode, cells, times }) => {
   return (
     <TTDDContainer>
       {dataMode === CREATE ? (
-        <CreateMode setDataMode={setDataMode} cells={cells} times={times} />
+        <CreateMode
+          setDataMode={setDataMode}
+          cells={cells}
+          callApi={callApi}
+          times={times}
+        />
       ) : dataMode === READ ? (
         <ReadMode selectedTT={selectedTT} setDataMode={setDataMode} />
       ) : (

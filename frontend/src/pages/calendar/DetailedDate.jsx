@@ -40,7 +40,7 @@ function toLocalISOString(date, type) {
   if (type == 0) return `${year}-${month}-${day}T00:00`;
   else return `${year}-${month}-${day}T23:59`;
 }
-const DetailedDate = ({ dateObj }) => {
+const DetailedDate = ({ dateObj, getMonthTimeTables }) => {
   const times = [];
   const tempDate = new Date(dateObj);
   tempDate.setHours(9);
@@ -66,6 +66,7 @@ const DetailedDate = ({ dateObj }) => {
         const resultdata = result.data;
 
         setTimeTables(resultdata);
+        getMonthTimeTables();
       }
     } catch (error) {
       console.log("getTimeTable error ", error);
@@ -111,6 +112,7 @@ const DetailedDate = ({ dateObj }) => {
           dataMode={dataMode}
           setDataMode={setDataMode}
           cells={cells}
+          callApi={callApi}
           times={times}
         />
       </ElementsContainer>
