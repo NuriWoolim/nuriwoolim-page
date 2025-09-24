@@ -11,5 +11,4 @@ public record CalendarResponse(
     String color,
     LocalDateTime start,
     LocalDateTime end) {
-
 }

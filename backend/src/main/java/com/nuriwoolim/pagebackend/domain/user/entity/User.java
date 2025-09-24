@@ -3,7 +3,7 @@ package com.nuriwoolim.pagebackend.domain.user.entity;
 import com.nuriwoolim.pagebackend.core.BaseEntity;
 import com.nuriwoolim.pagebackend.core.jwt.entity.RefreshToken;
 import com.nuriwoolim.pagebackend.domain.Comment;
-import com.nuriwoolim.pagebackend.domain.Post;
+import com.nuriwoolim.pagebackend.domain.post.entity.Post;
 import com.nuriwoolim.pagebackend.domain.Schedule;
 import com.nuriwoolim.pagebackend.domain.WeekSchedule;
 import com.nuriwoolim.pagebackend.domain.timeTable.entity.TimeTable;
