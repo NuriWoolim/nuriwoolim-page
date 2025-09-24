@@ -35,38 +35,55 @@ public class EmailVerificationService {
 
     @Transactional
     public void sendVerificationEmail(String email, EmailVerificationType type) {
-        Optional<EmailVerification> optional = emailVerificationRepository.findByEmailAndType(email,
-            type);
         String code = CodeGenerator.generateCode();
+        Optional<EmailVerification> existingVerification = emailVerificationRepository.findByEmailAndType(
+            email, type);
 
-        if (optional.isEmpty()) {                                  // 기존에 존재하는 정보가 없으면 즉시 재생성
-            EmailVerification newEmailVerification = UserMapper.toEmailVerification(email,
-                code, type);
-            newEmailVerification.setExpiresAt(verificationExpires);
-            emailVerificationRepository.save(newEmailVerification);
+        if (existingVerification.isEmpty()) {
+            createNewVerification(email, code, type);
         } else {
-            EmailVerification emailVerification = optional.get();
-
-            if (emailVerification.getResendCount() < resendCount) {  // 재전송 한도 내면 즉시 수정후 재전송
-                emailVerification.countResend(code);
-                emailVerification.setExpiresAt(resendTime);
-            } else {                                                // 재전송 한도 초과시 재전송 쿨타임을 기다려야함
-                if (LocalDateTime.now()
-                    .isBefore(emailVerification.getUpdatedAt().plusSeconds(resendTime))) {
-                    throw ErrorCode.TOO_MANY_RESEND.toException(
-                        "Request After " + emailVerification.getUpdatedAt()
-                            .plusSeconds(resendTime));
-                }
-                // 재전송 한도 초과후 쿨타임 이후에 요청시 기존 인증정보는 삭제하고 새로 생성
-                emailVerificationRepository.deleteByEmail(email);
-                emailVerificationRepository.flush();
-                EmailVerification newEmailVerification = UserMapper.toEmailVerification(email,
-                    code, type);
-                newEmailVerification.setExpiresAt(verificationExpires);
-                emailVerificationRepository.save(newEmailVerification);
-            }
+            handleExistingVerification(existingVerification.get(), email, code, type);
         }
+
         processSendEmail(email, code, type);
+    }
+
+    private void createNewVerification(String email, String code, EmailVerificationType type) {
+        EmailVerification newEmailVerification = UserMapper.toEmailVerification(email, code, type);
+        newEmailVerification.setExpiresAt(verificationExpires);
+        emailVerificationRepository.save(newEmailVerification);
+    }
+
+    private void handleExistingVerification(EmailVerification emailVerification, String email,
+        String code, EmailVerificationType type) {
+        if (canResendVerification(emailVerification)) {
+            updateExistingVerification(emailVerification, code);
+        } else {
+            validateResendCooldown(emailVerification);
+            recreateVerification(email, code, type);
+        }
+    }
+
+    private boolean canResendVerification(EmailVerification emailVerification) {
+        return emailVerification.getSendCount() < resendCount;
+    }
+
+    private void updateExistingVerification(EmailVerification emailVerification, String code) {
+        emailVerification.countResend(code);
+        emailVerification.setExpiresAt(verificationExpires);
+    }
+
+    private void validateResendCooldown(EmailVerification emailVerification) {
+        LocalDateTime cooldownEndTime = emailVerification.getUpdatedAt().plusSeconds(resendTime);
+        if (LocalDateTime.now().isBefore(cooldownEndTime)) {
+            throw ErrorCode.TOO_MANY_RESEND.toException("Request After " + cooldownEndTime);
+        }
+    }
+
+    private void recreateVerification(String email, String code, EmailVerificationType type) {
+        emailVerificationRepository.deleteByEmail(email);
+        emailVerificationRepository.flush();
+        createNewVerification(email, code, type);
     }
 
     private void processSendEmail(String email, String code, EmailVerificationType type) {

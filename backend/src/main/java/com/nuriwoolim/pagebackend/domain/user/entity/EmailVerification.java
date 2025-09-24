@@ -38,7 +38,7 @@ public class EmailVerification extends BaseEntity {
     private String code;
 
     @Builder.Default
-    private Integer resendCount = 0;
+    private Integer sendCount = 1;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -56,7 +56,7 @@ public class EmailVerification extends BaseEntity {
 
     public void countResend(String code) {
         this.code = code;
-        resendCount++;
+        sendCount++;
     }
 }
 
