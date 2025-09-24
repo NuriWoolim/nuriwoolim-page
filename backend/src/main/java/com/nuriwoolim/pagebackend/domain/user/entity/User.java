@@ -59,6 +59,7 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     @Builder.Default
+    @Setter
     private UserType type = UserType.NONMEMBER;
 
     private Integer year;
@@ -92,5 +93,9 @@ public class User extends BaseEntity {
 
     public void updatePassword(String password) {
         this.password = password;
+    }
+
+    public void updateRole(UserType type) {
+        this.type = type;
     }
 }

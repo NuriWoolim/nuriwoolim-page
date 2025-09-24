@@ -9,6 +9,7 @@ import com.nuriwoolim.pagebackend.domain.user.dto.LoginRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.PasswordResetRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.TokenPair;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserSignupRequest;
+import com.nuriwoolim.pagebackend.domain.user.entity.EmailVerificationType;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import com.nuriwoolim.pagebackend.domain.user.repository.UserRepository;
 import com.nuriwoolim.pagebackend.domain.user.util.UserMapper;
@@ -38,9 +39,11 @@ public class AuthService {
     public void signUp(UserSignupRequest userSignupRequest) {
         checkEmail(userSignupRequest.email());
 
-        emailVerificationService.verifyEmail(userSignupRequest.email(), userSignupRequest.code());
+        emailVerificationService.verifyEmail(userSignupRequest.email(), userSignupRequest.code(),
+            EmailVerificationType.SIGNUP);
 
-        emailVerificationService.deleteVerification(userSignupRequest.email());
+        emailVerificationService.deleteVerification(userSignupRequest.email(),
+            EmailVerificationType.SIGNUP);
 
         String encodedPassword = passwordEncoder.encode(userSignupRequest.password());
 
@@ -124,11 +127,13 @@ public class AuthService {
     @Transactional
     public void resetPassword(PasswordResetRequest request) {
         User user = userService.getUserByEmail(request.email());
-        emailVerificationService.verifyEmail(request.email(), request.code());
+        emailVerificationService.verifyEmail(request.email(), request.code(),
+            EmailVerificationType.RESET_PASSWORD);
 
         String encodedPassword = passwordEncoder.encode(request.password());
         user.updatePassword(encodedPassword);
 
-        emailVerificationService.deleteVerification(user.getEmail());
+        emailVerificationService.deleteVerification(user.getEmail(),
+            EmailVerificationType.RESET_PASSWORD);
     }
 }

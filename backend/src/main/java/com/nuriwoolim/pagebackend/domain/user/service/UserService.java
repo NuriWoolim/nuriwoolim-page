@@ -51,4 +51,11 @@ public class UserService {
         return user.getType() == UserType.ADMIN;
     }
 
+    //TODO: 운영시 제거
+    @Transactional
+    public void DEVchangeRole(String email, UserType userType) {
+        User user = getUserByEmail(email);
+        user.updateRole(userType);
+    }
+
 }

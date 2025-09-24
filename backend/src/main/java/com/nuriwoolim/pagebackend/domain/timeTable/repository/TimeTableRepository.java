@@ -11,14 +11,14 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TimeTableRepository extends JpaRepository<TimeTable, Long> {
 
-    @Query("SELECT t FROM TimeTable t WHERE t.start >= :from AND t.end <= :to")
+    @Query("SELECT t FROM TimeTable t JOIN FETCH t.user WHERE t.start >= :from AND t.end <= :to")
     List<TimeTable> findBetween(@Param("from") LocalDateTime from,
         @Param("to") LocalDateTime to);
 
     @Query("""
                 SELECT COUNT(t) > 0 FROM TimeTable t WHERE
                 (t.start < :to AND t.end > :from)
-                AND t.id != :excludeId
+                AND (t.id != :excludeId OR :excludeId is null)
         """)
     boolean existsTimeTableBetweenExcludingId(@Param("excludeId") Long excludeId,
         @Param("from") LocalDateTime from,
