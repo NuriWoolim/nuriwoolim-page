@@ -42,6 +42,7 @@ public class SecurityConfig {
                     "/webjars/**",
                     "/refresh").permitAll()
                 .requestMatchers(HttpMethod.GET).permitAll()
+                .requestMatchers("/calendars/**").hasAnyRole("MANAGER", "ADMIN")
                 .requestMatchers(HttpMethod.POST).hasAnyRole("ADMIN", "MANAGER", "MEMBER")
                 .requestMatchers(HttpMethod.PATCH).hasAnyRole("ADMIN", "MANAGER", "MEMBER")
                 .requestMatchers(HttpMethod.DELETE).hasAnyRole("ADMIN", "MANAGER", "MEMBER")
