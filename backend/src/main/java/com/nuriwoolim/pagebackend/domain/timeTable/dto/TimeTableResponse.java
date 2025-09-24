@@ -11,6 +11,8 @@ public record TimeTableResponse(
     String description,
     String color,
     LocalDateTime start,
-    LocalDateTime end) {
+    LocalDateTime end,
+    Long ownerId,
+    String ownerName) {
 
 }
