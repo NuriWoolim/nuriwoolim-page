@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -84,6 +85,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity
             .status(ErrorCode.API_NOT_FOUND.getStatus())
             .body(new ErrorResponse(ErrorCode.API_NOT_FOUND.toException()));
+    }
+
+    /*
+     * HTTP 400 파라미터가 없는 경우
+     */
+    @ExceptionHandler({MissingServletRequestParameterException.class})
+    protected ResponseEntity<ErrorResponse> handleMissingParameterException(final Exception e) {
+        log.trace("handleMissingParameterException: {}", e.getMessage());
+        return ResponseEntity
+            .status(ErrorCode.BAD_REQUEST.getStatus())
+            .body(new ErrorResponse(ErrorCode.BAD_REQUEST.toException(e.getMessage())));
     }
 
     /*
