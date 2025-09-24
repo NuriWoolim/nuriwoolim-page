@@ -30,6 +30,9 @@ public class EmailVerification extends BaseEntity {
     @Column(nullable = false)
     private String code;
 
+    @Builder.Default
+    private Integer resendCount = 0;
+
     private LocalDateTime expiresAt;
 
     public boolean isExpired() {
@@ -38,6 +41,11 @@ public class EmailVerification extends BaseEntity {
 
     public void setExpiresAt(int minutes) {
         expiresAt = LocalDateTime.now().plusMinutes(minutes);
+    }
+
+    public void resend(String code) {
+        this.code = code;
+        resendCount++;
     }
 }
 

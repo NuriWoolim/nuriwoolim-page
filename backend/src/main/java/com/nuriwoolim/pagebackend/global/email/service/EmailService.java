@@ -129,7 +129,7 @@ public class EmailService {
                 +
                 "<p style='color: #a0673b; font-size: 13px; margin: 0; line-height: 1.5;'>1. 회원가입 페이지로 돌아가세요<br>"
                 +
-                "2. 위의 6자리 인증 코드를 정확히 입력해주세요<br>" +
+                "2. 위의 5자리 인증 코드를 정확히 입력해주세요<br>" +
                 "3. '인증 확인' 버튼을 클릭하세요</p>" +
                 "</div>" +
 

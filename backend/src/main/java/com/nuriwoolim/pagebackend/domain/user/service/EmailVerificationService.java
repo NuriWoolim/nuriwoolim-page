@@ -26,26 +26,52 @@ public class EmailVerificationService {
     @Value("${custom.resendTime}")
     private int resendTime;
 
+    @Value("${custom.resendCount}")
+    private int resendCount;
+
     @Value("${custom.verificationExpires}")
     private int verificationExpires;
 
     @Transactional
-    public void sendVerificationEmail(String email) {
+    public void sendSignupEmail(String email) {
         String code = CodeGenerator.generateCode();
-        Optional<EmailVerification> optional = emailVerificationRepository.findByEmail(email);
+        processVerificationEmail(email, code);
+        emailService.sendVerificationEmail(email, code);
+    }
 
-        if (optional.isPresent()) {
+    @Transactional
+    public void sendPasswordResetEmail(String email) {
+        String code = CodeGenerator.generateCode();
+        processVerificationEmail(email, code);
+        emailService.sendPasswordResetEmail(email, code);
+    }
+
+    @Transactional
+    public void processVerificationEmail(String email, String code) {
+        EmailVerification emailVerification = getEmailVerification(email);
+
+        if (emailVerification.getResendCount() < resendCount) {  // 재전송 한도 내면 즉시 수정후 재전송
+            emailVerification.resend(code);
+            emailVerification.setExpiresAt(resendTime);
+        } else {                                                // 재전송 한도 초과시 재전송 쿨타임을 기다려야함
             if (LocalDateTime.now()
-                .isBefore(optional.get().getCreatedAt().plusSeconds(resendTime))) {
-                throw ErrorCode.TOO_MANY_RESEND.toException();
+                .isBefore(emailVerification.getUpdatedAt().plusSeconds(resendTime))) {
+                throw ErrorCode.TOO_MANY_RESEND.toException(
+                    "Request After " + emailVerification.getUpdatedAt().plusSeconds(resendTime));
             }
+            // 재전송 한도 초과후 쿨타임 이후에 요청시 기존 인증정보는 삭제하고 새로 생성
             emailVerificationRepository.deleteByEmail(email);
             emailVerificationRepository.flush();
+            EmailVerification newEmailVerification = UserMapper.toEmailVerification(email, code);
+            newEmailVerification.setExpiresAt(verificationExpires);
+            emailVerificationRepository.save(newEmailVerification);
         }
-        EmailVerification emailVerification = UserMapper.toEmailVerification(email, code);
-        emailVerification.setExpiresAt(verificationExpires);
-        emailVerificationRepository.save(emailVerification);
-        emailService.sendVerificationEmail(email, code);
+    }
+
+    @Transactional(readOnly = true)
+    public EmailVerification getEmailVerification(String email) {
+        return emailVerificationRepository.findByEmail(email).orElseThrow(
+            ErrorCode.DATA_NOT_FOUND::toException);
     }
 
     @Transactional
