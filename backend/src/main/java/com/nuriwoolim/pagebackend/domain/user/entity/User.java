@@ -59,6 +59,7 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     @Builder.Default
+    @Setter
     private UserType type = UserType.NONMEMBER;
 
     private Integer year;
