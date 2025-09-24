@@ -33,6 +33,7 @@ public class SecurityConfig {
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS).permitAll()
+                .requestMatchers("/dev/**").permitAll() // TODO: 개발 전용 API 이므로 추후 삭제
                 .requestMatchers("/auth/**",
                     "/v3/api-docs/**",
                     "/swagger-ui.html",
