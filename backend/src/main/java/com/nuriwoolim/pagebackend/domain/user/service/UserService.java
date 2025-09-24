@@ -55,7 +55,7 @@ public class UserService {
     @Transactional
     public void DEVchangeRole(String email, UserType userType) {
         User user = getUserByEmail(email);
-        user.setType(userType);
+        user.updateRole(userType);
     }
 
 }

@@ -81,7 +81,7 @@ public class EmailVerificationService {
     }
 
     private void recreateVerification(String email, String code, EmailVerificationType type) {
-        emailVerificationRepository.deleteByEmail(email);
+        emailVerificationRepository.deleteByEmailAndType(email, type);
         emailVerificationRepository.flush();
         createNewVerification(email, code, type);
     }
