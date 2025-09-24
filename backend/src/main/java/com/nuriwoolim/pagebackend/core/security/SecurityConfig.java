@@ -33,6 +33,7 @@ public class SecurityConfig {
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS).permitAll()
+                .requestMatchers("/dev/**").permitAll() // TODO: 개발 전용 API 이므로 추후 삭제
                 .requestMatchers("/auth/**",
                     "/v3/api-docs/**",
                     "/swagger-ui.html",
@@ -40,7 +41,11 @@ public class SecurityConfig {
                     "/swagger-resources/**",
                     "/webjars/**",
                     "/refresh").permitAll()
-                .requestMatchers(HttpMethod.GET, "/calendars", "/timetables").permitAll()
+                .requestMatchers(HttpMethod.GET).permitAll()
+                .requestMatchers("/calendars/**").hasAnyRole("MANAGER", "ADMIN")
+                .requestMatchers(HttpMethod.POST).hasAnyRole("ADMIN", "MANAGER", "MEMBER")
+                .requestMatchers(HttpMethod.PATCH).hasAnyRole("ADMIN", "MANAGER", "MEMBER")
+                .requestMatchers(HttpMethod.DELETE).hasAnyRole("ADMIN", "MANAGER", "MEMBER")
                 .anyRequest().authenticated());
         return http.build();
     }

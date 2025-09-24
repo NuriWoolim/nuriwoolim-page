@@ -34,6 +34,8 @@ public class TimeTableMapper {
             .start(timeTable.getStart())
             .end(timeTable.getEnd())
             .color(timeTable.getColor())
+            .ownerId(timeTable.getUser().getId())
+            .ownerName(timeTable.getUser().getName())
             .build();
     }
 

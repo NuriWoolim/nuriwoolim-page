@@ -1,7 +1,9 @@
 package com.nuriwoolim.pagebackend.domain.user.repository;
 
 import com.nuriwoolim.pagebackend.domain.user.entity.EmailVerification;
+import com.nuriwoolim.pagebackend.domain.user.entity.EmailVerificationType;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -12,7 +14,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface EmailVerificationRepository extends JpaRepository<EmailVerification, Long> {
 
-    Optional<EmailVerification> findByEmail(String email);
+    Optional<EmailVerification> findByEmailAndType(String email, EmailVerificationType type);
+
+    List<EmailVerification> findByEmail(String email);
 
     void deleteByEmail(String email);
 

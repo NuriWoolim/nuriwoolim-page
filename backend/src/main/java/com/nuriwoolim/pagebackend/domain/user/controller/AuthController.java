@@ -7,6 +7,7 @@ import com.nuriwoolim.pagebackend.domain.user.dto.PasswordResetRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.TokenPair;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserSignupRequest;
+import com.nuriwoolim.pagebackend.domain.user.entity.EmailVerificationType;
 import com.nuriwoolim.pagebackend.domain.user.service.AuthService;
 import com.nuriwoolim.pagebackend.domain.user.service.EmailVerificationService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -80,15 +81,17 @@ public class AuthController {
     }
 
     @GetMapping("/verify-email")
-    public ResponseEntity<Void> verifyEmail(@RequestParam String email, @RequestParam String code) {
-        emailVerificationService.verifyEmail(email, code);
+    public ResponseEntity<Void> verifyEmail(@RequestParam String email, @RequestParam String code,
+        @RequestParam EmailVerificationType type) {
+        emailVerificationService.verifyEmail(email, code, type);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/send-verification")
-    public ResponseEntity<Void> sendVerification(@RequestParam String email) {
-        emailVerificationService.sendVerificationEmail(email);
+    public ResponseEntity<Void> sendVerification(@RequestParam String email,
+        @RequestParam EmailVerificationType type) {
+        emailVerificationService.sendVerificationEmail(email, type);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

@@ -3,6 +3,7 @@ package com.nuriwoolim.pagebackend.domain.user.util;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserSignupRequest;
 import com.nuriwoolim.pagebackend.domain.user.entity.EmailVerification;
+import com.nuriwoolim.pagebackend.domain.user.entity.EmailVerificationType;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -30,10 +31,12 @@ public class UserMapper {
             .build();
     }
 
-    public static EmailVerification toEmailVerification(String email, String code) {
+    public static EmailVerification toEmailVerification(String email, String code,
+        EmailVerificationType type) {
         return EmailVerification.builder()
             .email(email)
             .code(code)
+            .type(type)
             .build();
     }
 }
