@@ -1,6 +1,7 @@
 package com.nuriwoolim.pagebackend.domain.user.service;
 
 import com.nuriwoolim.pagebackend.domain.user.entity.EmailVerification;
+import com.nuriwoolim.pagebackend.domain.user.entity.EmailVerificationType;
 import com.nuriwoolim.pagebackend.domain.user.repository.EmailVerificationRepository;
 import com.nuriwoolim.pagebackend.domain.user.util.CodeGenerator;
 import com.nuriwoolim.pagebackend.domain.user.util.UserMapper;
@@ -33,63 +34,70 @@ public class EmailVerificationService {
     private int verificationExpires;
 
     @Transactional
-    public void sendSignupEmail(String email) {
+    public void sendVerificationEmail(String email, EmailVerificationType type) {
+        Optional<EmailVerification> optional = emailVerificationRepository.findByEmailAndType(email,
+            type);
         String code = CodeGenerator.generateCode();
-        processVerificationEmail(email, code);
-        emailService.sendVerificationEmail(email, code);
-    }
 
-    @Transactional
-    public void sendPasswordResetEmail(String email) {
-        String code = CodeGenerator.generateCode();
-        processVerificationEmail(email, code);
-        emailService.sendPasswordResetEmail(email, code);
-    }
-
-    @Transactional
-    public void processVerificationEmail(String email, String code) {
-        EmailVerification emailVerification = getEmailVerification(email);
-
-        if (emailVerification.getResendCount() < resendCount) {  // 재전송 한도 내면 즉시 수정후 재전송
-            emailVerification.resend(code);
-            emailVerification.setExpiresAt(resendTime);
-        } else {                                                // 재전송 한도 초과시 재전송 쿨타임을 기다려야함
-            if (LocalDateTime.now()
-                .isBefore(emailVerification.getUpdatedAt().plusSeconds(resendTime))) {
-                throw ErrorCode.TOO_MANY_RESEND.toException(
-                    "Request After " + emailVerification.getUpdatedAt().plusSeconds(resendTime));
-            }
-            // 재전송 한도 초과후 쿨타임 이후에 요청시 기존 인증정보는 삭제하고 새로 생성
-            emailVerificationRepository.deleteByEmail(email);
-            emailVerificationRepository.flush();
-            EmailVerification newEmailVerification = UserMapper.toEmailVerification(email, code);
+        if (optional.isEmpty()) {                                  // 기존에 존재하는 정보가 없으면 즉시 재생성
+            EmailVerification newEmailVerification = UserMapper.toEmailVerification(email,
+                code, type);
             newEmailVerification.setExpiresAt(verificationExpires);
             emailVerificationRepository.save(newEmailVerification);
+        } else {
+            EmailVerification emailVerification = optional.get();
+
+            if (emailVerification.getResendCount() < resendCount) {  // 재전송 한도 내면 즉시 수정후 재전송
+                emailVerification.countResend(code);
+                emailVerification.setExpiresAt(resendTime);
+            } else {                                                // 재전송 한도 초과시 재전송 쿨타임을 기다려야함
+                if (LocalDateTime.now()
+                    .isBefore(emailVerification.getUpdatedAt().plusSeconds(resendTime))) {
+                    throw ErrorCode.TOO_MANY_RESEND.toException(
+                        "Request After " + emailVerification.getUpdatedAt()
+                            .plusSeconds(resendTime));
+                }
+                // 재전송 한도 초과후 쿨타임 이후에 요청시 기존 인증정보는 삭제하고 새로 생성
+                emailVerificationRepository.deleteByEmail(email);
+                emailVerificationRepository.flush();
+                EmailVerification newEmailVerification = UserMapper.toEmailVerification(email,
+                    code, type);
+                newEmailVerification.setExpiresAt(verificationExpires);
+                emailVerificationRepository.save(newEmailVerification);
+            }
+        }
+        processSendEmail(email, code, type);
+    }
+
+    private void processSendEmail(String email, String code, EmailVerificationType type) {
+        switch (type) {
+            case SIGNUP:
+                emailService.sendVerificationEmail(email, code);
+                break;
+            case RESET_PASSWORD:
+                emailService.sendPasswordResetEmail(email, code);
+                break;
+            default:
+                throw ErrorCode.BAD_REQUEST.toException();
         }
     }
 
     @Transactional(readOnly = true)
-    public EmailVerification getEmailVerification(String email) {
-        return emailVerificationRepository.findByEmail(email).orElseThrow(
+    public EmailVerification getEmailVerificationByType(String email, EmailVerificationType type) {
+        return emailVerificationRepository.findByEmailAndType(email, type).orElseThrow(
             ErrorCode.DATA_NOT_FOUND::toException);
     }
 
     @Transactional
-    public void verifyEmail(String email, String code) {
-        Optional<EmailVerification> emailVerification = emailVerificationRepository.findByEmail(
-            email);
-        if (emailVerification.isEmpty()) {
-            throw ErrorCode.DATA_NOT_FOUND.toException("인증 정보가 없습니다.");
-        }
+    public void verifyEmail(String email, String code, EmailVerificationType type) {
+        EmailVerification emailVerification = getEmailVerificationByType(email, type);
 
-        EmailVerification verification = emailVerification.get();
-
-        if (verification.isExpired()) {
+        if (emailVerification.isExpired()) {
             emailVerificationRepository.deleteByEmail(email);
             throw ErrorCode.EXPIRED_EMAIL_CODE.toException();
         }
 
-        if (!verification.getCode().equals(code)) {
+        if (!emailVerification.getCode().equals(code)) {
             throw ErrorCode.INVALID_EMAIL_CODE.toException();
         }
     }
