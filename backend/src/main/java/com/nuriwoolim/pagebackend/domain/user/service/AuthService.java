@@ -42,7 +42,8 @@ public class AuthService {
         emailVerificationService.verifyEmail(userSignupRequest.email(), userSignupRequest.code(),
             EmailVerificationType.SIGNUP);
 
-        emailVerificationService.deleteVerification(userSignupRequest.email());
+        emailVerificationService.deleteVerification(userSignupRequest.email(),
+            EmailVerificationType.SIGNUP);
 
         String encodedPassword = passwordEncoder.encode(userSignupRequest.password());
 
@@ -132,6 +133,7 @@ public class AuthService {
         String encodedPassword = passwordEncoder.encode(request.password());
         user.updatePassword(encodedPassword);
 
-        emailVerificationService.deleteVerification(user.getEmail());
+        emailVerificationService.deleteVerification(user.getEmail(),
+            EmailVerificationType.RESET_PASSWORD);
     }
 }

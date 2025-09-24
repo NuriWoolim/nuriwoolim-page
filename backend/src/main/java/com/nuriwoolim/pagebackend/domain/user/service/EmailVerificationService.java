@@ -81,7 +81,7 @@ public class EmailVerificationService {
     }
 
     private void recreateVerification(String email, String code, EmailVerificationType type) {
-        emailVerificationRepository.deleteByEmail(email);
+        emailVerificationRepository.deleteByEmailAndType(email, type);
         emailVerificationRepository.flush();
         createNewVerification(email, code, type);
     }
@@ -120,8 +120,8 @@ public class EmailVerificationService {
     }
 
     @Transactional
-    public void deleteVerification(String email) {
-        emailVerificationRepository.deleteByEmail(email);
+    public void deleteVerification(String email, EmailVerificationType type) {
+        emailVerificationRepository.deleteByEmailAndType(email, type);
     }
 
 //    @Scheduled(fixedRate = 300000) // 5분마다 실행
