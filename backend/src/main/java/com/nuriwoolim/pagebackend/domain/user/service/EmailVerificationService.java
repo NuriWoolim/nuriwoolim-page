@@ -120,8 +120,8 @@ public class EmailVerificationService {
     }
 
     @Transactional
-    public void deleteVerification(String email) {
-        emailVerificationRepository.deleteByEmail(email);
+    public void deleteVerification(String email, EmailVerificationType type) {
+        emailVerificationRepository.deleteByEmailAndType(email, type);
     }
 
 //    @Scheduled(fixedRate = 300000) // 5분마다 실행
