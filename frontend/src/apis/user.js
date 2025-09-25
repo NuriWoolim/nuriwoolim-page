@@ -12,11 +12,11 @@ export const signup = async (username, email, password, nickname) => {
   return result;
 };
 
-export const login = async (username, password) => {
+export const login = async (email, password) => {
   const result = await axios.post(
     `${baseURL}/api/auth/login`,
     {
-      username,
+      email,
       password,
     },
     {

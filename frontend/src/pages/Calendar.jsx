@@ -4,7 +4,6 @@ import DateCell from "./calendar/DateCell";
 import { TimeTableAPI } from "../apis/common";
 import { createDate } from "../tools/DateTool";
 
-
 /* Calendar 섹션의 전체 배경 */
 const CalendarSection = styled.section`
   background-color: #fefaef;
@@ -78,7 +77,7 @@ const MonthYearContainer = styled.div`
     outline: none;
   }
 
-  button img{
+  button img {
     height: 1.5rem;
     margin-top: 5px;
   }
@@ -93,6 +92,18 @@ const MonthYearContainer = styled.div`
     transform: scaleX(-1);
   }
 `;
+
+function toLocalISOString(date) {
+  const pad = (n) => String(n).padStart(2, "0");
+
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1); // 0부터 시작하니까 +1
+  const day = pad(date.getDate());
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
 
 // 현재 달의 날짜들을 찾고 올바른 위치를 찾아주는 함수
 const createCalendarData = (startDate) => {
@@ -177,7 +188,11 @@ const Calendar = () => {
   const getTimeTables = async () => {
     try {
       // 한달간 기간 설정
-      const result = await TimeTableAPI.getTimeTable();
+      const from = toLocalISOString(calendarState.dates[0]);
+      const to = toLocalISOString(
+        calendarState.dates[calendarState.dates.length - 1]
+      );
+      const result = await TimeTableAPI.getTimeTable(from, to);
       const resultdata = result.data;
 
       const newMonthTT = Array.from({ length: 42 }, () => []);
@@ -255,6 +270,7 @@ const Calendar = () => {
                   calendarState.dates[index].getMonth() ===
                   calendarState.startDate.getMonth()
                 }
+                getMonthTimeTables={getTimeTables}
               />
             );
           })}
