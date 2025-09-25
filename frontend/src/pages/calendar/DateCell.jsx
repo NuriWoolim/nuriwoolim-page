@@ -65,7 +65,7 @@ const TimeTableContainer = styled.div`
     border: none;
     border-radius: 2px;
 
-    background-color: ${(props) => lighten(0.5, props.$color)};
+    background-color: ${(props) => lighten(0.4, props.$color)};
     color: ${({ $color }) => $color};
     white-space: nowrap; /* 줄바꿈 안 함 */
     overflow: hidden; /* 넘친 부분 숨김 */
@@ -147,7 +147,10 @@ const DateCell = ({ dateObj, timetables, isSameMonth, getMonthTimeTables }) => {
       {isDetailedDateOpen && <Overlay onClick={closeDetailedDate} />}
       {isDetailedDateOpen && (
         <DropdownContainer $x={dropdownPosition.x} $y={dropdownPosition.y}>
-          <DetailedDate dateObj={dateObj} getMonthTimeTables={getMonthTimeTables} />
+          <DetailedDate
+            dateObj={dateObj}
+            getMonthTimeTables={getMonthTimeTables}
+          />
         </DropdownContainer>
       )}
     </>

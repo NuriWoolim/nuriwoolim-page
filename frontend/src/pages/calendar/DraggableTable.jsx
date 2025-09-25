@@ -18,7 +18,7 @@ const TableCell = styled.div`
 
   color: #486284;
   font-family: Pretendard;
-  font-size: 0.9rem;
+  font-size: 1.2rem;
   font-style: normal;
   font-weight: 800;
   line-height: normal;
@@ -26,7 +26,8 @@ const TableCell = styled.div`
 
   overflow: hidden;
   text-overflow: clip;
-  border-bottom: solid 0.5px #acbeff;
+  border-bottom: ${(props) => props.$border};
+  padding: 0.32rem;
 
   background-color: ${(props) => props.$color};
 
@@ -62,10 +63,12 @@ const TTTCell = styled.div`
 `;
 
 const TTTInnerBlock = styled.div`
-  padding: 10px;
+  /* padding: 10px; */
   margin-left: 1.5rem;
-  width: 60%;
-  height: 60%;
+  width: 70%;
+  height: 90%;
+  /* height: 100%; */
+  /* box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.4); */
 
   pointer-events: ${(props) => (props.$isTouched === -1 ? "auto" : "none")};
 
@@ -114,6 +117,11 @@ const DraggableTable = ({
 
   // cells를 채워주는 useEffect
   const initTable = useEffect(() => {
+    const newSelected = [...cells].map((cell) => ({
+      ...cell,
+      tt: null,
+    }));
+
     for (let i = 0; i < timeTables.data.length; i++) {
       const parseTime = (str) => {
         const [datePart, timePart] = str.split("T");
@@ -125,18 +133,14 @@ const DraggableTable = ({
       const startidx = parseTime(timeTables.data[i].start);
       const endidx = parseTime(timeTables.data[i].end);
 
-      setCells((prevSelected) => {
-        const newSelected = [...prevSelected];
-
-        for (let j = startidx; j < endidx; j++) {
-          newSelected[j] = {
-            ...newSelected[j],
-            tt: timeTables.data[i],
-          };
-        }
-        return newSelected;
-      });
+      for (let j = startidx; j < endidx; j++) {
+        newSelected[j] = {
+          ...newSelected[j],
+          tt: timeTables.data[i],
+        };
+      }
     }
+    setCells(newSelected);
   }, [timeTables]);
 
   // 테이블 위에 표시되는 팀 이름을 표시해주는 useEffect
@@ -274,15 +278,10 @@ const DraggableTable = ({
           <TableCell
             key={index}
             data-key={index}
-            $color={
-              cells[index]?.isSelected === false ? "white" : "#FFF7E2;"
-              // : cells[index] === 1
-              // ? "green"
-              // : cells[index]?.color ?? "white"
-            }
+            $border={index % 2 === 1 ? "solid 0.5px #acbeff" : "none"}
+            $color={cells[index]?.isSelected === false ? "white" : "#FFF7E2;"}
           >
-            {String(time.getHours()).padStart(2, "0")}:
-            {String(time.getMinutes()).padStart(2, "0")}
+            {index % 2 === 0 && String(time.getHours()).padStart(2, "0")}
           </TableCell>
         ))}
       </GridContainer>
@@ -304,9 +303,7 @@ const DraggableTable = ({
                 $isTouched={isTouched}
               >
                 <div>
-                  {TTTCells[index] === null ? null : TTTCells[index].title}
-                </div>
-                <div>
+                  {TTTCells[index] === null ? null : TTTCells[index].title}{" "}
                   {TTTCells[index] === null ? null : TTTCells[index].team}
                 </div>
               </TTTInnerBlock>

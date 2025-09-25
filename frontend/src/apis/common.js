@@ -7,8 +7,6 @@ const api = getAuthAxios();
 
 export const TimeTableAPI = {
   createTimeTable: async ({ title, description, team, color, start, end }) => {
-    const accessToken = localStorage.getItem("accessToken");
-
     const result = await api.post(
       `${baseURL}/api/timetables`,
       {
@@ -40,6 +38,9 @@ export const TimeTableAPI = {
     });
     return result;
   },
-  deleteTimeTable: {},
+  deleteTimeTable: async (id) => {
+    const result = await api.delete(`${baseURL}/api/timetables/${id}`);
+    return result;
+  },
   updateTimeTable: {},
 };

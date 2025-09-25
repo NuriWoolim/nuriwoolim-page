@@ -109,6 +109,7 @@ const DetailedDate = ({ dateObj, getMonthTimeTables }) => {
 
         <TTDataDisplay
           selectedTT={selectedTT}
+          setSelectedTT={setSelectedTT}
           dataMode={dataMode}
           setDataMode={setDataMode}
           cells={cells}

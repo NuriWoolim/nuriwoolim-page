@@ -61,8 +61,18 @@ function toLocalISOString(date) {
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
-const ReadMode = ({ selectedTT, setDataMode }) => {
-  const deleteTT = () => {};
+const ReadMode = ({ selectedTT, setSelectedTT, setDataMode, callTTGetApi }) => {
+  const deleteTT = async (id) => {
+    try {
+      const result = await TimeTableAPI.deleteTimeTable(id);
+      callTTGetApi();
+      setDataMode(READ);
+      setSelectedTT(null);
+    } catch (error) {
+      if (error.response)
+        console.error("응답 에러:", error.response.status, error.response.data);
+    }
+  };
   return (
     <>
       {selectedTT === null ? (
@@ -75,7 +85,7 @@ const ReadMode = ({ selectedTT, setDataMode }) => {
           <div>{selectedTT.start}</div>
           <div>{selectedTT.end}</div>
           <button onClick={() => setDataMode(UPDATE)}>일정 수정</button>
-          <button onClick={deleteTT}>일정 삭제</button>
+          <button onClick={() => deleteTT(selectedTT.id)}>일정 삭제</button>
         </div>
       )}
     </>
@@ -128,35 +138,43 @@ const UpdateMode = ({ setDataMode, cells, times, selectedTT }) => {
   return (
     <>
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <div>
-          <label for="title">곡명</label>
+        <FormElement>
+          <label for="title">곡 이름</label>
           <TextInput
             id="title"
             {...register("title", { required: "제목을 입력하세요" })}
             // placeholder="제목"
           />
-        </div>
-        <div>
-          <label for="team">곡명</label>
+        </FormElement>
+
+        <FormElement>
+          <label for="team">팀 이름</label>
           <TextInput
             id="team"
             {...register("team", { required: "제목을 입력하세요" })}
             // placeholder="팀"
           />
-        </div>
-        <div>
+        </FormElement>
+
+        <FormElement>
           <label for="description">설명</label>
           <TextInput id="description" {...register("description")} />
-        </div>
-        <div>
+        </FormElement>
+        <FormElement>
+          <label>색 설정</label>
           <Controller
             name="color"
             control={control}
             render={({ field }) => (
-              <HexColorPicker color={field.value} onChange={field.onChange} />
+              <StyledCirclePicker
+                colors={TTColors.map((x) => x[0])}
+                color={field.value}
+                onChangeComplete={(c) => field.onChange(c.hex)}
+                circleSize={30}
+              />
             )}
           />
-        </div>
+        </FormElement>
         <div>
           <button type="submit">수정</button>
           <button type="button" onClick={() => setDataMode(READ)}>
@@ -167,7 +185,7 @@ const UpdateMode = ({ setDataMode, cells, times, selectedTT }) => {
     </>
   );
 };
-const CreateMode = ({ setDataMode, cells, callApi, times }) => {
+const CreateMode = ({ setDataMode, cells, callTTGetApi, times }) => {
   const {
     register,
     handleSubmit,
@@ -210,8 +228,8 @@ const CreateMode = ({ setDataMode, cells, callApi, times }) => {
     try {
       const result = await TimeTableAPI.createTimeTable(finaldata);
 
-      callApi();
-
+      callTTGetApi();
+      setDataMode(READ);
       //   setCells((prevCells) =>
       //     prevCells.map((cell, idx) =>
       //       idx >= l && idx <= r ? { ...cell, tt: result.data } : cell
@@ -221,8 +239,6 @@ const CreateMode = ({ setDataMode, cells, callApi, times }) => {
       if (error.response)
         console.error("응답 에러:", error.response.status, error.response.data);
     }
-
-    setDataMode(READ);
   };
 
   const onError = (errors) => {
@@ -282,6 +298,7 @@ const CreateMode = ({ setDataMode, cells, callApi, times }) => {
 
 const TTDataDisplay = ({
   selectedTT,
+  setSelectedTT,
   dataMode,
   setDataMode,
   cells,
@@ -317,11 +334,16 @@ const TTDataDisplay = ({
         <CreateMode
           setDataMode={setDataMode}
           cells={cells}
-          callApi={callApi}
+          callTTGetApi={callApi}
           times={times}
         />
       ) : dataMode === READ ? (
-        <ReadMode selectedTT={selectedTT} setDataMode={setDataMode} />
+        <ReadMode
+          setSelectedTT={setSelectedTT}
+          selectedTT={selectedTT}
+          setDataMode={setDataMode}
+          callTTGetApi={callApi}
+        />
       ) : (
         <UpdateMode
           setDataMode={setDataMode}
