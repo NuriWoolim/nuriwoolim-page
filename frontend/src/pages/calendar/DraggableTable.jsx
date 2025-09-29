@@ -3,6 +3,7 @@ import styled from "styled-components";
 import _ from "lodash";
 import { TTColors } from "../../data/CalendarData";
 import { lighten } from "polished";
+import { UPDATE } from "./DetailedDate";
 
 const GridContainer = styled.div`
   display: grid;
@@ -66,7 +67,7 @@ const TTTInnerBlock = styled.div`
   /* padding: 10px; */
   margin-left: 1.5rem;
   width: 70%;
-  height: 90%;
+  height: 80%;
   /* height: 100%; */
   /* box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.4); */
 
@@ -79,6 +80,11 @@ const TTTInnerBlock = styled.div`
   border-radius: 2px;
   background-color: ${(props) => props.$color};
   color: ${(props) => lighten(0.5, props.$color)};
+  border: ${(props) => (props.$hasBorder ? `0.25rem solid #FFF7E2` : "none")};
+  box-shadow: ${(props) =>
+    props.$hasBorder ? `0.2rem 0.3rem 0.8rem 0 rgba(0, 0, 0, 0.25)` : "none"};
+  opacity: ${(props) =>
+    props.$isTransperent && props.$hasBorder ? "0.5" : "none"};
 
   font-family: Pretendard;
   font-size: 1rem;
@@ -90,13 +96,23 @@ const TTTInnerBlock = styled.div`
 const Wrapper = styled.div`
   position: relative;
 `;
+
+const Blocker = styled.div`
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+`;
 const DraggableTable = ({
   times, // 시간들
   cells,
   setCells,
   timeTables, // 해당 일(날짜)의 타임테이블 데이터들
+  selectedTT,
   setSelectedTT, // 현재 선택된 타임테이블
   enableChange = false, // 변경 가능 여부
+  dataMode,
 }) => {
   const [isTouched, setIsTouched] = useState(-1);
 
@@ -104,7 +120,7 @@ const DraggableTable = ({
   const [TTTStyle, setTTTStyle] = useState("");
 
   const clearCells = () => {
-    let newCells = [...cells];
+    const newCells = [...cells];
     for (let i = 0; i < times.length; i++) {
       newCells[i] = {
         ...newCells[i],
@@ -113,7 +129,7 @@ const DraggableTable = ({
     }
     setCells(newCells);
   };
-  useEffect(clearCells, []);
+  useEffect(clearCells, [enableChange]);
 
   // cells를 채워주는 useEffect
   const initTable = useEffect(() => {
@@ -171,8 +187,6 @@ const DraggableTable = ({
   const handleTouchStart = useCallback((e) => {
     // if (isTouched != -1) return;
 
-    // 표시하는 일정 없애버리기
-    setSelectedTT(null);
     const target = e.target.closest("div[data-key]");
     if (!target) return;
 
@@ -196,11 +210,11 @@ const DraggableTable = ({
       return newSelected;
     });
     setIsTouched(col);
-    console.log("start");
+    // console.log("start");
   }, []);
 
   const handleTouchEnd = useCallback(() => {
-    console.log("end");
+    // console.log("end");
 
     setIsTouched(-1);
   }, []);
@@ -234,12 +248,22 @@ const DraggableTable = ({
       const minCol = Math.min(st_col, cur_col);
       const maxCol = Math.max(st_col, cur_col);
 
+      let changed = false;
+
       for (let c = minCol; c <= maxCol; c++) {
         if (c === st_col) continue;
-        newSelected[c] = { ...newSelected[c], isSelected: add_dates };
+
+        const newValue = { ...newSelected[c], isSelected: add_dates };
+        if (newSelected[c].isSelected !== newValue.isSelected) {
+          newSelected[c] = newValue;
+          changed = true;
+        }
       }
 
-      setCells(newSelected);
+      if (changed) {
+        setCells(newSelected);
+        // console.log("bb");
+      }
 
       //   console.log(newSelected);
     }, 75),
@@ -285,6 +309,10 @@ const DraggableTable = ({
           </TableCell>
         ))}
       </GridContainer>
+
+      {enableChange === false && (
+        <Blocker onClick={() => setSelectedTT(null)} />
+      )}
       <TTTitleContainer
         id="TTTitleContainer"
         style={{
@@ -295,12 +323,15 @@ const DraggableTable = ({
           <TTTCell key={index}>
             {TTTCells[index] !== null && (
               <TTTInnerBlock
-                onClick={() => {
-                  if (enableChange) clearCells();
-                  return setSelectedTT(TTTCells[index]);
-                }}
+                onClick={
+                  dataMode != UPDATE
+                    ? () => setSelectedTT(TTTCells[index])
+                    : null
+                }
                 $color={"#" + TTTCells[index].color ?? "#000000"}
                 $isTouched={isTouched}
+                $hasBorder={selectedTT?.id == TTTCells[index]?.id}
+                $isTransperent={dataMode == UPDATE}
               >
                 <div>
                   {TTTCells[index] === null ? null : TTTCells[index].title}{" "}

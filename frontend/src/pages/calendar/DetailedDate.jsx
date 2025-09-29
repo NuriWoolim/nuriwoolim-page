@@ -90,6 +90,19 @@ const DetailedDate = ({ dateObj, getMonthTimeTables }) => {
   useEffect(() => {
     callApi();
   }, []);
+
+  useEffect(() => {
+    if (dataMode == UPDATE) {
+      setCells((cells) => {
+        const newCells = [...cells];
+        cells.map((cell, i) => {
+          if (cell.tt?.id == selectedTT.id)
+            newCells[i] = { ...newCells[i], isSelected: true };
+        });
+        return newCells;
+      });
+    }
+  }, [dataMode]);
   return (
     <DetailedDateContainer>
       <Bar>
@@ -101,10 +114,12 @@ const DetailedDate = ({ dateObj, getMonthTimeTables }) => {
         <DraggableTable
           times={times}
           timeTables={timeTables}
-          enableChange={dataMode === READ}
+          enableChange={dataMode !== READ}
+          selectedTT={selectedTT}
           setSelectedTT={setSelectedTT}
           cells={cells}
           setCells={setCells}
+          dataMode={dataMode}
         />
 
         <TTDataDisplay

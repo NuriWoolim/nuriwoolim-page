@@ -42,5 +42,23 @@ export const TimeTableAPI = {
     const result = await api.delete(`${baseURL}/api/timetables/${id}`);
     return result;
   },
-  updateTimeTable: {},
+  updateTimeTable: async ({
+    title,
+    description,
+    team,
+    color,
+    start,
+    end,
+    id,
+  }) => {
+    const result = await api.patch(`${baseURL}/api/timetables/${id}`, {
+      title,
+      description,
+      team,
+      color,
+      start,
+      end,
+    });
+    return result;
+  },
 };

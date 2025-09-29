@@ -1,4 +1,4 @@
-import { React } from "react";
+import { React, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import styled from "styled-components";
 import { CirclePicker } from "react-color";
@@ -61,6 +61,36 @@ function toLocalISOString(date) {
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
+const isSelectedError = (cells, exceptionTT) => {
+  let selectedCnt = 0,
+    first = 0,
+    err = false;
+  //   console.log("a");
+  cells.map((cell, i) => {
+    // 선택한 자리에 타임테이블 존재하면 에러
+    if (
+      cell.tt !== null &&
+      cell.isSelected === true &&
+      cell.tt?.id !== exceptionTT?.id
+    ) {
+      err = true;
+    }
+    if (cell.isSelected === true) selectedCnt += 1;
+
+    if (
+      cell.isSelected === true &&
+      (i == 0 || cells[i - 1].isSelected === false)
+    )
+      first += 1;
+  });
+  // 최대 시간 제한
+  if (selectedCnt > TIMELIMIT) err = true;
+  // 연속적이어야함, 최소 하나 선택해야함
+  if (first != 1) err = true;
+
+  return err;
+};
+
 const ReadMode = ({ selectedTT, setSelectedTT, setDataMode, callTTGetApi }) => {
   const deleteTT = async (id) => {
     try {
@@ -91,7 +121,13 @@ const ReadMode = ({ selectedTT, setSelectedTT, setDataMode, callTTGetApi }) => {
     </>
   );
 };
-const UpdateMode = ({ setDataMode, cells, times, selectedTT }) => {
+const UpdateMode = ({
+  setDataMode,
+  cells,
+  times,
+  selectedTT,
+  callTTGetApi,
+}) => {
   const {
     register,
     handleSubmit,
@@ -102,37 +138,38 @@ const UpdateMode = ({ setDataMode, cells, times, selectedTT }) => {
       title: selectedTT.title,
       team: selectedTT.team,
       description: selectedTT.description,
+      color: selectedTT.color,
     },
   });
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     let l = -1,
-      r = -1,
-      error = 0;
+      r = -1;
     for (let i = 0; i < times.length; i++) {
-      if (cells[i] === 1) {
-        if (i === 0 || cells[i - 1] !== 1) {
-          if (l !== -1) error = 1;
+      if (cells[i].isSelected === true) {
+        if (i === 0 || cells[i - 1].isSelected === false) {
           l = i;
         }
-
         r = i;
       }
     }
-    console.log(l, r, error);
-    if (r + 1 - l > 4) error = 1;
-
-    if (error) throw new Error("연속된 최대 2시간의 시간을 선택하세요!");
 
     const finaldata = {
       ...data,
       start: toLocalISOString(times[l]),
       end: toLocalISOString(times[r + 1]),
+      color: data.color.slice(-6),
+      id: selectedTT.id,
     };
 
-    console.log(finaldata);
-
-    setDataMode(READ);
+    try {
+      const result = await TimeTableAPI.updateTimeTable(finaldata);
+      callTTGetApi();
+      setDataMode(READ);
+    } catch (error) {
+      if (error.response)
+        console.error("응답 에러:", error.response.status, error.response.data);
+    }
   };
 
   return (
@@ -176,7 +213,9 @@ const UpdateMode = ({ setDataMode, cells, times, selectedTT }) => {
           />
         </FormElement>
         <div>
-          <button type="submit">수정</button>
+          {!isSelectedError(cells, selectedTT) && (
+            <button type="submit">수정</button>
+          )}
           <button type="button" onClick={() => setDataMode(READ)}>
             취소
           </button>
@@ -199,23 +238,15 @@ const CreateMode = ({ setDataMode, cells, callTTGetApi, times }) => {
 
   const onSubmit = async (data) => {
     let l = -1,
-      r = -1,
-      error = 0;
+      r = -1;
     for (let i = 0; i < times.length; i++) {
       if (cells[i].isSelected === true) {
         if (i === 0 || cells[i - 1].isSelected === false) {
-          if (l !== -1) error = 1;
           l = i;
         }
-
         r = i;
       }
     }
-    console.log(l, r, error);
-    if (r + 1 - l > 4) error = 1;
-
-    if (error) throw new Error("연속된 최대 2시간의 시간을 선택하세요!");
-
     const finaldata = {
       ...data,
       start: toLocalISOString(times[l]),
@@ -285,7 +316,7 @@ const CreateMode = ({ setDataMode, cells, callTTGetApi, times }) => {
           />
         </FormElement>
         <div>
-          <button type="submit">추가</button>
+          {!isSelectedError(cells, null) && <button type="submit">추가</button>}
           <button type="button" onClick={() => setDataMode(READ)}>
             취소
           </button>
@@ -304,29 +335,6 @@ const TTDataDisplay = ({
   callApi,
   times,
 }) => {
-  const isSelectedError = () => {
-    let selectedCnt = 0,
-      first = 0,
-      err = 0;
-    cells.map((cell, i) => {
-      // 선택한 자리에 타임테이블 존재하면 에러
-      if (cell.tt !== null && cell.isSelected === true) err = 1;
-
-      if (cell.isSelected === true) selectedCnt += 1;
-
-      if (
-        cell.isSelected === true &&
-        (i == 0 || cells[i - 1].isSelected === false)
-      )
-        first += 1;
-    });
-    // 최대 시간 제한
-    if (selectedCnt > TIMELIMIT) err = 1;
-    // 연속적이어야함, 최소 하나 선택해야함
-    if (first != 1) err = 1;
-
-    return err;
-  };
   return (
     <TTDDContainer>
       {dataMode === CREATE ? (
@@ -349,17 +357,16 @@ const TTDataDisplay = ({
           cells={cells}
           times={times}
           selectedTT={selectedTT}
+          callTTGetApi={callApi}
         />
       )}
-      {selectedTT === null && isSelectedError() === 0 && (
-        <button
-          onClick={() => {
-            setDataMode(CREATE);
-          }}
-        >
-          일정 추가
-        </button>
-      )}
+      <button
+        onClick={() => {
+          setDataMode(CREATE);
+        }}
+      >
+        일정 추가
+      </button>
     </TTDDContainer>
   );
 };
