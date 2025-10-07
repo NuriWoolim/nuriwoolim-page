@@ -3,7 +3,7 @@ import styled from "styled-components";
 import _ from "lodash";
 import { TTColors } from "../../data/CalendarData";
 import { lighten } from "polished";
-import { UPDATE } from "./DetailedDate";
+import { CREATE, UPDATE } from "./DetailedDate";
 
 const GridContainer = styled.div`
   display: grid;
@@ -71,8 +71,6 @@ const TTTInnerBlock = styled.div`
   /* height: 100%; */
   /* box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.4); */
 
-  pointer-events: ${(props) => (props.$isTouched === -1 ? "auto" : "none")};
-
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -85,6 +83,10 @@ const TTTInnerBlock = styled.div`
     props.$hasBorder ? `0.2rem 0.3rem 0.8rem 0 rgba(0, 0, 0, 0.25)` : "none"};
   opacity: ${(props) =>
     props.$isTransperent && props.$hasBorder ? "0.5" : "none"};
+  pointer-events: ${(props) =>
+    (props.$isTransperent && props.$hasBorder) || props.$isTouched !== -1
+      ? "none"
+      : "auto"};
 
   font-family: Pretendard;
   font-size: 1rem;
@@ -92,6 +94,13 @@ const TTTInnerBlock = styled.div`
   font-weight: 900;
   line-height: normal;
   letter-spacing: -0.9px;
+
+  .noselect {
+    user-select: none;
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+ */
+  }
 `;
 const Wrapper = styled.div`
   position: relative;
@@ -161,6 +170,7 @@ const DraggableTable = ({
 
   // 테이블 위에 표시되는 팀 이름을 표시해주는 useEffect
   useEffect(() => {
+    if (isTouched !== -1) return;
     let prev = null;
     let cnt = 0;
     let cssstr = "";
@@ -182,7 +192,7 @@ const DraggableTable = ({
     cssstr += String(cnt * 2) + "rem ";
     setTTTStyle(cssstr);
     setTTTCells(cellData);
-  }, [cells]);
+  }, [cells, isTouched]);
 
   const handleTouchStart = useCallback((e) => {
     // if (isTouched != -1) return;
@@ -324,7 +334,7 @@ const DraggableTable = ({
             {TTTCells[index] !== null && (
               <TTTInnerBlock
                 onClick={
-                  dataMode != UPDATE
+                  dataMode != UPDATE && dataMode != CREATE
                     ? () => setSelectedTT(TTTCells[index])
                     : null
                 }

@@ -150,6 +150,7 @@ const DateCell = ({ dateObj, timetables, isSameMonth, getMonthTimeTables }) => {
           <DetailedDate
             dateObj={dateObj}
             getMonthTimeTables={getMonthTimeTables}
+            
           />
         </DropdownContainer>
       )}

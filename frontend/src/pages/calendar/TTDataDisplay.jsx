@@ -126,6 +126,7 @@ const UpdateMode = ({
   cells,
   times,
   selectedTT,
+  setSelectedTT,
   callTTGetApi,
 }) => {
   const {
@@ -165,6 +166,7 @@ const UpdateMode = ({
     try {
       const result = await TimeTableAPI.updateTimeTable(finaldata);
       callTTGetApi();
+      setSelectedTT(null);
       setDataMode(READ);
     } catch (error) {
       if (error.response)
@@ -176,7 +178,7 @@ const UpdateMode = ({
     <>
       <Form onSubmit={handleSubmit(onSubmit)}>
         <FormElement>
-          <label for="title">곡 이름</label>
+          <label htmlFor="title">곡 이름</label>
           <TextInput
             id="title"
             {...register("title", { required: "제목을 입력하세요" })}
@@ -185,7 +187,7 @@ const UpdateMode = ({
         </FormElement>
 
         <FormElement>
-          <label for="team">팀 이름</label>
+          <label htmlFor="team">팀 이름</label>
           <TextInput
             id="team"
             {...register("team", { required: "제목을 입력하세요" })}
@@ -194,7 +196,7 @@ const UpdateMode = ({
         </FormElement>
 
         <FormElement>
-          <label for="description">설명</label>
+          <label htmlFor="description">설명</label>
           <TextInput id="description" {...register("description")} />
         </FormElement>
         <FormElement>
@@ -279,7 +281,7 @@ const CreateMode = ({ setDataMode, cells, callTTGetApi, times }) => {
     <>
       <Form onSubmit={handleSubmit(onSubmit)}>
         <FormElement>
-          <label for="title">곡 이름</label>
+          <label htmlFor="title">곡 이름</label>
           <TextInput
             id="title"
             {...register("title", { required: "제목을 입력하세요" })}
@@ -288,7 +290,7 @@ const CreateMode = ({ setDataMode, cells, callTTGetApi, times }) => {
         </FormElement>
 
         <FormElement>
-          <label for="team">팀 이름</label>
+          <label htmlFor="team">팀 이름</label>
           <TextInput
             id="team"
             {...register("team", { required: "제목을 입력하세요" })}
@@ -297,7 +299,7 @@ const CreateMode = ({ setDataMode, cells, callTTGetApi, times }) => {
         </FormElement>
 
         <FormElement>
-          <label for="description">설명</label>
+          <label htmlFor="description">설명</label>
           <TextInput id="description" {...register("description")} />
         </FormElement>
         <FormElement>
@@ -357,16 +359,20 @@ const TTDataDisplay = ({
           cells={cells}
           times={times}
           selectedTT={selectedTT}
+          setSelectedTT={setSelectedTT}
           callTTGetApi={callApi}
         />
       )}
-      <button
-        onClick={() => {
-          setDataMode(CREATE);
-        }}
-      >
-        일정 추가
-      </button>
+
+      {dataMode != CREATE && (
+        <button
+          onClick={() => {
+            setDataMode(CREATE);
+          }}
+        >
+          일정 추가
+        </button>
+      )}
     </TTDDContainer>
   );
 };

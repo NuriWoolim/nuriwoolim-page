@@ -104,7 +104,7 @@ const DetailedDate = ({ dateObj, getMonthTimeTables }) => {
     }
   }, [dataMode]);
   return (
-    <DetailedDateContainer>
+    <DetailedDateContainer data-testid="DetailedDate">
       <Bar>
         <h1>
           {dateObj.getMonth() + 1}/{dateObj.getDate()}
