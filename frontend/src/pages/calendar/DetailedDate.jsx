@@ -6,26 +6,75 @@ import { TimeTableAPI } from "../../apis/common";
 import TTDataDisplay from "./TTDataDisplay";
 
 const DetailedDateContainer = styled.div`
-  /* display: flex; */
-  height: calc(100% - 40px);
-`;
-
-const Bar = styled.div`
-  background-color: #486284;
-  padding: 0.6rem 0.7rem 0.6rem 0.7rem;
-  && h1 {
-    font-family: Pretendard;
-    font-weight: 900;
-    color: #fff;
-    text-align: right;
-    font-size: 1.8rem;
-    margin-top: 0;
-    margin-bottom: 0;
-  }
-`;
-
-const ElementsContainer = styled.div`
   display: flex;
+  width: 35.3rem;
+  height: 46.56581rem;
+  * {
+    box-sizing: border-box;
+  }
+
+  h2 {
+    color: #fff;
+  }
+
+  /* transform: scale(1.1); */
+`;
+
+const LeftBar = styled.div`
+  background-color: #486284;
+
+  height: 3.11688rem;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 0.9rem;
+`;
+
+const RightBar = styled.div`
+  background-color: #486284;
+  height: 3.11688rem;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 0.9rem;
+  padding-right: 0.45rem;
+`;
+
+const LeftContainer = styled.div`
+  flex: 1;
+`;
+const RightContainer = styled.div`
+  flex: 1;
+  border-left: 1px solid black;
+  display: flex;
+  flex-direction: column;
+
+`;
+
+const CloseButton = styled.button`
+  background: url("/assets/close_button.svg") no-repeat center;
+  background-size: 1.12rem;
+  box-sizing: content-box;
+  width: 1.12rem;
+  height: 1.12rem;
+  padding: 0.45rem;
+
+  cursor: pointer;
+  border: none;
+  /* border-radius: 0.75rem; */
+
+  &:hover {
+    opacity: 0.9;
+  }
+  &:active {
+    opacity: 0.8;
+  }
 `;
 
 function toLocalISOString(date, type) {
@@ -40,7 +89,7 @@ function toLocalISOString(date, type) {
   if (type == 0) return `${year}-${month}-${day}T00:00`;
   else return `${year}-${month}-${day}T23:59`;
 }
-const DetailedDate = ({ dateObj, getMonthTimeTables }) => {
+const DetailedDate = ({ dateObj, getMonthTimeTables, onClose }) => {
   const times = [];
   const tempDate = new Date(dateObj);
   tempDate.setHours(9);
@@ -105,12 +154,12 @@ const DetailedDate = ({ dateObj, getMonthTimeTables }) => {
   }, [dataMode]);
   return (
     <DetailedDateContainer data-testid="DetailedDate">
-      <Bar>
-        <h1>
-          {dateObj.getMonth() + 1}/{dateObj.getDate()}
-        </h1>
-      </Bar>
-      <ElementsContainer>
+      <LeftContainer>
+        <LeftBar>
+          <h2>
+            {dateObj.getMonth() + 1}/{dateObj.getDate()}
+          </h2>
+        </LeftBar>
         <DraggableTable
           times={times}
           timeTables={timeTables}
@@ -121,7 +170,12 @@ const DetailedDate = ({ dateObj, getMonthTimeTables }) => {
           setCells={setCells}
           dataMode={dataMode}
         />
-
+      </LeftContainer>
+      <RightContainer>
+        <RightBar>
+          <h2>합주 생성 및 편집</h2>
+          <CloseButton onClick={onClose} />
+        </RightBar>
         <TTDataDisplay
           selectedTT={selectedTT}
           setSelectedTT={setSelectedTT}
@@ -131,7 +185,7 @@ const DetailedDate = ({ dateObj, getMonthTimeTables }) => {
           callApi={callApi}
           times={times}
         />
-      </ElementsContainer>
+      </RightContainer>
     </DetailedDateContainer>
   );
 };

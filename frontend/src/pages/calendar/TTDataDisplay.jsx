@@ -8,18 +8,18 @@ import { TTColors } from "../../data/CalendarData";
 import { TimeTableAPI } from "../../apis/common";
 
 const TTDDContainer = styled.div`
-  min-width: 34rem;
-  border: solid 1px black;
+  flex: 1;
+  /* border: solid 1px black; */
   background: #fff7e2;
 `;
 
 const TextInput = styled.input`
   border: none;
   box-shadow: 1px 1px 4.1px 0 rgba(72, 98, 132, 0.2) inset;
-  width: 23rem;
-  height: 3rem;
+  width: 17rem;
+  height: 2.7rem;
 
-  margin: 0.5rem 1rem;
+  margin: 0.4rem 0.5rem;
 `;
 
 const Form = styled.form`
@@ -29,6 +29,7 @@ const Form = styled.form`
 
   justify-content: space-evenly;
   align-items: center;
+  padding: 0 1rem 0 1rem;
 `;
 
 const FormElement = styled.div`
@@ -38,7 +39,7 @@ const FormElement = styled.div`
     color: #486284;
 
     font-family: Pretendard;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-style: normal;
     font-weight: 900;
     line-height: normal;
@@ -47,7 +48,31 @@ const FormElement = styled.div`
 
 const StyledCirclePicker = styled(CirclePicker)`
   margin: 0.5rem 1rem;
-  width: 23rem;
+  /* width: 23rem; */
+`;
+
+const Button = styled.button`
+  flex: 1;
+  background: ${(props) => props.$color};
+  border: none;
+  box-shadow: 1px 1px 8.3px 0 rgba(0, 0, 0, 0.2) inset;
+  & {
+    transition: transform 0.1s ease;
+  }
+  &:hover {
+    transform: scale(1.05);
+    /* opacity: 90%; */
+  }
+  &:active {
+    /* opacity: 90%; */
+  }
+`;
+
+const ButtonsContainer = styled.div`
+  gap: 1rem;
+  width: 90%;
+  height: 3.4rem;
+  display: flex;
 `;
 function toLocalISOString(date) {
   const pad = (n) => String(n).padStart(2, "0");
@@ -210,18 +235,25 @@ const UpdateMode = ({
                 color={field.value}
                 onChangeComplete={(c) => field.onChange(c.hex)}
                 circleSize={30}
+                width="19rem"
               />
             )}
           />
         </FormElement>
-        <div>
+        <ButtonsContainer>
           {!isSelectedError(cells, selectedTT) && (
-            <button type="submit">수정</button>
+            <Button $color={"#486284"} type="submit">
+              수정
+            </Button>
           )}
-          <button type="button" onClick={() => setDataMode(READ)}>
+          <Button
+            type="button"
+            onClick={() => setDataMode(READ)}
+            $color={"#FFA8A8"}
+          >
             취소
-          </button>
-        </div>
+          </Button>
+        </ButtonsContainer>
       </Form>
     </>
   );
@@ -364,7 +396,7 @@ const TTDataDisplay = ({
         />
       )}
 
-      {dataMode != CREATE && (
+      {dataMode == READ && (
         <button
           onClick={() => {
             setDataMode(CREATE);

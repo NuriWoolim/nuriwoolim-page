@@ -6,12 +6,7 @@ import DetailedDate from "./DetailedDate";
 import { lighten } from "polished";
 
 const DateCellContainer = styled.div`
-  h2 {
-    font-size: 1.1rem;
-    font-weight: 500;
-    margin: 0px;
-    margin-bottom: 5px;
-  }
+
   padding: 0.6rem;
   border-right: 1px solid #033148;
   border-bottom: 1px solid #033148;
@@ -118,6 +113,8 @@ const DateCell = ({ dateObj, timetables, isSameMonth, getMonthTimeTables }) => {
     setIsDetailedDateOpen(false);
   };
 
+  const onDDClose = () => {};
+
   return (
     <>
       <DateCellContainer
@@ -125,7 +122,7 @@ const DateCell = ({ dateObj, timetables, isSameMonth, getMonthTimeTables }) => {
         $isSameMonth={isSameMonth}
         ref={divRef}
       >
-        <h2>{date.getDate()}</h2>
+        <p>{date.getDate()}</p>
 
         {timetables
           ? timetables.slice(0, 2).map((timetable, index) => (
@@ -150,7 +147,7 @@ const DateCell = ({ dateObj, timetables, isSameMonth, getMonthTimeTables }) => {
           <DetailedDate
             dateObj={dateObj}
             getMonthTimeTables={getMonthTimeTables}
-            
+            onClose={() => setIsDetailedDateOpen(false)}
           />
         </DropdownContainer>
       )}

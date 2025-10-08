@@ -6,6 +6,41 @@ import { createDate } from "../tools/DateTool";
 
 /* Calendar 섹션의 전체 배경 */
 const CalendarSection = styled.section`
+  h1 {
+    font-weight: 800;
+    /* color: #033148; */
+    font-size: 3rem;
+    letter-spacing: -1.8px;
+    margin: 2.1rem 0 2.1rem 0;
+  }
+
+  h2 {
+    font-family: Pretendard;
+    font-weight: 900;
+    /* color: #fff; */
+    font-size: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  h3 {
+    font-family: Pretendard;
+    font-size: 0.93881rem;
+    font-style: normal;
+    font-weight: 800;
+    line-height: normal;
+    letter-spacing: -1.25px;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  p {
+    font-family: Pretendard;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-top: 0px;
+    margin-bottom: 0px;
+  }
   background-color: #fefaef;
   padding: 2.8rem 0;
 `;
@@ -22,6 +57,10 @@ const CalendarWrapper = styled.div`
   > ul {
     list-style: none;
     padding: 0;
+  }
+  h1 {
+    text-align: center;
+    color: #033148;
   }
 `;
 
@@ -55,15 +94,14 @@ const MonthYearContainer = styled.div`
   width: 17rem;
   justify-content: space-between;
   align-items: center;
-  margin: 1.2rem 0 1.2rem 0;
-  h2 {
-    color: #486284;
+  padding: 1.2rem 0 1.2rem 0;
 
-    font-family: Pretendard;
-    font-size: 2.2rem;
-    font-weight: 900;
-    margin: 0;
-  }
+  color: #486284;
+
+  font-family: Pretendard;
+  font-size: 2.2rem;
+  font-weight: 900;
+  margin: 0;
 
   button {
     background: none; /* 배경 제거 */
@@ -247,10 +285,8 @@ const Calendar = () => {
           <button onClick={() => onMonthChange(-1)}>
             <img src="/assets/rightarrow_blue.svg" className="down" />
           </button>
-          <h2>
-            {months[calendarState.startDate.getMonth()]},{" "}
-            {calendarState.startDate.getFullYear()}
-          </h2>
+          {months[calendarState.startDate.getMonth()]},{" "}
+          {calendarState.startDate.getFullYear()}
           <button onClick={() => onMonthChange(1)}>
             <img src="/assets/rightarrow_blue.svg" className="up" />
           </button>

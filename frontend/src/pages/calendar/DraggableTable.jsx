@@ -7,9 +7,9 @@ import { CREATE, UPDATE } from "./DetailedDate";
 
 const GridContainer = styled.div`
   display: grid;
-  grid-template-rows: repeat(${(props) => props.$length}, 2rem);
-  grid-template-columns: 20rem;
-  border: solid 1px black;
+  grid-template-rows: repeat(${(props) => props.$length}, 1.55rem);
+  /* grid-template-columns: 20rem; */
+  /* border: solid 1px black; */
   /* overflow: hidden; */
 `;
 
@@ -17,30 +17,28 @@ const TableCell = styled.div`
   /* box-sizing: border-box; */
   cursor: pointer;
 
-  color: #486284;
-  font-family: Pretendard;
-  font-size: 1.2rem;
-  font-style: normal;
-  font-weight: 800;
-  line-height: normal;
-  letter-spacing: -1.25px;
-
   overflow: hidden;
   text-overflow: clip;
   border-bottom: ${(props) => props.$border};
-  padding: 0.32rem;
+  padding: 0.2rem 0.4rem;
 
   background-color: ${(props) => props.$color};
 
   user-select: none;
+
+  h3 {
+    color: #486284;
+  }
 `;
 
 const TTTitleContainer = styled.div`
   position: absolute;
   top: 0;
   display: grid;
-  grid-template-columns: 20rem;
-  border: solid 1px black;
+  width: 100%;
+  height: 100%;
+  /* grid-template-columns: 100%; */
+  /* border: solid 1px black; */
 
   background: transparent;
   pointer-events: none;
@@ -49,9 +47,8 @@ const TTTitleContainer = styled.div`
 const TTTCell = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  text-align: center;
+
   text-overflow: clip;
 
   background: transparent;
@@ -65,8 +62,8 @@ const TTTCell = styled.div`
 
 const TTTInnerBlock = styled.div`
   /* padding: 10px; */
-  margin-left: 1.5rem;
-  width: 70%;
+  margin-left: 2.5rem;
+  width: 75%;
   height: 80%;
   /* height: 100%; */
   /* box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.4); */
@@ -74,13 +71,16 @@ const TTTInnerBlock = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
+  text-align: center;
 
   border-radius: 2px;
   background-color: ${(props) => props.$color};
-  color: ${(props) => lighten(0.5, props.$color)};
-  border: ${(props) => (props.$hasBorder ? `0.25rem solid #FFF7E2` : "none")};
+
+  border: ${(props) => (props.$hasBorder ? `3px solid #FFF7E2` : "none")};
   box-shadow: ${(props) =>
-    props.$hasBorder ? `0.2rem 0.3rem 0.8rem 0 rgba(0, 0, 0, 0.25)` : "none"};
+    props.$hasBorder
+      ? `7.811px 10.214px 14.781px 0 rgba(0, 0, 0, 0.25);`
+      : "none"};
   opacity: ${(props) =>
     props.$isTransperent && props.$hasBorder ? "0.5" : "none"};
   pointer-events: ${(props) =>
@@ -88,12 +88,9 @@ const TTTInnerBlock = styled.div`
       ? "none"
       : "auto"};
 
-  font-family: Pretendard;
-  font-size: 1rem;
-  font-style: normal;
-  font-weight: 900;
-  line-height: normal;
-  letter-spacing: -0.9px;
+  h3 {
+    color: ${(props) => lighten(0.5, props.$color)};
+  }
 
   .noselect {
     user-select: none;
@@ -179,7 +176,7 @@ const DraggableTable = ({
     for (let i = 0; i < times.length; i++) {
       if (i === 0 || cells[i].tt === prev) cnt++;
       else {
-        cssstr += String(cnt * 2) + "rem ";
+        cssstr += String(cnt * 1.55) + "rem ";
 
         if (prev === null) cellData.push(null);
         else cellData.push({ ...prev });
@@ -189,7 +186,7 @@ const DraggableTable = ({
     }
     if (prev === null) cellData.push(null);
     else cellData.push({ ...prev });
-    cssstr += String(cnt * 2) + "rem ";
+    cssstr += String(cnt * 1.55) + "rem ";
     setTTTStyle(cssstr);
     setTTTCells(cellData);
   }, [cells, isTouched]);
@@ -276,7 +273,7 @@ const DraggableTable = ({
       }
 
       //   console.log(newSelected);
-    }, 75),
+    }, 50),
     [isTouched]
   );
   useEffect(() => {
@@ -312,10 +309,12 @@ const DraggableTable = ({
           <TableCell
             key={index}
             data-key={index}
-            $border={index % 2 === 1 ? "solid 0.5px #acbeff" : "none"}
+            $border={index % 2 === 1 ? "solid 0.6px #acbeff" : "none"}
             $color={cells[index]?.isSelected === false ? "white" : "#FFF7E2;"}
           >
-            {index % 2 === 0 && String(time.getHours()).padStart(2, "0")}
+            <h3>
+              {index % 2 === 0 && String(time.getHours()).padStart(2, "0")}
+            </h3>
           </TableCell>
         ))}
       </GridContainer>
@@ -344,8 +343,10 @@ const DraggableTable = ({
                 $isTransperent={dataMode == UPDATE}
               >
                 <div>
-                  {TTTCells[index] === null ? null : TTTCells[index].title}{" "}
-                  {TTTCells[index] === null ? null : TTTCells[index].team}
+                  <h3>
+                    {TTTCells[index] === null ? null : TTTCells[index].title}{" "}
+                    {TTTCells[index] === null ? null : TTTCells[index].team}
+                  </h3>
                 </div>
               </TTTInnerBlock>
             )}

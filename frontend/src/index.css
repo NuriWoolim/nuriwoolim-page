@@ -8,11 +8,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-@media (-webkit-min-device-pixel-ratio: 2) {
-  html {
-    font-size: 12px; /* 1rem = 14px */
-  }
-}
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
