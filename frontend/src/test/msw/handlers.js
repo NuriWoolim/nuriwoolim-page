@@ -10,7 +10,7 @@ export const handlers = [
     const body = await request.json();
     const created = { id: 1, ...body };
     db.push(created);
-    console.log(db);
+    // console.log(db);
     return HttpResponse.json(created, { status: 200 });
   }),
   http.patch(`${baseURL}/api/timetables/:id`, async ({ params, request }) => {
@@ -23,11 +23,17 @@ export const handlers = [
     db[idx] = { ...db[idx], ...body }; // 병합 업데이트
     return HttpResponse.json(db[idx], { status: 200 });
   }),
+  http.delete(`${baseURL}/api/timetables/:id`, async ({ request }) => {
+    // const body = await request.json();
+    console.log("aAa");
+    resetDb();
+    return new HttpResponse(null, { status: 200 });
+  }),
   http.get(`${baseURL}/api/timetables`, ({ request }) => {
     const url = new URL(request.url);
     const from = url.searchParams.get("from");
     const to = url.searchParams.get("to");
-    console.log(db);
+    // console.log(db);
     return HttpResponse.json({
       from: from ?? "2025-10-02T09:00:00.856Z",
       to: to ?? "2025-10-02T22:00:00.856Z",

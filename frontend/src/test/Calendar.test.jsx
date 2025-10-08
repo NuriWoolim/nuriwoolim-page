@@ -82,8 +82,21 @@ describe("타임테이블 CRUD", () => {
     );
 
     await within(DDWindow).findByText(/사과의 시간/);
+
+    //// 삭제
+    const appleButton = within(DDWindow).getByText(/사과의 시간/);
+
+    await user.click(appleButton);
+
+    const deleteButton = within(DDWindow).getByText(/일정 삭제/);
+
+    await user.click(deleteButton);
+
+    // await new Promise((resolve) => setTimeout(resolve, 300)); // 0.3초 대기
+
+    // screen.debug(document.body, 100000);
+    await waitForElementToBeRemoved(() =>
+      within(DDWindow).getByText(/사과의 시간/)
+    );
   });
-
-
-  ////
 });
