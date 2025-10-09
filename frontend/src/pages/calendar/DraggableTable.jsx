@@ -194,10 +194,14 @@ const DraggableTable = ({
   const handleTouchStart = useCallback((e) => {
     // if (isTouched != -1) return;
 
-    const target = e.target.closest("div[data-key]");
-    if (!target) return;
+    const { clientX, clientY } = e;
+    const target =
+      document
+        .elementsFromPoint(clientX, clientY)
+        .find((el) => el.matches("[datakey], [data-key]")) || null;
 
-    const col = parseInt(target.dataset.key, 10);
+    if (target?.getAttribute("data-key") == null) return;
+    const col = +target.getAttribute("data-key");
 
     setCells((prevSelected) => {
       const newSelected = [...prevSelected];
@@ -230,46 +234,46 @@ const DraggableTable = ({
     _.throttle((e) => {
       if (isTouched === -1) return;
 
-      const clientX = e.type.startsWith("touch")
-        ? e.touches[0].clientX
-        : e.clientX;
-      const clientY = e.type.startsWith("touch")
-        ? e.touches[0].clientY
-        : e.clientY;
-      const target = document.elementFromPoint(clientX, clientY);
+      const { clientX, clientY } = e;
+      const target =
+        document
+          .elementsFromPoint(clientX, clientY)
+          .find((el) => el.matches("[datakey], [data-key]")) || null;
+
+      if (target.getAttribute("data-key") == null) return;
+      const cur_col = +target.getAttribute("data-key");
 
       const st_col = isTouched;
 
       let add_dates = true;
       if (cells[st_col].isSelected === false) add_dates = false;
 
-      if (target.getAttribute("data-key") == null) return;
-      const cur_col = +target.getAttribute("data-key");
-
-      // console.log(cur_col, lastTouchedCol)
+    //   console.log(st_col, cur_col);
       //////////
 
-      //   console.log(cells);
-      let newSelected = [...cells];
 
       const minCol = Math.min(st_col, cur_col);
       const maxCol = Math.max(st_col, cur_col);
 
+      const newSelected = cells.map((cell, idx) => {
+        const inRange = idx >= minCol && idx <= maxCol;
+
+        if (cell.isSelected == add_dates || idx == st_col) return cell; 
+        if (!inRange) return cell; 
+        return { ...cell, isSelected: add_dates };
+      });
+
+      // console.log(cells, newSelected);
       let changed = false;
-
-      for (let c = minCol; c <= maxCol; c++) {
-        if (c === st_col) continue;
-
-        const newValue = { ...newSelected[c], isSelected: add_dates };
-        if (newSelected[c].isSelected !== newValue.isSelected) {
-          newSelected[c] = newValue;
+      cells.forEach((cell, idx) => {
+        if (newSelected[idx].isSelected !== cell.isSelected) {
           changed = true;
+          //   console.log("diff at", idx);
         }
-      }
-
-      if (changed) {
+      });
+      //   if (st_col == cur_col) console.log(changed);
+      if (changed || st_col == cur_col) {
         setCells(newSelected);
-        // console.log("bb");
       }
 
       //   console.log(newSelected);
@@ -281,20 +285,20 @@ const DraggableTable = ({
 
     if (isTouched !== -1) {
       document.addEventListener("touchmove", preventScroll, { passive: false });
-      document.addEventListener("touchmove", handleTouchMove);
-      document.addEventListener("mousemove", handleTouchMove);
+      document.addEventListener("pointermove", handleTouchMove);
+      //   document.addEventListener("mousemove", handleTouchMove);
       //   document.addEventListener("pointerup", handleTouchEnd);
     } else {
       document.removeEventListener("touchmove", preventScroll);
-      document.removeEventListener("touchmove", handleTouchMove);
-      document.removeEventListener("mousemove", handleTouchMove);
+      document.removeEventListener("pointermove", handleTouchMove);
+      //   document.removeEventListener("mousemove", handleTouchMove);
       //   document.removeEventListener("pointerup", handleTouchEnd);
     }
 
     return () => {
       document.removeEventListener("touchmove", preventScroll);
-      document.removeEventListener("touchmove", handleTouchMove);
-      document.removeEventListener("mousemove", handleTouchMove);
+      document.removeEventListener("pointermove", handleTouchMove);
+      //   document.removeEventListener("mousemove", handleTouchMove);
       //   document.removeEventListener("pointerup", handleTouchEnd);
     };
   }, [isTouched]);
