@@ -8,13 +8,9 @@ import TTDataDisplay from "./TTDataDisplay";
 const DetailedDateContainer = styled.div`
   display: flex;
   width: 35.3rem;
-  height: 46.56581rem;
+  height: 43.4rem;
   * {
     box-sizing: border-box;
-  }
-
-  h2 {
-    color: #fff;
   }
 
   /* transform: scale(1.1); */
@@ -31,6 +27,9 @@ const LeftBar = styled.div`
   align-items: center;
 
   padding: 0.9rem;
+  h2 {
+    color: #fff;
+  }
 `;
 
 const RightBar = styled.div`
@@ -44,6 +43,9 @@ const RightBar = styled.div`
 
   padding: 0.9rem;
   padding-right: 0.45rem;
+  h2 {
+    color: #fff;
+  }
 `;
 
 const LeftContainer = styled.div`
@@ -54,7 +56,6 @@ const RightContainer = styled.div`
   border-left: 1px solid black;
   display: flex;
   flex-direction: column;
-
 `;
 
 const CloseButton = styled.button`

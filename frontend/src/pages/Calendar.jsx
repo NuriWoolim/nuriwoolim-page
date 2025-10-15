@@ -30,16 +30,28 @@ const CalendarSection = styled.section`
     font-weight: 800;
     line-height: normal;
     letter-spacing: -1.25px;
+  }
+
+  h4 {
+    font-family: Pretendard;
+    font-size: 0.93881rem;
+    font-style: normal;
+    font-weight: 900;
+    line-height: normal;
     margin-top: 0;
     margin-bottom: 0;
   }
 
   p {
     font-family: Pretendard;
-    font-size: 1.1rem;
-    font-weight: 500;
-    margin-top: 0px;
-    margin-bottom: 0px;
+    font-size: 0.78863rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 110%;
+    letter-spacing: -0.02369rem;
+
+    margin-top: 0;
+    margin-bottom: 0;
   }
   background-color: #fefaef;
   padding: 2.8rem 0;

@@ -28,6 +28,8 @@ const TableCell = styled.div`
 
   h3 {
     color: #486284;
+    margin-top: 0;
+    margin-bottom: 0;
   }
 `;
 
@@ -78,9 +80,7 @@ const TTTInnerBlock = styled.div`
 
   border: ${(props) => (props.$hasBorder ? `3px solid #FFF7E2` : "none")};
   box-shadow: ${(props) =>
-    props.$hasBorder
-      ? `7.811px 10.214px 14.781px 0 rgba(0, 0, 0, 0.25);`
-      : "none"};
+    props.$hasBorder ? `2px 2px 7.781px 1.5px rgba(0, 0, 0, 0.25);` : "none"};
   opacity: ${(props) =>
     props.$isTransperent && props.$hasBorder ? "0.5" : "none"};
   pointer-events: ${(props) =>
@@ -90,6 +90,7 @@ const TTTInnerBlock = styled.div`
 
   h3 {
     color: ${(props) => lighten(0.5, props.$color)};
+    white-space: pre;
   }
 
   .noselect {
@@ -248,9 +249,8 @@ const DraggableTable = ({
       let add_dates = true;
       if (cells[st_col].isSelected === false) add_dates = false;
 
-    //   console.log(st_col, cur_col);
+      //   console.log(st_col, cur_col);
       //////////
-
 
       const minCol = Math.min(st_col, cur_col);
       const maxCol = Math.max(st_col, cur_col);
@@ -258,8 +258,8 @@ const DraggableTable = ({
       const newSelected = cells.map((cell, idx) => {
         const inRange = idx >= minCol && idx <= maxCol;
 
-        if (cell.isSelected == add_dates || idx == st_col) return cell; 
-        if (!inRange) return cell; 
+        if (cell.isSelected == add_dates || idx == st_col) return cell;
+        if (!inRange) return cell;
         return { ...cell, isSelected: add_dates };
       });
 
@@ -348,7 +348,8 @@ const DraggableTable = ({
               >
                 <div>
                   <h3>
-                    {TTTCells[index] === null ? null : TTTCells[index].title}{" "}
+                    {TTTCells[index] === null ? null : TTTCells[index].title}
+                    {"  -  "}
                     {TTTCells[index] === null ? null : TTTCells[index].team}
                   </h3>
                 </div>

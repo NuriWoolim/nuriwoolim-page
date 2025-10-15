@@ -5,31 +5,96 @@ import { CirclePicker } from "react-color";
 import { READ, UPDATE, CREATE, TIMELIMIT } from "./DetailedDate";
 import { TTColors } from "../../data/CalendarData";
 
+import CustomColorPicker from "./CustomColorPicker";
 import { TimeTableAPI } from "../../apis/common";
 
 const TTDDContainer = styled.div`
   flex: 1;
   /* border: solid 1px black; */
   background: #fff7e2;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
 `;
 
 const TextInput = styled.input`
   border: none;
   box-shadow: 1px 1px 4.1px 0 rgba(72, 98, 132, 0.2) inset;
-  width: 17rem;
-  height: 2.7rem;
+  width: 14.42038rem;
+  height: 2.40338rem;
 
   margin: 0.4rem 0.5rem;
+  padding: 0.6rem;
 `;
 
 const Form = styled.form`
-  height: 100%;
+  flex: 1;
   display: flex;
   flex-direction: column;
 
-  justify-content: space-evenly;
   align-items: center;
-  padding: 0 1rem 0 1rem;
+`;
+
+const FormMain = styled.div`
+  flex: 1;
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  /* padding-top: 1.5rem; */
+  padding-bottom: 2rem;
+
+  align-items: center;
+  h3 {
+    color: #486284;
+    margin: 0 0 0 0;
+  }
+
+  p {
+    color: #486284;
+  }
+`;
+
+const ShowElement = styled.div`
+  width: 100%;
+  height: 6rem;
+  h2 {
+    color: #486284;
+    text-align: left;
+    margin-left: 0.2rem;
+    padding-left: 0.4rem;
+  }
+  h3 {
+    margin-bottom: 0.4rem;
+  }
+  p {
+    margin-left: 0.2rem;
+    padding-left: 0.4rem;
+    border-left: #486284 solid 2px;
+  }
+`;
+
+const ShowTime = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: end;
+  h2 {
+    color: #486284;
+    text-align: left;
+    margin-left: 0.2rem;
+    padding-left: 0.4rem;
+  }
+  h3 {
+    position: relative;
+    margin: 0 0 0 0;
+    top: -0.2rem;
+  }
 `;
 
 const FormElement = styled.div`
@@ -55,25 +120,44 @@ const Button = styled.button`
   flex: 1;
   background: ${(props) => props.$color};
   border: none;
-  box-shadow: 1px 1px 8.3px 0 rgba(0, 0, 0, 0.2) inset;
+  box-shadow: 1.403px 1.403px 4.193px 0 rgba(0, 0, 0, 0.15) inset;
+
+  color: #fff;
+  h3 {
+    margin: 0 0 0 0;
+  }
   & {
     transition: transform 0.1s ease;
   }
   &:hover {
-    transform: scale(1.05);
-    /* opacity: 90%; */
+    /* transform: scale(1.05); */
+    opacity: 90%;
   }
   &:active {
-    /* opacity: 90%; */
+    opacity: 80%;
   }
 `;
 
 const ButtonsContainer = styled.div`
   gap: 1rem;
-  width: 90%;
-  height: 3.4rem;
+  width: 14.4rem;
+  height: 2.7rem;
   display: flex;
+  margin-top: auto;
+  margin-bottom: 1rem;
 `;
+
+const HowToUse = styled.div`
+  width: 14.2rem;
+  h3 {
+    text-align: center;
+    margin: 0 0 0.5rem 0;
+  }
+  p {
+    text-align: center;
+  }
+`;
+
 function toLocalISOString(date) {
   const pad = (n) => String(n).padStart(2, "0");
 
@@ -131,17 +215,53 @@ const ReadMode = ({ selectedTT, setSelectedTT, setDataMode, callTTGetApi }) => {
   return (
     <>
       {selectedTT === null ? (
-        <div>일정을 선택하세요</div>
+        <p>일정을 선택하세요</p>
       ) : (
-        <div>
-          <div>{selectedTT.title}</div>
-          <div>{selectedTT.team}</div>
-          <div>{selectedTT.description}</div>
-          <div>{selectedTT.start}</div>
-          <div>{selectedTT.end}</div>
-          <button onClick={() => setDataMode(UPDATE)}>일정 수정</button>
-          <button onClick={() => deleteTT(selectedTT.id)}>일정 삭제</button>
-        </div>
+        <Form>
+          <FormMain>
+            <ShowElement>
+              <ShowTime>
+                <h3>시작:</h3>
+                <h2>
+                  {selectedTT.start.split("T")[1].split(":")[0]}:
+                  {selectedTT.start.split("T")[1].split(":")[1]}
+                </h2>
+              </ShowTime>
+
+              <ShowTime>
+                <h3>종료:</h3>
+                <h2>
+                  {selectedTT.end.split("T")[1].split(":")[0]}:
+                  {selectedTT.end.split("T")[1].split(":")[1]}
+                </h2>
+              </ShowTime>
+            </ShowElement>
+
+            <ShowElement>
+              <h3>곡명</h3>
+              <p>{selectedTT.title}</p>
+            </ShowElement>
+
+            <ShowElement>
+              <h3>제목</h3>
+              <p>{selectedTT.team}</p>
+            </ShowElement>
+
+            <ShowElement>
+              <h3>설명</h3>
+              <p>{selectedTT.description}</p>
+            </ShowElement>
+          </FormMain>
+
+          <ButtonsContainer>
+            <Button onClick={() => setDataMode(UPDATE)} $color="#486284">
+              <h3>일정 수정</h3>
+            </Button>
+            <Button onClick={() => deleteTT(selectedTT.id)} $color="#FFA8A8">
+              <h3>일정 삭제</h3>
+            </Button>
+          </ButtonsContainer>
+        </Form>
       )}
     </>
   );
@@ -202,48 +322,63 @@ const UpdateMode = ({
   return (
     <>
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <FormElement>
-          <label htmlFor="title">곡 이름</label>
-          <TextInput
-            id="title"
-            {...register("title", { required: "제목을 입력하세요" })}
-            // placeholder="제목"
-          />
-        </FormElement>
+        <FormMain>
+          <HowToUse>
+            <h3>이용 안내</h3>
+            <p>
+              좌측 시트에서 원하는 시간 드래그 후, 우측 정보란에 해당하는 정보
+              입력한 뒤 수정 버튼을 눌러주시면 됩니다.
+            </p>
+          </HowToUse>
+          <FormElement>
+            <label htmlFor="title">
+              <h4>곡 이름</h4>
+            </label>
+            <TextInput
+              id="title"
+              {...register("title", { required: "제목을 입력하세요" })}
+              // placeholder="제목"
+            />
+          </FormElement>
 
-        <FormElement>
-          <label htmlFor="team">팀 이름</label>
-          <TextInput
-            id="team"
-            {...register("team", { required: "제목을 입력하세요" })}
-            // placeholder="팀"
-          />
-        </FormElement>
+          <FormElement>
+            <label htmlFor="team">
+              <h4>팀 이름</h4>
+            </label>
+            <TextInput
+              id="team"
+              {...register("team", { required: "제목을 입력하세요" })}
+              // placeholder="팀"
+            />
+          </FormElement>
 
-        <FormElement>
-          <label htmlFor="description">설명</label>
-          <TextInput id="description" {...register("description")} />
-        </FormElement>
-        <FormElement>
-          <label>색 설정</label>
-          <Controller
-            name="color"
-            control={control}
-            render={({ field }) => (
-              <StyledCirclePicker
-                colors={TTColors.map((x) => x[0])}
-                color={field.value}
-                onChangeComplete={(c) => field.onChange(c.hex)}
-                circleSize={30}
-                width="19rem"
-              />
-            )}
-          />
-        </FormElement>
+          <FormElement>
+            <label htmlFor="description">
+              <h4>설명</h4>
+            </label>
+            <TextInput id="description" {...register("description")} />
+          </FormElement>
+          <FormElement>
+            <label>
+              <h4>색 설정</h4>
+            </label>
+            <Controller
+              name="color"
+              control={control}
+              render={({ field }) => (
+                <CustomColorPicker
+                  colors={TTColors.map((x) => x[0])}
+                  color={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+          </FormElement>
+        </FormMain>
         <ButtonsContainer>
           {!isSelectedError(cells, selectedTT) && (
             <Button $color={"#486284"} type="submit">
-              수정
+              <h3>수정</h3>
             </Button>
           )}
           <Button
@@ -251,7 +386,7 @@ const UpdateMode = ({
             onClick={() => setDataMode(READ)}
             $color={"#FFA8A8"}
           >
-            취소
+            <h3>취소</h3>
           </Button>
         </ButtonsContainer>
       </Form>
@@ -312,49 +447,74 @@ const CreateMode = ({ setDataMode, cells, callTTGetApi, times }) => {
   return (
     <>
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <FormElement>
-          <label htmlFor="title">곡 이름</label>
-          <TextInput
-            id="title"
-            {...register("title", { required: "제목을 입력하세요" })}
-            // placeholder="제목"
-          />
-        </FormElement>
+        <FormMain>
+          <HowToUse>
+            <h3>이용 안내</h3>
+            <p>
+              좌측 시트에서 원하는 시간 드래그 후, 우측 정보란에 해당하는 정보
+              입력한 뒤 추가 버튼을 눌러주시면 됩니다.
+            </p>
+          </HowToUse>
+          <FormElement>
+            <label htmlFor="title">
+              <h4>곡 이름</h4>
+            </label>
+            <TextInput
+              id="title"
+              {...register("title", { required: "제목을 입력하세요" })}
+              // placeholder="제목"
+            />
+          </FormElement>
 
-        <FormElement>
-          <label htmlFor="team">팀 이름</label>
-          <TextInput
-            id="team"
-            {...register("team", { required: "제목을 입력하세요" })}
-            // placeholder="팀"
-          />
-        </FormElement>
+          <FormElement>
+            <label htmlFor="team">
+              <h4>팀 이름</h4>
+            </label>
+            <TextInput
+              id="team"
+              {...register("team", { required: "제목을 입력하세요" })}
+              // placeholder="팀"
+            />
+          </FormElement>
 
-        <FormElement>
-          <label htmlFor="description">설명</label>
-          <TextInput id="description" {...register("description")} />
-        </FormElement>
-        <FormElement>
-          <label>색 설정</label>
-          <Controller
-            name="color"
-            control={control}
-            render={({ field }) => (
-              <StyledCirclePicker
-                colors={TTColors.map((x) => x[0])}
-                color={field.value}
-                onChangeComplete={(c) => field.onChange(c.hex)}
-                circleSize={30}
-              />
-            )}
-          />
-        </FormElement>
-        <div>
-          {!isSelectedError(cells, null) && <button type="submit">추가</button>}
-          <button type="button" onClick={() => setDataMode(READ)}>
-            취소
-          </button>
-        </div>
+          <FormElement>
+            <label htmlFor="description">
+              <h4>설명</h4>
+            </label>
+            <TextInput id="description" {...register("description")} />
+          </FormElement>
+
+          <FormElement>
+            <label>
+              <h4>색 설정</h4>
+            </label>
+            <Controller
+              name="color"
+              control={control}
+              render={({ field }) => (
+                <CustomColorPicker
+                  colors={TTColors.map((x) => x[0])}
+                  color={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+          </FormElement>
+        </FormMain>
+        <ButtonsContainer>
+          {!isSelectedError(cells, null) && (
+            <Button $color={"#486284"} type="submit">
+              <h3>추가</h3>
+            </Button>
+          )}
+          <Button
+            type="button"
+            onClick={() => setDataMode(READ)}
+            $color={"#FFA8A8"}
+          >
+            <h3>취소</h3>
+          </Button>
+        </ButtonsContainer>
       </Form>
     </>
   );
@@ -397,13 +557,17 @@ const TTDataDisplay = ({
       )}
 
       {dataMode == READ && (
-        <button
-          onClick={() => {
-            setDataMode(CREATE);
-          }}
-        >
-          일정 추가
-        </button>
+        <ButtonsContainer>
+          <Button
+            onClick={() => {
+              setSelectedTT(null);
+              setDataMode(CREATE);
+            }}
+            $color="#486284"
+          >
+            <h3>일정 추가</h3>
+          </Button>
+        </ButtonsContainer>
       )}
     </TTDDContainer>
   );
