@@ -123,6 +123,7 @@ const Button = styled.button`
   box-shadow: 1.403px 1.403px 4.193px 0 rgba(0, 0, 0, 0.15) inset;
 
   color: #fff;
+  opacity: ${(props) => props.$opacity};
   h3 {
     margin: 0 0 0 0;
   }
@@ -136,17 +137,33 @@ const Button = styled.button`
   &:active {
     opacity: 80%;
   }
+
+  &:disabled {
+    /* cursor: not-allowed; */
+    pointer-events: none;
+    opacity: 0.5;
+  }
 `;
 
 const ButtonsContainer = styled.div`
-  gap: 1rem;
   width: 14.4rem;
   height: 2.7rem;
   display: flex;
-  margin-top: auto;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
+  gap: 0.6rem;
 `;
-
+const ButtonsWrapper = styled.div`
+  margin-top: auto;
+  /* margin-bottom: 1rem; */
+  margin-bottom: 0.5rem;
+  p {
+    text-align: end;
+    font-size: 0.75rem;
+    font-style: normal;
+    font-weight: 600;
+    color: var(--2, #863d3d);
+  }
+`;
 const HowToUse = styled.div`
   width: 14.2rem;
   h3 {
@@ -155,6 +172,16 @@ const HowToUse = styled.div`
   }
   p {
     text-align: center;
+  }
+`;
+
+const TTSelectAlertContainer = styled.div`
+  height: 75%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  h3 {
+    color: #486284;
   }
 `;
 
@@ -215,7 +242,9 @@ const ReadMode = ({ selectedTT, setSelectedTT, setDataMode, callTTGetApi }) => {
   return (
     <>
       {selectedTT === null ? (
-        <p>일정을 선택하세요</p>
+        <TTSelectAlertContainer>
+          <h3>일정을 선택하세요!</h3>
+        </TTSelectAlertContainer>
       ) : (
         <Form>
           <FormMain>
@@ -253,14 +282,17 @@ const ReadMode = ({ selectedTT, setSelectedTT, setDataMode, callTTGetApi }) => {
             </ShowElement>
           </FormMain>
 
-          <ButtonsContainer>
-            <Button onClick={() => setDataMode(UPDATE)} $color="#486284">
-              <h3>일정 수정</h3>
-            </Button>
-            <Button onClick={() => deleteTT(selectedTT.id)} $color="#FFA8A8">
-              <h3>일정 삭제</h3>
-            </Button>
-          </ButtonsContainer>
+          <ButtonsWrapper>
+            <ButtonsContainer>
+              <Button onClick={() => setDataMode(UPDATE)} $color="#486284">
+                <h3>일정 수정</h3>
+              </Button>
+              <Button onClick={() => deleteTT(selectedTT.id)} $color="#FFA8A8">
+                <h3>일정 삭제</h3>
+              </Button>
+            </ButtonsContainer>
+            <p>생성자만 수정/삭제할 수 있습니다</p>
+          </ButtonsWrapper>
         </Form>
       )}
     </>
@@ -529,6 +561,7 @@ const TTDataDisplay = ({
   callApi,
   times,
 }) => {
+  const isLogged = localStorage.getItem("accessToken") !== null;
   return (
     <TTDDContainer>
       {dataMode === CREATE ? (
@@ -557,17 +590,21 @@ const TTDataDisplay = ({
       )}
 
       {dataMode == READ && (
-        <ButtonsContainer>
-          <Button
-            onClick={() => {
-              setSelectedTT(null);
-              setDataMode(CREATE);
-            }}
-            $color="#486284"
-          >
-            <h3>일정 추가</h3>
-          </Button>
-        </ButtonsContainer>
+        <ButtonsWrapper>
+          <ButtonsContainer>
+            <Button
+              onClick={() => {
+                setSelectedTT(null);
+                setDataMode(CREATE);
+              }}
+              $color="#486284"
+              disabled={!isLogged}
+            >
+              <h3>일정 추가</h3>
+            </Button>
+          </ButtonsContainer>
+          <p>로그인 후 이용 가능합니다</p>
+        </ButtonsWrapper>
       )}
     </TTDDContainer>
   );
