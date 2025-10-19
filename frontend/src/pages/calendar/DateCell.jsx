@@ -113,7 +113,6 @@ const DateCell = ({ dateObj, timetables, isSameMonth, getMonthTimeTables }) => {
     setIsDetailedDateOpen(false);
   };
 
-  const onDDClose = () => {};
 
   return (
     <>

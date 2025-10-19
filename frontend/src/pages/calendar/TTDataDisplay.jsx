@@ -7,7 +7,8 @@ import { TTColors } from "../../data/CalendarData";
 
 import CustomColorPicker from "./CustomColorPicker";
 import { TimeTableAPI } from "../../apis/common";
-
+import { userDataState } from "../../atoms";
+import { useAtom } from "jotai";
 const TTDDContainer = styled.div`
   flex: 1;
   /* border: solid 1px black; */
@@ -228,6 +229,7 @@ const isSelectedError = (cells, exceptionTT) => {
 };
 
 const ReadMode = ({ selectedTT, setSelectedTT, setDataMode, callTTGetApi }) => {
+  const [userData, setUserData] = useAtom(userDataState);
   const deleteTT = async (id) => {
     try {
       const result = await TimeTableAPI.deleteTimeTable(id);
@@ -284,14 +286,31 @@ const ReadMode = ({ selectedTT, setSelectedTT, setDataMode, callTTGetApi }) => {
 
           <ButtonsWrapper>
             <ButtonsContainer>
-              <Button onClick={() => setDataMode(UPDATE)} $color="#486284">
+              <Button
+                onClick={() => setDataMode(UPDATE)}
+                $color="#486284"
+                disabled={
+                  userData.id !== selectedTT.ownerId &&
+                  userData.type !== "ADMIN"
+                }
+              >
                 <h3>일정 수정</h3>
               </Button>
-              <Button onClick={() => deleteTT(selectedTT.id)} $color="#FFA8A8">
+              <Button
+                onClick={() => deleteTT(selectedTT.id)}
+                $color="#FFA8A8"
+                disabled={
+                  userData.id !== selectedTT.ownerId &&
+                  userData.type !== "ADMIN"
+                }
+              >
                 <h3>일정 삭제</h3>
               </Button>
             </ButtonsContainer>
-            <p>생성자만 수정/삭제할 수 있습니다</p>
+            {userData.id !== selectedTT.ownerId &&
+              userData.type !== "ADMIN" && (
+                <p>생성자만 수정/삭제할 수 있습니다</p>
+              )}
           </ButtonsWrapper>
         </Form>
       )}
@@ -603,7 +622,7 @@ const TTDataDisplay = ({
               <h3>일정 추가</h3>
             </Button>
           </ButtonsContainer>
-          <p>로그인 후 이용 가능합니다</p>
+          {!isLogged && <p>로그인 후 이용 가능합니다</p>}
         </ButtonsWrapper>
       )}
     </TTDDContainer>

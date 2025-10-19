@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { fadeIn } from "../../style/fadeIn";
 import MyPageDropdown from "./MyPageDropdown";
+import { logout } from "../../apis/user";
 
 const HeaderContainer = styled.header`
   position: relative;
@@ -122,6 +123,7 @@ const Header = () => {
   const isLoggedIn = !!localStorage.getItem("accessToken");
 
   const handleLogout = () => {
+    logout();
     localStorage.removeItem("accessToken");
     navigate("/");
   };

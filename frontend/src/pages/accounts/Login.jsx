@@ -4,6 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "../../hooks/useForm";
 import { login } from "../../apis/user";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useAtom } from "jotai";
+import { userDataState } from "../../atoms";
 
 const Body = styled.div`
   background: linear-gradient(to right, #daf0f6, #fff2ce);

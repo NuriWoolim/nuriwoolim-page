@@ -242,6 +242,9 @@ const Calendar = () => {
       const to = toLocalISOString(
         calendarState.dates[calendarState.dates.length - 1]
       );
+
+      // 응답 딜레이 시 잔상 안남기도록 제거
+      setMonthTT(() => Array.from({ length: 30 }, () => []));
       const result = await TimeTableAPI.getTimeTable(from, to);
       const resultdata = result.data;
 

@@ -1,5 +1,7 @@
 import axios from "axios";
 import { getAuthAxios } from "./authAxios";
+import { store, userDataState } from "../atoms";
+import { RESET } from "jotai/utils";
 const baseURL = import.meta.env.VITE_API_URL;
 
 export const signup = async (username, email, password, nickname) => {
@@ -26,7 +28,7 @@ export const login = async (email, password) => {
 
   const accessToken = result.headers["authorization"]?.split("Bearer ")[1]; // 응답 형식 : Authorization: Bearer abc.def.jhi
   if (accessToken) localStorage.setItem("accessToken", accessToken);
-
+  store.set(userDataState, result.data);
   return result.data;
 };
 
@@ -39,6 +41,7 @@ export const logout = async () => {
         withCredentials: true,
       }
     );
+    store.set(userDataState, RESET);
   } catch (error) {
     console.error("로그아웃 요청 실패", error);
   } finally {
