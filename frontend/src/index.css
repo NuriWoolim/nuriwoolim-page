@@ -8,10 +8,15 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+@media (-webkit-min-device-pixel-ratio: 2) {
+  html {
+    font-size: 14px; /* 1rem = 14px */
+  }
 }
 
 :root {

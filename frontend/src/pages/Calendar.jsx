@@ -3,7 +3,7 @@ import styled from "styled-components";
 import DateCell from "./calendar/DateCell";
 import { TimeTableAPI } from "../apis/common";
 import { createDate } from "../tools/DateTool";
-
+import TimeLine from "./calendar/TimeLine";
 /* Calendar 섹션의 전체 배경 */
 const CalendarSection = styled.section`
   h1 {
@@ -18,14 +18,14 @@ const CalendarSection = styled.section`
     font-family: Pretendard;
     font-weight: 900;
     /* color: #fff; */
-    font-size: 1.5rem;
+    font-size: 2rem;
     margin-top: 0;
     margin-bottom: 0;
   }
 
   h3 {
     font-family: Pretendard;
-    font-size: 0.93881rem;
+    font-size: 1.2rem;
     font-style: normal;
     font-weight: 800;
     line-height: normal;
@@ -34,9 +34,9 @@ const CalendarSection = styled.section`
 
   h4 {
     font-family: Pretendard;
-    font-size: 0.93881rem;
+    font-size: 1.2rem;
     font-style: normal;
-    font-weight: 900;
+    font-weight: 600;
     line-height: normal;
     margin-top: 0;
     margin-bottom: 0;
@@ -44,7 +44,7 @@ const CalendarSection = styled.section`
 
   p {
     font-family: Pretendard;
-    font-size: 0.78863rem;
+    font-size: 1rem;
     font-style: normal;
     font-weight: 600;
     line-height: 110%;
@@ -53,35 +53,39 @@ const CalendarSection = styled.section`
     margin-top: 0;
     margin-bottom: 0;
   }
+
   background-color: #fefaef;
-  padding: 2.8rem 0;
+  border: 4px solid #033148;
+  padding-bottom: 7rem;
+  background-color: #ffffff;
+  margin: 2rem 2rem;
+
+  .calendarTitle {
+    color: #033148;
+    text-align: center;
+    margin-bottom: 0;
+  }
 `;
 
 /* Calendar 섹션의 컨테이너 박스 */
 const CalendarWrapper = styled.div`
-  width: 92%;
-  margin: 0 auto;
-  padding: 0px 17rem 0 17rem;
-  box-sizing: border-box;
-  background-color: #ffffff;
-  border: 4px solid #033148;
+  display: flex;
+  justify-content: center;
 
-  > ul {
-    list-style: none;
-    padding: 0;
-  }
-  h1 {
-    text-align: center;
-    color: #033148;
-  }
+  /* padding: 0px 3rem; */
+`;
+const LeftPart = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 // 전체 테이블
 const GridContainer = styled.div`
   display: grid;
-  grid-template-columns: repeat(7, calc(100% / 7));
-  grid-template-rows: 2.7rem repeat(6, 9rem);
-  width: 100%;
+  width: 63rem;
+  grid-template-columns: repeat(7, 9rem);
+  grid-template-rows: 2.7rem repeat(6, 8.5rem);
 
   border-top: 1px solid #033148;
   border-left: 1px solid #033148;
@@ -103,18 +107,18 @@ const WeekDayCell = styled.div`
 // 현재 년월 라벨과 버튼들을 감싸는 컨테이너
 const MonthYearContainer = styled.div`
   display: flex;
-  width: 17rem;
-  justify-content: space-between;
+  width: 63rem;
   align-items: center;
   padding: 1.2rem 0 1.2rem 0;
 
-  color: #486284;
-
-  font-family: Pretendard;
-  font-size: 2.2rem;
-  font-weight: 900;
-  margin: 0;
-
+  /* margin: 0 10px; */
+  p {
+    color: #486284;
+    font-family: Pretendard;
+    font-size: 2.2rem;
+    font-weight: 900;
+    padding: 0 15px;
+  }
   button {
     background: none; /* 배경 제거 */
     width: 2rem;
@@ -130,6 +134,9 @@ const MonthYearContainer = styled.div`
   button img {
     height: 1.5rem;
     margin-top: 5px;
+    /* padding-inline: 10px; */
+    /* margin-left: 10px; */
+    /* margin-right: 10px; */
   }
   button:hover img {
     filter: brightness(0.8); /* 밝게 */
@@ -293,39 +300,43 @@ const Calendar = () => {
 
   return (
     <CalendarSection>
+      <h1 className="calendarTitle">CALENDAR</h1>
       <CalendarWrapper>
-        <h1>CALENDAR</h1>
+        <LeftPart>
+          <MonthYearContainer>
+            <button onClick={() => onMonthChange(-1)}>
+              <img src="/assets/rightarrow_blue.svg" className="down" />
+            </button>
+            <p>
+              {months[calendarState.startDate.getMonth()]},{" "}
+              {calendarState.startDate.getFullYear()}
+            </p>
+            <button onClick={() => onMonthChange(1)}>
+              <img src="/assets/rightarrow_blue.svg" className="up" />
+            </button>
+          </MonthYearContainer>
 
-        <MonthYearContainer>
-          <button onClick={() => onMonthChange(-1)}>
-            <img src="/assets/rightarrow_blue.svg" className="down" />
-          </button>
-          {months[calendarState.startDate.getMonth()]},{" "}
-          {calendarState.startDate.getFullYear()}
-          <button onClick={() => onMonthChange(1)}>
-            <img src="/assets/rightarrow_blue.svg" className="up" />
-          </button>
-        </MonthYearContainer>
-
-        <GridContainer>
-          {Array.from({ length: col }, (_, index) => {
-            return <WeekDayCell key={index}> {days[index]} </WeekDayCell>;
-          })}
-          {Array.from({ length: col * row }, (_, index) => {
-            return (
-              <DateCell
-                key={index}
-                dateObj={calendarState.dates[index]}
-                timetables={monthTT[index]}
-                isSameMonth={
-                  calendarState.dates[index].getMonth() ===
-                  calendarState.startDate.getMonth()
-                }
-                getMonthTimeTables={getTimeTables}
-              />
-            );
-          })}
-        </GridContainer>
+          <GridContainer>
+            {Array.from({ length: col }, (_, index) => {
+              return <WeekDayCell key={index}> {days[index]} </WeekDayCell>;
+            })}
+            {Array.from({ length: col * row }, (_, index) => {
+              return (
+                <DateCell
+                  key={index}
+                  dateObj={calendarState.dates[index]}
+                  timetables={monthTT[index]}
+                  isSameMonth={
+                    calendarState.dates[index].getMonth() ===
+                    calendarState.startDate.getMonth()
+                  }
+                  getMonthTimeTables={getTimeTables}
+                />
+              );
+            })}
+          </GridContainer>
+        </LeftPart>
+        <TimeLine />
       </CalendarWrapper>
     </CalendarSection>
   );

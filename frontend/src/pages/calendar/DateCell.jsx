@@ -7,17 +7,21 @@ import { lighten } from "polished";
 
 const DateCellContainer = styled.div`
 
-  padding: 0.6rem;
+  padding: 0.4rem;
   border-right: 1px solid #033148;
   border-bottom: 1px solid #033148;
   background-color: ${({ $isSameMonth }) =>
     $isSameMonth ? "#fff" : "#EFE7D1"};
 
   color: rgba(0, 0, 0, ${({ $isSameMonth }) => ($isSameMonth ? "1" : "0.4")});
+
+  p {
+    margin-bottom: 0.2rem;
+  }
 `;
 
 const TimeTableContainer = styled.div`
-  height: 1.8rem;
+  height: 1.7rem;
   width: 100%;
 
   display: flex;
@@ -26,15 +30,15 @@ const TimeTableContainer = styled.div`
   box-sizing: border-box;
 
   font-family: "Pretendard";
-  font-size: 0.81rem;
+  font-size: 0.85rem;
 
   .time {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    flex: 1 0 0;
-    padding-left: 0.3rem;
-    padding-right: 0.3rem;
+    flex: 1.2 0 0;
+    padding-left: 0.2rem;
+    padding-right: 0.2rem;
 
     text-align: center;
     font-weight: 900;
@@ -52,8 +56,8 @@ const TimeTableContainer = styled.div`
     flex-direction: column;
     justify-content: center;
     flex: 2 0 0;
-    padding-left: 0.3rem;
-    padding-right: 0.3rem;
+    padding-left: 0.2rem;
+    padding-right: 0.2rem;
 
     text-align: center;
     font-weight: 700;

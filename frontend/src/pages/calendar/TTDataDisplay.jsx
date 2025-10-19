@@ -383,7 +383,7 @@ const UpdateMode = ({
           </HowToUse>
           <FormElement>
             <label htmlFor="title">
-              <h4>곡 이름</h4>
+              <h3>곡 이름</h3>
             </label>
             <TextInput
               id="title"
@@ -394,7 +394,7 @@ const UpdateMode = ({
 
           <FormElement>
             <label htmlFor="team">
-              <h4>팀 이름</h4>
+              <h3>팀 이름</h3>
             </label>
             <TextInput
               id="team"
@@ -405,13 +405,13 @@ const UpdateMode = ({
 
           <FormElement>
             <label htmlFor="description">
-              <h4>설명</h4>
+              <h3>설명</h3>
             </label>
             <TextInput id="description" {...register("description")} />
           </FormElement>
           <FormElement>
             <label>
-              <h4>색 설정</h4>
+              <h3>색 설정</h3>
             </label>
             <Controller
               name="color"
@@ -508,7 +508,7 @@ const CreateMode = ({ setDataMode, cells, callTTGetApi, times }) => {
           </HowToUse>
           <FormElement>
             <label htmlFor="title">
-              <h4>곡 이름</h4>
+              <h3>곡 이름</h3>
             </label>
             <TextInput
               id="title"
@@ -519,7 +519,7 @@ const CreateMode = ({ setDataMode, cells, callTTGetApi, times }) => {
 
           <FormElement>
             <label htmlFor="team">
-              <h4>팀 이름</h4>
+              <h3>팀 이름</h3>
             </label>
             <TextInput
               id="team"
@@ -530,14 +530,14 @@ const CreateMode = ({ setDataMode, cells, callTTGetApi, times }) => {
 
           <FormElement>
             <label htmlFor="description">
-              <h4>설명</h4>
+              <h3>설명</h3>
             </label>
             <TextInput id="description" {...register("description")} />
           </FormElement>
 
           <FormElement>
             <label>
-              <h4>색 설정</h4>
+              <h3>색 설정</h3>
             </label>
             <Controller
               name="color"
