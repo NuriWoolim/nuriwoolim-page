@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import { TimeLineAPI } from "../../apis/common";
+import { userDataState } from "../../atoms";
+import { useAtom } from "jotai";
 
 const CREATE = 0;
 const READ = 1;
@@ -57,9 +59,15 @@ const ClubEventContainer = styled.div`
   h4 {
     margin-bottom: 0.4rem;
   }
-  &:hover {
-    background-color: #bdbcbc;
+  div {
+    transition: transform 0.1s ease;
     cursor: pointer;
+  }
+  div:hover {
+    transform: scale(1.05);
+  }
+  div:active {
+    transform: scale(1);
   }
 `;
 const Circle = styled.div`
@@ -102,8 +110,8 @@ const EditWindow = styled.div`
   table {
     border-collapse: collapse;
   }
-  th,
-  td {
+  th:not(.confirm-button),
+  td:not(.confirm-button) {
     border: 2px solid #ccc;
     text-align: left;
     width: 9rem;
@@ -149,17 +157,12 @@ const FormRow = ({ register, handleSubmit, setMode, type, ...rest }) => {
         />
       </td>
       <td>
-        <input
-          type="date"
-          {...register("end", {
-            required: "종료일을 입력하세요",
-          })}
-        />
+        <input type="date" {...register("end")} />
       </td>
-      <td>
+      <td className="confirm-button">
         <button>저장</button>
       </td>
-      <td>
+      <td className="confirm-button">
         <button onClick={() => setMode(READ)}>취소</button>
       </td>
     </Row>
@@ -167,25 +170,31 @@ const FormRow = ({ register, handleSubmit, setMode, type, ...rest }) => {
 };
 
 const TimeLine = () => {
+  const [clubEvents, setClubEvents] = useState([]);
+  const [userData, setUserData] = useAtom(userDataState);
+
+  // 관리자 페이지 관련
+  const [isEditWindowOpen, setIsEditWindowOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [mode, setMode] = useState(READ);
+  // 폼 관련
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
+    reset,
   } = useForm({
     defaultValues: {},
   });
 
-  const [clubEvents, setClubEvents] = useState([]);
-  const [isEditWindowOpen, setIsEditWindowOpen] = useState(false);
-  const [selectedRow, setSelectedRow] = useState(null);
-  const [mode, setMode] = useState(READ);
   const reloadClubEvents = async () => {
     try {
       const result = await TimeLineAPI.getTimeLine(
         "2023-01-01T00:00",
         "2050-01-01T00:00"
       );
+      result.data.data.sort((a, b) => new Date(a.start) - new Date(b.start));
       return result.data;
     } catch (error) {
       console.error(
@@ -193,7 +202,7 @@ const TimeLine = () => {
         error.response.status,
         error.response.data
       );
-      return Array.from({ length: 5 }, () => ({
+      return Array.from({ length: 1 }, () => ({
         id: 0,
         title: "개강일",
         description: "설명",
@@ -203,6 +212,8 @@ const TimeLine = () => {
       }));
     }
   };
+
+  // 처음에 api 호출
   useEffect(() => {
     const load = async () => {
       const result = await reloadClubEvents();
@@ -211,9 +222,25 @@ const TimeLine = () => {
     load();
   }, []);
 
+  // 수정 창에서 기존 값 업데이트
+  useEffect(() => {
+    if (clubEvents[selectedRow]) {
+      const { title, description, start, end } = clubEvents[selectedRow];
+      reset({
+        title,
+        description,
+        start: start.split("T")[0], // 날짜 형식 정리
+        end: end.split("T")[0],
+      });
+    } else reset({});
+  }, [selectedRow, clubEvents, reset]);
+
   const onSubmit = async (data) => {
     if (mode == CREATE) {
       try {
+        if (!data.end) {
+          data.end = data.start;
+        }
         await TimeLineAPI.createTimeLine({
           ...data,
           start: data.start + "T00:00",
@@ -229,6 +256,9 @@ const TimeLine = () => {
       }
     } else if (mode == UPDATE) {
       try {
+        if (!data.end) {
+          data.end = data.start;
+        }
         await TimeLineAPI.updateTimeLine({
           ...clubEvents[selectedRow],
           ...data,
@@ -261,7 +291,9 @@ const TimeLine = () => {
   return (
     <TimeLineContainer>
       <TimeLineWrapper>
-        <button onClick={() => setIsEditWindowOpen(true)}>일정 추가</button>
+        {userData.type == "ADMIN" && (
+          <button onClick={() => setIsEditWindowOpen(true)}>일정 추가</button>
+        )}
         <Line $height={clubEvents.length * 9.56}>
           {clubEvents.map((clubEvent, i) => (
             <ClubEventContainer key={i}>
@@ -269,7 +301,20 @@ const TimeLine = () => {
                 {clubEvent.start.split("T")[0].split("-")[1]}.
                 {clubEvent.start.split("T")[0].split("-")[2]}
               </h2>
-              <h4>{clubEvent.title}</h4>
+
+              <div>
+                <img
+                  src="/assets/play_arrow_filled.svg"
+                  alt="해당 게시글로 이동"
+                  style={{
+                    width: "1.3rem",
+                    position: "relative",
+                    top: "0.2rem",
+                    right: "0.2rem",
+                  }}
+                />
+                <h4 style={{ display: "inline" }}>{clubEvent.title}</h4>
+              </div>
               <Circle></Circle>
             </ClubEventContainer>
           ))}
@@ -289,7 +334,7 @@ const TimeLine = () => {
                     <th>일정명</th>
                     <th>게시글 링크</th>
                     <th>시작일</th>
-                    <th>종료일</th>
+                    <th>종료일 (시작일과 동일할 시 공백)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -311,13 +356,13 @@ const TimeLine = () => {
                           <td>{clubEvent.start.split("T")[0]}</td>
                           <td>{clubEvent.end.split("T")[0]}</td>
                           {mode == DELETE && selectedRow == i && (
-                            <td>
+                            <td className="confirm-button">
                               <button>확인</button>
                             </td>
                           )}
 
                           {mode == DELETE && selectedRow == i && (
-                            <td>
+                            <td className="confirm-button">
                               <button onClick={() => setMode(READ)}>
                                 취소
                               </button>
@@ -349,32 +394,32 @@ const TimeLine = () => {
                   )}
                 </tbody>
               </table>
+              <CRUDButton
+                onClick={() => {
+                  setMode(CREATE);
+                  setSelectedRow(null);
+                }}
+                $opacity={mode == CREATE ? "0.6" : "1"}
+              >
+                추가
+              </CRUDButton>
+              {selectedRow !== null && (
+                <CRUDButton
+                  onClick={() => setMode(UPDATE)}
+                  $opacity={mode == UPDATE ? "0.6" : "1"}
+                >
+                  수정
+                </CRUDButton>
+              )}
+              {selectedRow !== null && (
+                <CRUDButton
+                  onClick={() => setMode(DELETE)}
+                  $opacity={mode == DELETE ? "0.6" : "1"}
+                >
+                  삭제
+                </CRUDButton>
+              )}
             </form>
-            <CRUDButton
-              onClick={() => {
-                setMode(CREATE);
-                setSelectedRow(null);
-              }}
-              $opacity={mode == CREATE ? "0.6" : "1"}
-            >
-              추가
-            </CRUDButton>
-            {selectedRow !== null && (
-              <CRUDButton
-                onClick={() => setMode(UPDATE)}
-                $opacity={mode == UPDATE ? "0.6" : "1"}
-              >
-                수정
-              </CRUDButton>
-            )}
-            {selectedRow !== null && (
-              <CRUDButton
-                onClick={() => setMode(DELETE)}
-                $opacity={mode == DELETE ? "0.6" : "1"}
-              >
-                삭제
-              </CRUDButton>
-            )}
           </EditWindow>
         </DropdownContainer>
       )}
