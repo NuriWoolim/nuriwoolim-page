@@ -13,7 +13,26 @@ const DetailedDateContainer = styled.div`
     box-sizing: border-box;
   }
 
-  /* transform: scale(1.1); */
+  && h1 {
+    font-size: 2.4rem;
+  }
+
+  && h2 {
+    font-size: 1.6rem;
+  }
+
+  && h3 {
+
+    font-size: 0.96rem;
+  }
+
+  && h4 {
+    font-size: 0.96rem;
+  }
+
+  && p {
+    font-size: 0.8rem;
+  }
 `;
 
 const LeftBar = styled.div`

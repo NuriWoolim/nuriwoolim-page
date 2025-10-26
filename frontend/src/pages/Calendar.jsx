@@ -29,7 +29,7 @@ const CalendarSection = styled.section`
     font-style: normal;
     font-weight: 800;
     line-height: normal;
-    letter-spacing: -1.25px;
+    letter-spacing: -0.5px;
   }
 
   h4 {

@@ -33,6 +33,7 @@ export const login = async (email, password) => {
 };
 
 export const logout = async () => {
+  store.set(userDataState, RESET);
   try {
     await axios.post(
       `${baseURL}/api/auth/logout`,
@@ -41,7 +42,6 @@ export const logout = async () => {
         withCredentials: true,
       }
     );
-    store.set(userDataState, RESET);
   } catch (error) {
     console.error("로그아웃 요청 실패", error);
   } finally {
