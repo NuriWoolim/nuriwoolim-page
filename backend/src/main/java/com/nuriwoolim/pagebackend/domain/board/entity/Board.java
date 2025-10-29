@@ -34,6 +34,7 @@ public class Board extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
     @Column(unique = true, length = 20, nullable = false)
     private String title;
 

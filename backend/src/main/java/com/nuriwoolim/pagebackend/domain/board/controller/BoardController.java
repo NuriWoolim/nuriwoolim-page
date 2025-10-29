@@ -3,6 +3,7 @@ package com.nuriwoolim.pagebackend.domain.board.controller;
 
 import com.nuriwoolim.pagebackend.core.jwt.dto.JwtPrincipal;
 import com.nuriwoolim.pagebackend.domain.board.dto.BoardCreateRequest;
+import com.nuriwoolim.pagebackend.domain.board.dto.BoardListResponse;
 import com.nuriwoolim.pagebackend.domain.board.dto.BoardUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.board.dto.BoardResponse;
 import com.nuriwoolim.pagebackend.domain.board.service.BoardService;
@@ -12,8 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,14 +30,16 @@ public class BoardController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BoardResponse>> getAll(){ //Q: 운영진만 볼 수 있는 개시판도 필요한가?
-        List<BoardResponse> boards = boardService.getAll();
-        return ResponseEntity.ok(boards); //entity 대신 dto를 return 할것 (encapsulation)
+    public ResponseEntity<BoardListResponse> getBoards(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){ //Q: 운영진만 볼 수 있는 개시판도 필요한가?
+        return ResponseEntity.ok(boardService.findBoardList(page, size)); //entity 대신 dto를 return 할것 (encapsulation)
     }
 
     @GetMapping("/{boardId}")
     public ResponseEntity<BoardResponse> getById(@PathVariable Long id){
-        return ResponseEntity.ok(boardService.getById(id));
+        return ResponseEntity.ok(boardService.findById(id));
     }
 
     @DeleteMapping("/{boardId}")
