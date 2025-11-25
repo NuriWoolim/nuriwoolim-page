@@ -6,9 +6,9 @@ import MyPageDropdown from "./MyPageDropdown";
 import { logout } from "../../apis/user";
 
 const HeaderContainer = styled.header`
-  position: relative;
-  width: 100vw;
-  height: 100vh;
+  /* position: relative; */
+  width: 100%;
+  height: 85px;
   overflow: hidden;
   animation: ${fadeIn} 2s ease-out forwards;
 `;
@@ -80,44 +80,6 @@ const LoginButton = styled.button`
   }
 `;
 
-const OverlayText = styled.div`
-  position: absolute;
-  bottom: 100px;
-  width: 100%;
-  color: #fefaef;
-  z-index: 2;
-  margin-left: 73px;
-  line-height: 0%;
-
-  h1 {
-    font-family: Plus Jakarta Sans;
-    font-weight: 800;
-    font-size: 200px;
-    letter-spacing: -15px;
-    vertical-align: middle;
-    text-transform: uppercase;
-  }
-
-  p {
-    font-family: Plus Jakarta Sans;
-    font-weight: 500;
-    font-size: 30px;
-    letter-spacing: 69.5px;
-    text-transform: uppercase;
-    margin-left: 12px;
-  }
-`;
-
-const ImgBackground = styled.img`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  object-fit: cover;
-  z-index: 0;
-`;
-
 const Header = () => {
   const navigate = useNavigate();
   const isLoggedIn = !!localStorage.getItem("accessToken");
@@ -141,7 +103,7 @@ const Header = () => {
           <RightGroup>
             <NavLinks>
               <a href="#Home">Home</a>
-              <a href="#Notice">Notice</a>
+              <a href="Boards">Boards</a>
               <a href="#Archive">Archive</a>
               <a href="#Equipment">Equipment</a>
               <a href="#Calendar">Calendar</a>
@@ -164,13 +126,6 @@ const Header = () => {
             )}
           </RightGroup>
         </NavBar>
-
-        <OverlayText>
-          <h1>NURIWOOLIM</h1>
-          <p>중앙대학교 민중가요 동아리</p>
-        </OverlayText>
-
-        <ImgBackground src="/assets/backgroundimage.png" alt="누리울림 로고" />
       </HeaderContainer>
     </>
   );

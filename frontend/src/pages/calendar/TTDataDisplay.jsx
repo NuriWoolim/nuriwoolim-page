@@ -40,6 +40,14 @@ const Form = styled.form`
   align-items: center;
 `;
 
+const Show = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+`;
+
 const FormMain = styled.div`
   flex: 1;
   width: 100%;
@@ -248,7 +256,7 @@ const ReadMode = ({ selectedTT, setSelectedTT, setDataMode, callTTGetApi }) => {
           <h3>일정을 선택하세요!</h3>
         </TTSelectAlertContainer>
       ) : (
-        <Form>
+        <Show>
           <FormMain>
             <ShowElement>
               <ShowTime>
@@ -312,7 +320,7 @@ const ReadMode = ({ selectedTT, setSelectedTT, setDataMode, callTTGetApi }) => {
                 <p>생성자만 수정/삭제할 수 있습니다</p>
               )}
           </ButtonsWrapper>
-        </Form>
+        </Show>
       )}
     </>
   );
