@@ -103,7 +103,7 @@ const Header = () => {
           <RightGroup>
             <NavLinks>
               <a href="#Home">Home</a>
-              <a href="Boards">Boards</a>
+              <a href="boards">Boards</a>
               <a href="#Archive">Archive</a>
               <a href="#Equipment">Equipment</a>
               <a href="#Calendar">Calendar</a>
