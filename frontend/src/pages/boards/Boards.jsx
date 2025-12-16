@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import ArticlesList from "./ArticlesList";
+import Button from "../../components/ui";
 const BoardsSection = styled.div`
   min-height: 28.8rem;
 
@@ -70,38 +71,34 @@ const BSBContainer = styled.div`
 
   margin-top: 2.87rem;
 `;
-const BoardSelectButton = styled.button`
+const BoardSelectButton = styled(Button)`
   width: 12.5rem;
   height: 3.4375rem;
-  flex-shrink: 0;
-
-  border: 1px solid #033148;
-  background: rgba(246, 230, 176, 0.54);
 `;
 
 const StyledArticleList = styled(ArticlesList)`
   margin: 0 15.38rem;
   margin-top: 2.6rem;
 `;
-const Boards = () => {
+const Boards = ({ boardId = 0 }) => {
   return (
     <BoardsSection>
       <BoardsWrapper>
         <h1>BOARD</h1>
         <BSBContainer>
-          <BoardSelectButton>
+          <BoardSelectButton className={boardId === 0 ? "selected" : null}>
             <h3>기본 공지</h3>
           </BoardSelectButton>
 
-          <BoardSelectButton>
+          <BoardSelectButton className={boardId === 1 ? "selected" : null}>
             <h3>자유 게시판</h3>
           </BoardSelectButton>
 
-          <BoardSelectButton>
+          <BoardSelectButton className={boardId === 2 ? "selected" : null}>
             <h3>구인구직 게시판</h3>
           </BoardSelectButton>
         </BSBContainer>
-        <StyledArticleList />
+        <StyledArticleList pageNumber={6} />
       </BoardsWrapper>
     </BoardsSection>
   );

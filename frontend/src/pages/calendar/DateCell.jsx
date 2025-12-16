@@ -1,7 +1,6 @@
 import { React, useState, useRef } from "react";
 import styled from "styled-components";
 import { TimeTableAPI } from "../../apis/common";
-import CustomModal from "../CustomModal";
 import DetailedDate from "./DetailedDate";
 import { lighten } from "polished";
 
