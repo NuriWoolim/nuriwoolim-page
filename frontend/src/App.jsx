@@ -8,6 +8,9 @@ import Main from "./pages/Main";
 import FindMyId from "./pages/accounts/FindMyId";
 import FindMyPw from "./pages/accounts/FindMyPw";
 import SignupTerms from "./pages/accounts/SignupTerms";
+import Boards from "./pages/boards/Boards";
+import ArticleEditor from "./pages/boards/ArticleEditor";
+
 const App = () => {
   return (
     <BrowserRouter>
@@ -23,6 +26,8 @@ const App = () => {
         {/* 공통 레이아웃 안에 포함되는 Routes */}
         <Route element={<Layout />}>
           <Route path="/" element={<Main />} />
+          <Route path="/boards" element={<Boards />} />
+          <Route path="/boards/editor" element={<ArticleEditor />} />
         </Route>
       </Routes>
     </BrowserRouter>

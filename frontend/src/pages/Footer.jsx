@@ -114,7 +114,7 @@ const Footer = () => {
       <SSibalContainer>
         <LeftPart>
           <Logo>
-            <img src="public/assets/logo_crop.png" />
+            <img src="/assets/logo_crop.png" />
           </Logo>
           <h2>누리울림 공식 홈페이지입니다.</h2>
           <p>©2025 Nuriwoolimhompageteam. All rights reserved</p>
