@@ -1,6 +1,9 @@
-package com.nuriwoolim.pagebackend.domain;
+package com.nuriwoolim.pagebackend.domain.board.entity;
 
 import com.nuriwoolim.pagebackend.core.BaseEntity;
+import com.nuriwoolim.pagebackend.domain.board.dto.BoardUpdateRequest;
+import com.nuriwoolim.pagebackend.domain.calendar.dto.CalendarUpdateRequest;
+import com.nuriwoolim.pagebackend.domain.post.entity.Post;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -31,6 +34,7 @@ public class Board extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
     @Column(unique = true, length = 20, nullable = false)
     private String title;
 
@@ -46,4 +50,16 @@ public class Board extends BaseEntity {
         cascade = {jakarta.persistence.CascadeType.REMOVE})
     @Builder.Default
     private List<Post> postList = new ArrayList<>();
+
+    public void update(BoardUpdateRequest request) {
+        if (request.title() != null) {
+            this.title = request.title();
+        }
+        if (request.description() != null) {
+            this.description = request.description();
+        }
+        if (request.type() != null) {
+            this.type = request.type();
+        }
+    }
 }
