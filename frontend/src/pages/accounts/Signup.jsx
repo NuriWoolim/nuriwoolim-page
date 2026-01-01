@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { signup } from "../../apis/user";
+import { sendVerification, signup, verifyEmail } from "../../apis/user";
 import { useForm } from "../../hooks/useForm";
 
 const Body = styled.div`
@@ -91,6 +91,7 @@ const Inputs = styled.div`
   align-items: start;
   flex-direction: column;
   gap: 8px;
+  justify-content: center;
   input {
     font-size: 20px;
     height: 12px;
@@ -99,36 +100,174 @@ const Inputs = styled.div`
     padding: 10px;
 
     &::placeholder {
-      color: #033148;
-      font-size: 20px;
-      font-weight: 500;
+      color: #8888;
+      font-size: 12px;
+      font-weight: 400;
       font-family: "Pretendard";
     }
   }
 `;
 
+// 1) 공용 래퍼
+const InputWithButton = styled.div`
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+`;
+
+// 2) 인풋: 버튼이 겹치므로 오른쪽 패딩을 늘린다(버튼 너비 + 여백)
+const RightPaddedInput = styled.input`
+  width: 100%;
+  height: 40px;
+  border: 1px solid #033148;
+  padding: 0 100px 0 12px; /* ← 버튼 88px + 여백 12px 가정 */
+  font-size: 16px;
+  box-sizing: border-box;
+`;
+
+// 3) 버튼: 래퍼 기준 우측·수직 중앙 고정
+const InlineBtn = styled.button`
+  position: absolute;
+  top: 50%;
+  right: 5px;
+  transform: translateY(-50%);
+  height: 32px;
+  min-width: 88px;
+  padding: 0 10px;
+  border: 1px solid #275e81;
+  background: #275e81;
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+
+  &:hover {
+    background: #fff;
+    color: #000;
+    box-shadow: 0 0 3px 3px skyblue;
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
+const InlineRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  button {
+    position: absolute;
+    top: 55%;
+    right: 3rem;
+    transform: translateY(-50%);
+    height: 32px;
+    min-width: 88px;
+    padding: 0 10px;
+    border: 1px solid #275e81;
+    background: #275e81;
+    color: #fff;
+    font-size: 13px;
+    cursor: pointer;
+
+    &:hover {
+      background: #fff;
+      color: #000;
+      box-shadow: 0 0 3px 3px skyblue;
+    }
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+`;
+
+const HelperText = styled.div`
+  font-size: 12px;
+  color: #666;
+  margin-top: 2px;
+  min-height: 16px;
+`;
+
 const Signup = () => {
-  const [username, onChangeUsername] = useForm("");
+  const [name, onChangeName] = useForm("");
   const [email, onChangeEmail] = useForm("");
+  const [verifyCode, onChangeVerifyCode] = useForm("");
   const [password, onChangePassword] = useForm("");
-  const [nickname, onChangeNickname] = useForm("");
   const [passwordConfirm, onChangePasswordConfirm] = useForm("");
-  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
-  const onClick = async () => {
+  const [errorMessage, setErrorMessage] = useState("");
+  const [infoMessage, setInfoMessage] = useState("");
+
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const [verified, setVerified] = useState(false);
+
+  const isEmailValid = !!email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); // 아주 기초 검증
+
+  const onSendVerification = async () => {
+    setErrorMessage("");
+    setInfoMessage("");
+    if (!isEmailValid) {
+      setErrorMessage("올바른 이메일 형식이 아닙니다.");
+      return;
+    }
+    try {
+      setSending(true);
+      await sendVerification(email);
+      setSending(false);
+      setSent(true);
+      setInfoMessage("인증 메일을 보냈습니다. 메일함을 확인해주세요.");
+    } catch (error) {
+      setSending(false);
+      setErrorMessage(
+        error?.response?.data?.message || "인증 메일 발송에 실패했습니다."
+      );
+    }
+  };
+
+  const onVerifyCode = async () => {
+    setErrorMessage("");
+    setInfoMessage("");
+    if (!verifyCode) {
+      setErrorMessage("인증 코드를 입력해주세요.");
+      return;
+    }
+    try {
+      setVerifying(true);
+      const res = await verifyEmail(email, verifyCode);
+      setVerifying(false);
+      setVerified(true);
+      setInfoMessage("이메일 인증이 완료되었습니다.");
+    } catch (error) {
+      setVerifying(false);
+      setVerified(false);
+      setErrorMessage(
+        err?.response?.data?.message || "인증 코드가 올바르지 않습니다."
+      );
+    }
+  };
+
+  const onClickSignup = async () => {
+    setErrorMessage("");
+    setInfoMessage("");
     if (password !== passwordConfirm) {
       setErrorMessage("비밀번호가 일치하지 않습니다.");
       return;
     }
+    if (!verified) {
+      setErrorMessage("이메일 인증을 완료해주세요.");
+      return;
+    }
 
     try {
-      await signup(username, email, password, nickname);
+      await signup(name, email, password, code);
       alert("회원가입이 완료되었습니다!");
       navigate("/");
     } catch (error) {
       const backendMessage =
-        error.response?.data?.message || "회원가입 중 오류가 발생했습니다.";
+        error?.response?.data?.message || "회원가입 중 오류가 발생했습니다.";
       setErrorMessage(backendMessage);
     }
   };
@@ -144,12 +283,53 @@ const Signup = () => {
         <Title>SIGN-UP</Title>
         <Form>
           <Inputs>
-            <div>사용자명(아이디)</div>
-            <input value={username} onChange={onChangeUsername}></input>
+            <div>이름</div>
+            <input value={name} onChange={onChangeName}></input>
+
             <div>이메일</div>
-            <input value={email} onChange={onChangeEmail}></input>
-            <div>닉네임</div>
-            <input value={nickname} onChange={onChangeNickname}></input>
+            <InputWithButton>
+              <RightPaddedInput
+                placeholder="example@cau.ac.kr"
+                value={email}
+                onChange={onChangeEmail}
+                aria-label="이메일"
+              />
+              <InlineBtn
+                type="button"
+                onClick={onSendVerification}
+                disabled={!isEmailValid || sending}
+              >
+                {sending ? "발송중..." : "인증코드 전송"}
+              </InlineBtn>
+              <HelperText>
+                {infoMessage && (
+                  <div
+                    style={{
+                      color: "blue",
+                      fontSize: "14px",
+                      marginTop: "10px",
+                    }}
+                  >
+                    {infoMessage}
+                  </div>
+                )}
+              </HelperText>
+            </InputWithButton>
+
+            <div>이메일 인증 코드 입력</div>
+            <InlineRow>
+              <input
+                placeholder="인증 코드를 입력하세요"
+                value={verifyCode}
+                onChange={onChangeVerifyCode}
+              ></input>
+              <button
+                onClick={onVerifyCode}
+                disabled={!verifyCode || verifying}
+              >
+                {verifying ? "확인중..." : verified ? "재검증" : "인증"}
+              </button>
+            </InlineRow>
             <div>비밀번호</div>
             <input
               type="password"
@@ -172,8 +352,8 @@ const Signup = () => {
           )}
           <BtnWrapper>
             <button
-              onClick={onClick}
-              disabled={!username || !password || password !== passwordConfirm}
+              onClick={onClickSignup}
+              disabled={!email || !password || password !== passwordConfirm}
             >
               Join
             </button>
