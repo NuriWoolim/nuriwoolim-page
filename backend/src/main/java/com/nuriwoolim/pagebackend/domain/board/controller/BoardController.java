@@ -38,8 +38,8 @@ public class BoardController {
     }
 
     @GetMapping("/{boardId}")
-    public ResponseEntity<BoardResponse> getById(@PathVariable Long id){
-        return ResponseEntity.ok(boardService.findById(id));
+    public ResponseEntity<BoardResponse> getById(@PathVariable Long boardId){
+        return ResponseEntity.ok(boardService.findById(boardId));
     }
 
     @DeleteMapping("/{boardId}")
@@ -50,11 +50,11 @@ public class BoardController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{boardId}")
-    public ResponseEntity<BoardResponse> update(
-            @PathVariable Long boardId,
-            @Valid @RequestBody BoardUpdateRequest request,
-            @AuthenticationPrincipal JwtPrincipal jwtPrincipal){
-        return ResponseEntity.ok(boardService.updateById(boardId, request, jwtPrincipal.getId()));
-    }
+        @PatchMapping("/{boardId}")
+        public ResponseEntity<BoardResponse> update(
+                @PathVariable Long boardId,
+                @Valid @RequestBody BoardUpdateRequest request,
+                @AuthenticationPrincipal JwtPrincipal jwtPrincipal){
+            return ResponseEntity.ok(boardService.updateById(boardId, request, jwtPrincipal.getId()));
+        }
 }
