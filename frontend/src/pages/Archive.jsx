@@ -7,12 +7,10 @@ const ArchiveSection = styled.section`
 `;
 
 const ArchiveWrapper = styled.div`
-  width: 95%;
-  margin: 0 auto;
+  width: 100%;
   position: relative;
-
-  background-color: #ffffff;
-  border: 4px solid #033148;
+  border-top: 4px solid #033148;
+  border-bottom: 4px solid #033148;
 
   h2 {
     font-family: Plus Jakarta Sans;
@@ -56,7 +54,7 @@ const OverlayText = styled.div`
 const ImageContainer = styled.div`
   position: relative;
   width: 100%;
-  height: 900px;
+  height: 100vh;
   overflow: hidden;
 `;
 

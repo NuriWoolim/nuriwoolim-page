@@ -55,14 +55,17 @@ const CalendarSection = styled.section`
   }
 
   background-color: #fefaef;
-  border: 4px solid #033148;
-  padding-bottom: 7rem;
-  background-color: #ffffff;
-  margin: 2rem 2rem;
+  padding: 80px 0 7rem 0;
 
   .calendarTitle {
-    color: #033148;
+    font-family: Pretendard;
+    font-weight: 800;
+    font-size: 56px;
+    line-height: 219%;
+    letter-spacing: -0.05em;
     text-align: center;
+    text-transform: uppercase;
+    color: #033148;
     margin-bottom: 0;
   }
 `;
