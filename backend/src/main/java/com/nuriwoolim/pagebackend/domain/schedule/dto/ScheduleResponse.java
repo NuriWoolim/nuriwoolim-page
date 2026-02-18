@@ -1,10 +1,10 @@
-package com.nuriwoolim.pagebackend.domain.calendar.dto;
+package com.nuriwoolim.pagebackend.domain.schedule.dto;
 
 import java.time.LocalDate;
 import lombok.Builder;
 
 @Builder
-public record CalendarResponse(
+public record ScheduleResponse(
     Long id,
     String title,
     String description,

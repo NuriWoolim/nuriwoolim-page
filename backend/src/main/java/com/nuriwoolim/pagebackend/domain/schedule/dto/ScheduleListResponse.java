@@ -1,14 +1,14 @@
-package com.nuriwoolim.pagebackend.domain.calendar.dto;
+package com.nuriwoolim.pagebackend.domain.schedule.dto;
 
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
 
 @Builder
-public record CalendarListResponse(
+public record ScheduleListResponse(
     LocalDate from,
     LocalDate to,
-    List<CalendarResponse> data
+    List<ScheduleResponse> data
 ) {
 
 }

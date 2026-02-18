@@ -1,11 +1,11 @@
-package com.nuriwoolim.pagebackend.domain.calendar.controller;
+package com.nuriwoolim.pagebackend.domain.schedule.controller;
 
 import com.nuriwoolim.pagebackend.core.jwt.dto.JwtPrincipal;
-import com.nuriwoolim.pagebackend.domain.calendar.dto.CalendarCreateRequest;
-import com.nuriwoolim.pagebackend.domain.calendar.dto.CalendarListResponse;
-import com.nuriwoolim.pagebackend.domain.calendar.dto.CalendarResponse;
-import com.nuriwoolim.pagebackend.domain.calendar.dto.CalendarUpdateRequest;
-import com.nuriwoolim.pagebackend.domain.calendar.service.CalendarService;
+import com.nuriwoolim.pagebackend.domain.schedule.dto.ScheduleCreateRequest;
+import com.nuriwoolim.pagebackend.domain.schedule.dto.ScheduleListResponse;
+import com.nuriwoolim.pagebackend.domain.schedule.dto.ScheduleResponse;
+import com.nuriwoolim.pagebackend.domain.schedule.dto.ScheduleUpdateRequest;
+import com.nuriwoolim.pagebackend.domain.schedule.service.ScheduleService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
@@ -24,43 +24,43 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/calendars")
-public class CalendarController {
+@RequestMapping("/schedules")
+public class ScheduleController {
 
-    private final CalendarService calendarService;
+    private final ScheduleService scheduleService;
 
     @PostMapping
-    public ResponseEntity<CalendarResponse> create(
-        @Valid @RequestBody CalendarCreateRequest request,
+    public ResponseEntity<ScheduleResponse> create(
+        @Valid @RequestBody ScheduleCreateRequest request,
         @AuthenticationPrincipal JwtPrincipal principal) {
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(calendarService.create(request, principal.getId()));
+            .body(scheduleService.create(request, principal.getId()));
     }
 
     @GetMapping
-    public ResponseEntity<CalendarListResponse> readBetween(
+    public ResponseEntity<ScheduleListResponse> readBetween(
         @RequestParam(required = false) LocalDate from,
         @RequestParam(required = false) LocalDate to) {
         if (from == null || to == null) {
             from = LocalDate.now().withDayOfMonth(1);
             to = LocalDate.now().plusMonths(1).withDayOfMonth(1);
         }
-        return ResponseEntity.ok(calendarService.findCalendarList(from, to));
+        return ResponseEntity.ok(scheduleService.findCalendarList(from, to));
     }
 
     @DeleteMapping("/{calendarId}")
     public ResponseEntity<Void> delete(@PathVariable Long calendarId,
         @AuthenticationPrincipal JwtPrincipal principal) {
-        calendarService.deleteCalendarById(calendarId, principal.getId());
+        scheduleService.deleteCalendarById(calendarId, principal.getId());
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{calendarId}")
-    public ResponseEntity<CalendarResponse> update(
+    public ResponseEntity<ScheduleResponse> update(
         @PathVariable Long calendarId,
-        @Valid @RequestBody CalendarUpdateRequest request,
+        @Valid @RequestBody ScheduleUpdateRequest request,
         @AuthenticationPrincipal JwtPrincipal principal) {
         return ResponseEntity.ok(
-            calendarService.updateCalendar(calendarId, request, principal.getId()));
+            scheduleService.updateCalendar(calendarId, request, principal.getId()));
     }
 }

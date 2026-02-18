@@ -1,7 +1,7 @@
-package com.nuriwoolim.pagebackend.domain.calendar.entity;
+package com.nuriwoolim.pagebackend.domain.schedule.entity;
 
 import com.nuriwoolim.pagebackend.core.BaseEntity;
-import com.nuriwoolim.pagebackend.domain.calendar.dto.CalendarUpdateRequest;
+import com.nuriwoolim.pagebackend.domain.schedule.dto.ScheduleUpdateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,7 +21,7 @@ import org.hibernate.annotations.SQLRestriction;
 @Builder
 @AllArgsConstructor
 @SQLRestriction("deleted = false")
-public class Calendar extends BaseEntity {
+public class Schedule extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,7 +39,7 @@ public class Calendar extends BaseEntity {
     @Column(nullable = false)
     private LocalDate date;
 
-    public void update(CalendarUpdateRequest request) {
+    public void update(ScheduleUpdateRequest request) {
         if (request.title() != null) {
             this.title = request.title();
         }
