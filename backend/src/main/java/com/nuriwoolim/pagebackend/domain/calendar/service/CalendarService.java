@@ -9,7 +9,7 @@ import com.nuriwoolim.pagebackend.domain.calendar.repository.CalendarRepository;
 import com.nuriwoolim.pagebackend.domain.calendar.util.CalendarMapper;
 import com.nuriwoolim.pagebackend.domain.user.service.UserService;
 import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,19 +26,9 @@ public class CalendarService {
     public CalendarResponse create(CalendarCreateRequest request, Long actorId) {
         Calendar calendar = CalendarMapper.fromCalendarCreateRequest(request);
         validatePermission(actorId);
-        validateCalendar(calendar);
 
         Calendar savedCalendar = calendarRepository.save(calendar);
         return CalendarMapper.toCalendarResponse(savedCalendar);
-    }
-
-    private void validateCalendar(Calendar calendar) {
-        LocalDateTime start = calendar.getStart();
-        LocalDateTime end = calendar.getEnd();
-        //시작시간과 종료시간의 순서가 맞지 않는 경우
-        if (!start.isBefore(end)) {
-            throw ErrorCode.BAD_REQUEST.toException("시간이 잘못되었습니다.");
-        }
     }
 
     @Transactional(readOnly = true)
@@ -52,7 +42,7 @@ public class CalendarService {
     }
 
     @Transactional(readOnly = true)
-    public CalendarListResponse findCalendarList(LocalDateTime from, LocalDateTime to) {
+    public CalendarListResponse findCalendarList(LocalDate from, LocalDate to) {
         List<Calendar> calendars = calendarRepository.findBetween(from, to);
         return CalendarMapper.toCalendarListResponse(calendars, from, to);
     }
@@ -76,8 +66,7 @@ public class CalendarService {
 
         Calendar calendar = getCalendarById(id);
         calendar.update(request);
-
-        validateCalendar(calendar);
+        
         return CalendarMapper.toCalendarResponse(calendar);
     }
 

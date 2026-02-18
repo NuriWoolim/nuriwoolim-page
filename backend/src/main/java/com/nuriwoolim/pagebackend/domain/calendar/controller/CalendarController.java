@@ -7,7 +7,7 @@ import com.nuriwoolim.pagebackend.domain.calendar.dto.CalendarResponse;
 import com.nuriwoolim.pagebackend.domain.calendar.dto.CalendarUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.calendar.service.CalendarService;
 import jakarta.validation.Valid;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,11 +39,11 @@ public class CalendarController {
 
     @GetMapping
     public ResponseEntity<CalendarListResponse> readBetween(
-        @RequestParam(required = false) LocalDateTime from,
-        @RequestParam(required = false) LocalDateTime to) {
+        @RequestParam(required = false) LocalDate from,
+        @RequestParam(required = false) LocalDate to) {
         if (from == null || to == null) {
-            from = LocalDateTime.now().toLocalDate().withDayOfMonth(1).atStartOfDay();
-            to = LocalDateTime.now().toLocalDate().plusMonths(1).withDayOfMonth(1).atStartOfDay();
+            from = LocalDate.now().withDayOfMonth(1);
+            to = LocalDate.now().plusMonths(1).withDayOfMonth(1);
         }
         return ResponseEntity.ok(calendarService.findCalendarList(from, to));
     }

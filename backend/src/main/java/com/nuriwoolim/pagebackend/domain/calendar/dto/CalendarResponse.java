@@ -1,6 +1,6 @@
 package com.nuriwoolim.pagebackend.domain.calendar.dto;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import lombok.Builder;
 
 @Builder
@@ -9,6 +9,6 @@ public record CalendarResponse(
     String title,
     String description,
     String color,
-    LocalDateTime start,
-    LocalDateTime end) {
+    LocalDate date) {
+
 }

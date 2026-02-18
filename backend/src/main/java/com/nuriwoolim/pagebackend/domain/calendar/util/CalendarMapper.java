@@ -4,7 +4,7 @@ import com.nuriwoolim.pagebackend.domain.calendar.dto.CalendarCreateRequest;
 import com.nuriwoolim.pagebackend.domain.calendar.dto.CalendarListResponse;
 import com.nuriwoolim.pagebackend.domain.calendar.dto.CalendarResponse;
 import com.nuriwoolim.pagebackend.domain.calendar.entity.Calendar;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -16,8 +16,7 @@ public class CalendarMapper {
         return Calendar.builder()
             .title(request.title())
             .description(request.description())
-            .start(request.start())
-            .end(request.end())
+            .date(request.date())
             .color(request.color())
             .build();
     }
@@ -27,15 +26,14 @@ public class CalendarMapper {
             .id(timeTable.getId())
             .title(timeTable.getTitle())
             .description(timeTable.getDescription())
-            .start(timeTable.getStart())
-            .end(timeTable.getEnd())
+            .date(timeTable.getDate())
             .color(timeTable.getColor())
             .build();
     }
 
     public static CalendarListResponse toCalendarListResponse(List<Calendar> calendars,
-        LocalDateTime from,
-        LocalDateTime to) {
+        LocalDate from,
+        LocalDate to) {
         return CalendarListResponse.builder()
             .from(from)
             .to(to)
