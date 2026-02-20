@@ -1,6 +1,7 @@
 package com.nuriwoolim.pagebackend.domain.board.service;
 
 import com.nuriwoolim.pagebackend.domain.board.dto.BoardCreateRequest;
+import com.nuriwoolim.pagebackend.domain.board.dto.BoardListResponse;
 import com.nuriwoolim.pagebackend.domain.board.dto.BoardResponse;
 import com.nuriwoolim.pagebackend.domain.board.dto.BoardUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.board.entity.Board;
@@ -9,11 +10,14 @@ import com.nuriwoolim.pagebackend.domain.board.util.BoardMapper;
 import com.nuriwoolim.pagebackend.domain.user.service.UserService;
 import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static com.nuriwoolim.pagebackend.domain.board.util.BoardMapper.toBoardListResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -33,34 +37,33 @@ public class BoardService {
     }
 
     @Transactional(readOnly = true)
-    public List<BoardResponse> getAll(){
-        return boardRepository.findAll().stream()
-                .map(BoardMapper::toBoardResponse)
-                .collect(Collectors.toList()); //repository에서 찾은 entity의 stream을 list로 변형하는 작업
+    public BoardListResponse findBoardList(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        List<Board> boards = boardRepository.findAll(pageable).getContent();
+
+        return toBoardListResponse(boards);
     }
 
     @Transactional(readOnly = true)
-    public Board getBoardById(Long id){ //service layer에서 쓸 함수 (특히 updateById)
+    public Board getById(Long id){ //service layer에서 쓸 함수 (특히 updateById)
         return boardRepository.findById(id).orElseThrow(ErrorCode.DATA_NOT_FOUND::toException);
     }
 
     @Transactional(readOnly = true)
-    public BoardResponse getById(Long id){ //controller에서 쓸 함수
-        return BoardMapper.toBoardResponse(getBoardById(id));
+    public BoardResponse findById(Long id){ //controller에서 쓸 함수
+        return BoardMapper.toBoardResponse(getById(id));
     }
 
     @Transactional
     public void deleteById(Long boardId, Long actorId){
         validatePermission(actorId);
-        validateBoard(boardId);
         boardRepository.deleteById(boardId);
     }
 
     @Transactional
     public BoardResponse updateById(Long boardId, BoardUpdateRequest request, Long actorId){
         validatePermission(actorId);
-        validateBoard(boardId);
-        Board board = getBoardById(boardId);
+        Board board = getById(boardId);
 
         board.update(request);
         return BoardMapper.toBoardResponse(board);
@@ -71,11 +74,4 @@ public class BoardService {
             throw ErrorCode.DATA_FORBIDDEN.toException();
         }
     }
-
-    private void validateBoard(Long boardId) {
-        if (!boardRepository.existsById(boardId)){
-            throw ErrorCode.DATA_NOT_FOUND.toException();
-        }
-    }
-
 }

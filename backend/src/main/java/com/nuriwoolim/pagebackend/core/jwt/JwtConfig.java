@@ -8,7 +8,7 @@ public record JwtConfig(
     String secretKey
 ) {
 
-    public record Expire(Long access, Long refresh, Long email) {
+    public record Expire(Long access, Long refresh) {
 
     }
 }

@@ -10,7 +10,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update # TODO: 나중에 validate로 변경
 
   mail:
     host: smtp.gmail.com
@@ -37,9 +37,9 @@ custom:
     expire:
       access: 3600_000 #1시간
       refresh: 259200_000 #3일
-      email: 600_000 # 10분
     secret-key: ${SECRET_KEY}
-  resendLimit: 5
-  frontUrl: ${FRONT_URL}
+  resendTime: 30
+  resendCount: 3
+  verificationExpires: 10
   cors:
     origins: ${PRIVATE_ORIGINS}

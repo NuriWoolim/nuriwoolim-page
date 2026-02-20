@@ -1,7 +1,8 @@
 import axios from "axios";
 import { getAuthAxios } from "./authAxios";
-
-const baseURL = "https://nuriwoolim.n-e.kr";
+import { store, userDataState } from "../atoms";
+import { RESET } from "jotai/utils";
+const baseURL = import.meta.env.VITE_API_URL;
 
 export const signup = async (username, email, password, nickname) => {
   const result = await axios.post(`${baseURL}/api/auth/signup`, {
@@ -13,11 +14,11 @@ export const signup = async (username, email, password, nickname) => {
   return result;
 };
 
-export const login = async (username, password) => {
+export const login = async (email, password) => {
   const result = await axios.post(
     `${baseURL}/api/auth/login`,
     {
-      username,
+      email,
       password,
     },
     {
@@ -27,11 +28,12 @@ export const login = async (username, password) => {
 
   const accessToken = result.headers["authorization"]?.split("Bearer ")[1]; // 응답 형식 : Authorization: Bearer abc.def.jhi
   if (accessToken) localStorage.setItem("accessToken", accessToken);
-
+  store.set(userDataState, result.data);
   return result.data;
 };
 
 export const logout = async () => {
+  store.set(userDataState, RESET);
   try {
     await axios.post(
       `${baseURL}/api/auth/logout`,

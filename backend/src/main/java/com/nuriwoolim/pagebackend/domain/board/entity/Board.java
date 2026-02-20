@@ -2,7 +2,6 @@ package com.nuriwoolim.pagebackend.domain.board.entity;
 
 import com.nuriwoolim.pagebackend.core.BaseEntity;
 import com.nuriwoolim.pagebackend.domain.board.dto.BoardUpdateRequest;
-import com.nuriwoolim.pagebackend.domain.calendar.dto.CalendarUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.post.entity.Post;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

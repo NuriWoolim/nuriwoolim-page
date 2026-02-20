@@ -34,6 +34,12 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+            .orElseThrow(ErrorCode.USER_NOT_FOUND::toException);
+    }
+
+    @Transactional(readOnly = true)
     public boolean isManager(Long userId) {
         User user = getUserById(userId);
         return user.getType() == UserType.ADMIN || user.getType() == UserType.MANAGER;
@@ -43,6 +49,13 @@ public class UserService {
     public boolean isAdmin(Long userId) {
         User user = getUserById(userId);
         return user.getType() == UserType.ADMIN;
+    }
+
+    //TODO: 운영시 제거
+    @Transactional
+    public void DEVchangeRole(String email, UserType userType) {
+        User user = getUserByEmail(email);
+        user.updateRole(userType);
     }
 
 }

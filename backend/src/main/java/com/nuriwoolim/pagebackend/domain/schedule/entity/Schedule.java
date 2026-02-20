@@ -1,0 +1,56 @@
+package com.nuriwoolim.pagebackend.domain.schedule.entity;
+
+import com.nuriwoolim.pagebackend.core.BaseEntity;
+import com.nuriwoolim.pagebackend.domain.schedule.dto.ScheduleUpdateRequest;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import java.time.LocalDate;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
+
+@Getter
+@Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor
+@SQLRestriction("deleted = false")
+public class Schedule extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(length = 20, nullable = false)
+    private String title;
+
+    @Column(length = 100)
+    private String description;
+
+    @Column(length = 6)
+    private String color;
+
+    @Column(nullable = false)
+    private LocalDate date;
+
+    public void update(ScheduleUpdateRequest request) {
+        if (request.title() != null) {
+            this.title = request.title();
+        }
+        if (request.description() != null) {
+            this.description = request.description();
+        }
+        if (request.date() != null) {
+            this.date = request.date();
+        }
+        if (request.color() != null) {
+            this.color = request.color();
+        }
+    }
+}
