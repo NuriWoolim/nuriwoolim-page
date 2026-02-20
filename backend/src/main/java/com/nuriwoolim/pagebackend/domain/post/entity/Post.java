@@ -3,6 +3,7 @@ package com.nuriwoolim.pagebackend.domain.post.entity;
 import com.nuriwoolim.pagebackend.core.BaseEntity;
 import com.nuriwoolim.pagebackend.domain.Comment;
 import com.nuriwoolim.pagebackend.domain.board.entity.Board;
+import com.nuriwoolim.pagebackend.domain.post.dto.PostUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -75,4 +76,16 @@ public class Post extends BaseEntity {
         cascade = {jakarta.persistence.CascadeType.REMOVE})
     @Builder.Default
     private List<Comment> commentList = new ArrayList<>();
+
+    public void update(PostUpdateRequest request) {
+        if (request.title() != null) {
+            this.title = request.title();
+        }
+        if (request.content() != null) {
+            this.content = request.content();
+        }
+        if (request.type() != null) {
+            this.type = request.type();
+        }
+    }
 }

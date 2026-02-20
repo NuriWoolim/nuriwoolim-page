@@ -40,7 +40,7 @@ public class SecurityConfig {
                     "/swagger-resources/**",
                     "/webjars/**",
                     "/refresh").permitAll()
-                .requestMatchers(HttpMethod.GET, "/calendars", "/timetables").permitAll()
+                .requestMatchers(HttpMethod.GET, "/calendars", "/timetables", "/boards", "/posts").permitAll()
                 .anyRequest().authenticated());
         return http.build();
     }
