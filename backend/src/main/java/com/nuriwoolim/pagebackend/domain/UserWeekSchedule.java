@@ -29,13 +29,13 @@ import org.hibernate.annotations.SQLRestriction;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
     indexes = {
-        @Index(name = "idx_schedule_user", columnList = "user_id"),
+        @Index(name = "idx_user_week_schedule_user", columnList = "user_id"),
     }
 )
 @Builder
 @AllArgsConstructor
 @SQLRestriction("deleted = false")
-public class WeekSchedule extends BaseEntity {
+public class UserWeekSchedule extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,8 +53,8 @@ public class WeekSchedule extends BaseEntity {
         foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User user;
 
-    @OneToMany(mappedBy = "weekSchedule", fetch = FetchType.LAZY, orphanRemoval = true,
+    @OneToMany(mappedBy = "userWeekSchedule", fetch = FetchType.LAZY, orphanRemoval = true,
         cascade = {jakarta.persistence.CascadeType.REMOVE})
     @Builder.Default
-    private List<Schedule> scheduleList = new ArrayList<>();
+    private List<UserSchedule> userScheduleList = new ArrayList<>();
 }

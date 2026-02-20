@@ -1,13 +1,13 @@
-package com.nuriwoolim.pagebackend.domain.calendar.entity;
+package com.nuriwoolim.pagebackend.domain.schedule.entity;
 
 import com.nuriwoolim.pagebackend.core.BaseEntity;
-import com.nuriwoolim.pagebackend.domain.calendar.dto.CalendarUpdateRequest;
+import com.nuriwoolim.pagebackend.domain.schedule.dto.ScheduleUpdateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +21,7 @@ import org.hibernate.annotations.SQLRestriction;
 @Builder
 @AllArgsConstructor
 @SQLRestriction("deleted = false")
-public class Calendar extends BaseEntity {
+public class Schedule extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,22 +37,17 @@ public class Calendar extends BaseEntity {
     private String color;
 
     @Column(nullable = false)
-    private LocalDateTime start;
-    @Column(nullable = false)
-    private LocalDateTime end;
+    private LocalDate date;
 
-    public void update(CalendarUpdateRequest request) {
+    public void update(ScheduleUpdateRequest request) {
         if (request.title() != null) {
             this.title = request.title();
         }
         if (request.description() != null) {
             this.description = request.description();
         }
-        if (request.start() != null) {
-            this.start = request.start();
-        }
-        if (request.end() != null) {
-            this.end = request.end();
+        if (request.date() != null) {
+            this.date = request.date();
         }
         if (request.color() != null) {
             this.color = request.color();
