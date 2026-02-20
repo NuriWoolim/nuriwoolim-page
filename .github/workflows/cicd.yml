@@ -101,13 +101,28 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Copy docker-compose-server.yml to server
+      - name: Create .env file
+        run: |
+          cat > .env << EOF
+          DOCKER_USERNAME=${{ env.DOCKER_USERNAME }}
+          DB_NAME=${{ env.DB_NAME }}
+          DB_USERNAME=${{ env.DB_USERNAME }}
+          DB_PASSWORD=${{ env.DB_PASSWORD }}
+          DB_ROOT=${{ env.DB_ROOT }}
+          SECRET_KEY=${{ env.SECRET_KEY }}
+          EMAIL=${{ env.EMAIL }}
+          EMAIL_PASSWORD=${{ env.EMAIL_PASSWORD }}
+          FRONT_URL=${{ env.FRONT_URL }}
+          PRIVATE_ORIGINS=${{ env.PRIVATE_ORIGINS }}
+          EOF
+
+      - name: Copy files to server
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ env.HOST }}
           username: ${{ env.HOST_USERNAME }}
           key: ${{ env.HOST_SSH_KEY }}
-          source: "docker-compose-server.yml"
+          source: "docker-compose-server.yml,.env"
           target: "/home/ubuntu/"
 
       - name: Deploy to server
@@ -118,24 +133,12 @@ jobs:
           key: ${{ env.HOST_SSH_KEY }}
           script: |
             echo "Deploying to Server instance..."
-            echo "make environment variables"
-            export DOCKER_USERNAME="${{ env.DOCKER_USERNAME }}"
-            export "${{ env.DOCKER_PASSWORD }}"
-            export DB_NAME="${{ env.DB_NAME }}"
-            export DB_USERNAME="${{ env.DB_USERNAME }}"
-            export DB_PASSWORD="${{ env.DB_PASSWORD }}"
-            export DB_ROOT="${{ env.DB_ROOT }}"
-            export SECRET_KEY="${{ env.SECRET_KEY }}"
-            export EMAIL="${{ env.EMAIL }}"
-            export EMAIL_PASSWORD="${{ env.EMAIL_PASSWORD }}"
-            export FRONT_URL="${{ env.FRONT_URL }}"
-            export PRIVATE_ORIGINS="${{ env.PRIVATE_ORIGINS }}"
             
             # 기존 컨테이너 중지 및 제거
             echo "Stopping and removing existing containers..."
             docker compose -f docker-compose-server.yml down || true
             
-            echo "로그인"
+            echo "Docker Hub 로그인"
             echo "${{ env.DOCKER_PASSWORD }}" | docker login -u "${{ env.DOCKER_USERNAME }}" --password-stdin
             
             # 최신 이미지 풀
