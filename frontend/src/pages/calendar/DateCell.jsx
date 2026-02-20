@@ -1,28 +1,26 @@
 import { React, useState, useRef } from "react";
 import styled from "styled-components";
 import { TimeTableAPI } from "../../apis/common";
-import CustomModal from "../CustomModal";
 import DetailedDate from "./DetailedDate";
-import { TTColors } from "../../data/CalendarData";
+import { lighten } from "polished";
 
 const DateCellContainer = styled.div`
-  h2 {
-    font-size: 1.1rem;
-    font-weight: 500;
-    margin: 0px;
-    margin-bottom: 5px;
-  }
-  padding: 0.6rem;
+
+  padding: 0.4rem;
   border-right: 1px solid #033148;
   border-bottom: 1px solid #033148;
   background-color: ${({ $isSameMonth }) =>
     $isSameMonth ? "#fff" : "#EFE7D1"};
 
   color: rgba(0, 0, 0, ${({ $isSameMonth }) => ($isSameMonth ? "1" : "0.4")});
+
+  p {
+    margin-bottom: 0.2rem;
+  }
 `;
 
 const TimeTableContainer = styled.div`
-  height: 1.8rem;
+  height: 1.7rem;
   width: 100%;
 
   display: flex;
@@ -31,22 +29,22 @@ const TimeTableContainer = styled.div`
   box-sizing: border-box;
 
   font-family: "Pretendard";
-  font-size: 0.81rem;
+  font-size: 0.85rem;
 
   .time {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    flex: 1 0 0;
-    padding-left: 0.3rem;
-    padding-right: 0.3rem;
+    flex: 1.2 0 0;
+    padding-left: 0.2rem;
+    padding-right: 0.2rem;
 
     text-align: center;
     font-weight: 900;
     border: none;
     border-radius: 2px;
-    background-color: ${(props) => props.$color1};
-    color: ${(props) => props.$color2};
+    background-color: ${(props) => props.$color};
+    color: ${(props) => lighten(0.5, props.$color)};
     white-space: nowrap; /* 줄바꿈 안 함 */
     overflow: hidden; /* 넘친 부분 숨김 */
     text-overflow: ellipsis;
@@ -57,15 +55,16 @@ const TimeTableContainer = styled.div`
     flex-direction: column;
     justify-content: center;
     flex: 2 0 0;
-    padding-left: 0.3rem;
-    padding-right: 0.3rem;
+    padding-left: 0.2rem;
+    padding-right: 0.2rem;
 
     text-align: center;
     font-weight: 700;
     border: none;
     border-radius: 2px;
-    background-color: ${(props) => props.$color2};
-    color: ${(props) => props.$color1};
+
+    background-color: ${(props) => lighten(0.4, props.$color)};
+    color: ${({ $color }) => $color};
     white-space: nowrap; /* 줄바꿈 안 함 */
     overflow: hidden; /* 넘친 부분 숨김 */
     text-overflow: ellipsis;
@@ -91,7 +90,7 @@ const DropdownContainer = styled.div`
   transform: translate(-50%, -50%);
 `;
 
-const DateCell = ({ dateObj, timetables, isSameMonth }) => {
+const DateCell = ({ dateObj, timetables, isSameMonth, getMonthTimeTables }) => {
   const date = new Date(dateObj);
   const today = new Date();
 
@@ -117,6 +116,7 @@ const DateCell = ({ dateObj, timetables, isSameMonth }) => {
     setIsDetailedDateOpen(false);
   };
 
+
   return (
     <>
       <DateCellContainer
@@ -124,16 +124,15 @@ const DateCell = ({ dateObj, timetables, isSameMonth }) => {
         $isSameMonth={isSameMonth}
         ref={divRef}
       >
-        <h2>{date.getDate()}</h2>
+        <p>{date.getDate()}</p>
 
         {timetables
           ? timetables.slice(0, 2).map((timetable, index) => (
-              <TimeTableContainer
-                key={index}
-                $color1={TTColors[parseInt(timetable.color)][0]}
-                $color2={TTColors[parseInt(timetable.color)][1]}
-              >
-                <div className="time">{timetable.start.split("T")[1]}</div>
+              <TimeTableContainer key={index} $color={"#" + timetable.color}>
+                <div className="time">
+                  {timetable.start.split("T")[1].split(":")[0]}:
+                  {timetable.start.split("T")[1].split(":")[1]}
+                </div>
                 <div className="title">{timetable.title}</div>
               </TimeTableContainer>
             ))
@@ -147,7 +146,11 @@ const DateCell = ({ dateObj, timetables, isSameMonth }) => {
       {isDetailedDateOpen && <Overlay onClick={closeDetailedDate} />}
       {isDetailedDateOpen && (
         <DropdownContainer $x={dropdownPosition.x} $y={dropdownPosition.y}>
-          <DetailedDate dateObj={dateObj} />
+          <DetailedDate
+            dateObj={dateObj}
+            getMonthTimeTables={getMonthTimeTables}
+            onClose={() => setIsDetailedDateOpen(false)}
+          />
         </DropdownContainer>
       )}
     </>

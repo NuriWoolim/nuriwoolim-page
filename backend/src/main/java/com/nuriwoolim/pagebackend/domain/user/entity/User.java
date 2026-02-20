@@ -3,9 +3,9 @@ package com.nuriwoolim.pagebackend.domain.user.entity;
 import com.nuriwoolim.pagebackend.core.BaseEntity;
 import com.nuriwoolim.pagebackend.core.jwt.entity.RefreshToken;
 import com.nuriwoolim.pagebackend.domain.Comment;
-import com.nuriwoolim.pagebackend.domain.Post;
-import com.nuriwoolim.pagebackend.domain.Schedule;
-import com.nuriwoolim.pagebackend.domain.WeekSchedule;
+import com.nuriwoolim.pagebackend.domain.UserSchedule;
+import com.nuriwoolim.pagebackend.domain.UserWeekSchedule;
+import com.nuriwoolim.pagebackend.domain.post.entity.Post;
 import com.nuriwoolim.pagebackend.domain.timeTable.entity.TimeTable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -75,7 +75,7 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true,
         cascade = {jakarta.persistence.CascadeType.REMOVE})
     @Builder.Default
-    private List<Schedule> scheduleList = new ArrayList<>();
+    private List<UserSchedule> userScheduleList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true,
         cascade = {jakarta.persistence.CascadeType.REMOVE})
@@ -85,7 +85,7 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true,
         cascade = {jakarta.persistence.CascadeType.REMOVE})
     @Builder.Default
-    private List<WeekSchedule> weekScheduleList = new ArrayList<>();
+    private List<UserWeekSchedule> userWeekScheduleList = new ArrayList<>();
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Setter

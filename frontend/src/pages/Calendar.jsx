@@ -3,35 +3,89 @@ import styled from "styled-components";
 import DateCell from "./calendar/DateCell";
 import { TimeTableAPI } from "../apis/common";
 import { createDate } from "../tools/DateTool";
-
-
+import TimeLine from "./calendar/TimeLine";
 /* Calendar 섹션의 전체 배경 */
 const CalendarSection = styled.section`
+  h1 {
+    font-weight: 800;
+    /* color: #033148; */
+    font-size: 3rem;
+    letter-spacing: -1.8px;
+    margin: 2.1rem 0 2.1rem 0;
+  }
+
+  h2 {
+    font-family: Pretendard;
+    font-weight: 900;
+    /* color: #fff; */
+    font-size: 2rem;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  h3 {
+    font-family: Pretendard;
+    font-size: 1.2rem;
+    font-style: normal;
+    font-weight: 800;
+    line-height: normal;
+    letter-spacing: -0.5px;
+  }
+
+  h4 {
+    font-family: Pretendard;
+    font-size: 1.2rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  p {
+    font-family: Pretendard;
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 110%;
+    letter-spacing: -0.02369rem;
+
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
   background-color: #fefaef;
-  padding: 2.8rem 0;
+  border: 4px solid #033148;
+  padding-bottom: 7rem;
+  background-color: #ffffff;
+  margin: 2rem 2rem;
+
+  .calendarTitle {
+    color: #033148;
+    text-align: center;
+    margin-bottom: 0;
+  }
 `;
 
 /* Calendar 섹션의 컨테이너 박스 */
 const CalendarWrapper = styled.div`
-  width: 92%;
-  margin: 0 auto;
-  padding: 0px 17rem 0 17rem;
-  box-sizing: border-box;
-  background-color: #ffffff;
-  border: 4px solid #033148;
+  display: flex;
+  justify-content: center;
 
-  > ul {
-    list-style: none;
-    padding: 0;
-  }
+  /* padding: 0px 3rem; */
+`;
+const LeftPart = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 // 전체 테이블
 const GridContainer = styled.div`
   display: grid;
-  grid-template-columns: repeat(7, calc(100% / 7));
-  grid-template-rows: 2.7rem repeat(6, 9rem);
-  width: 100%;
+  width: 63rem;
+  grid-template-columns: repeat(7, 9rem);
+  grid-template-rows: 2.7rem repeat(6, 8.5rem);
 
   border-top: 1px solid #033148;
   border-left: 1px solid #033148;
@@ -53,19 +107,18 @@ const WeekDayCell = styled.div`
 // 현재 년월 라벨과 버튼들을 감싸는 컨테이너
 const MonthYearContainer = styled.div`
   display: flex;
-  width: 17rem;
-  justify-content: space-between;
+  width: 63rem;
   align-items: center;
-  margin: 1.2rem 0 1.2rem 0;
-  h2 {
-    color: #486284;
+  padding: 1.2rem 0 1.2rem 0;
 
+  /* margin: 0 10px; */
+  p {
+    color: #486284;
     font-family: Pretendard;
     font-size: 2.2rem;
     font-weight: 900;
-    margin: 0;
+    padding: 0 15px;
   }
-
   button {
     background: none; /* 배경 제거 */
     width: 2rem;
@@ -78,9 +131,12 @@ const MonthYearContainer = styled.div`
     outline: none;
   }
 
-  button img{
+  button img {
     height: 1.5rem;
     margin-top: 5px;
+    /* padding-inline: 10px; */
+    /* margin-left: 10px; */
+    /* margin-right: 10px; */
   }
   button:hover img {
     filter: brightness(0.8); /* 밝게 */
@@ -93,6 +149,18 @@ const MonthYearContainer = styled.div`
     transform: scaleX(-1);
   }
 `;
+
+function toLocalISOString(date) {
+  const pad = (n) => String(n).padStart(2, "0");
+
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1); // 0부터 시작하니까 +1
+  const day = pad(date.getDate());
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
 
 // 현재 달의 날짜들을 찾고 올바른 위치를 찾아주는 함수
 const createCalendarData = (startDate) => {
@@ -177,7 +245,14 @@ const Calendar = () => {
   const getTimeTables = async () => {
     try {
       // 한달간 기간 설정
-      const result = await TimeTableAPI.getTimeTable();
+      const from = toLocalISOString(calendarState.dates[0]);
+      const to = toLocalISOString(
+        calendarState.dates[calendarState.dates.length - 1]
+      );
+
+      // 응답 딜레이 시 잔상 안남기도록 제거
+      setMonthTT(() => Array.from({ length: 30 }, () => []));
+      const result = await TimeTableAPI.getTimeTable(from, to);
       const resultdata = result.data;
 
       const newMonthTT = Array.from({ length: 42 }, () => []);
@@ -225,40 +300,43 @@ const Calendar = () => {
 
   return (
     <CalendarSection>
+      <h1 className="calendarTitle">CALENDAR</h1>
       <CalendarWrapper>
-        <h1>CALENDAR</h1>
+        <LeftPart>
+          <MonthYearContainer>
+            <button onClick={() => onMonthChange(-1)}>
+              <img src="/assets/rightarrow_blue.svg" className="down" />
+            </button>
+            <p>
+              {months[calendarState.startDate.getMonth()]},{" "}
+              {calendarState.startDate.getFullYear()}
+            </p>
+            <button onClick={() => onMonthChange(1)}>
+              <img src="/assets/rightarrow_blue.svg" className="up" />
+            </button>
+          </MonthYearContainer>
 
-        <MonthYearContainer>
-          <button onClick={() => onMonthChange(-1)}>
-            <img src="/assets/rightarrow_blue.svg" className="down" />
-          </button>
-          <h2>
-            {months[calendarState.startDate.getMonth()]},{" "}
-            {calendarState.startDate.getFullYear()}
-          </h2>
-          <button onClick={() => onMonthChange(1)}>
-            <img src="/assets/rightarrow_blue.svg" className="up" />
-          </button>
-        </MonthYearContainer>
-
-        <GridContainer>
-          {Array.from({ length: col }, (_, index) => {
-            return <WeekDayCell key={index}> {days[index]} </WeekDayCell>;
-          })}
-          {Array.from({ length: col * row }, (_, index) => {
-            return (
-              <DateCell
-                key={index}
-                dateObj={calendarState.dates[index]}
-                timetables={monthTT[index]}
-                isSameMonth={
-                  calendarState.dates[index].getMonth() ===
-                  calendarState.startDate.getMonth()
-                }
-              />
-            );
-          })}
-        </GridContainer>
+          <GridContainer>
+            {Array.from({ length: col }, (_, index) => {
+              return <WeekDayCell key={index}> {days[index]} </WeekDayCell>;
+            })}
+            {Array.from({ length: col * row }, (_, index) => {
+              return (
+                <DateCell
+                  key={index}
+                  dateObj={calendarState.dates[index]}
+                  timetables={monthTT[index]}
+                  isSameMonth={
+                    calendarState.dates[index].getMonth() ===
+                    calendarState.startDate.getMonth()
+                  }
+                  getMonthTimeTables={getTimeTables}
+                />
+              );
+            })}
+          </GridContainer>
+        </LeftPart>
+        <TimeLine />
       </CalendarWrapper>
     </CalendarSection>
   );

@@ -4,6 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "../../hooks/useForm";
 import { login } from "../../apis/user";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useAtom } from "jotai";
+import { userDataState } from "../../atoms";
 
 const Body = styled.div`
   background: linear-gradient(to right, #daf0f6, #fff2ce);
@@ -164,7 +166,8 @@ const Login = () => {
   const onClick = async () => {
     try {
       const result = await login(username, password);
-      localStorage.setItem("accessToken", result.accessToken);
+      // 아래 코드가 토큰을 undefined로 만들어버려서 일단 지움
+    //   localStorage.setItem("accessToken", result.accessToken);
       navigate("/");
     } catch (error) {
       setHasError(true);

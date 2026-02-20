@@ -6,30 +6,114 @@ import { TimeTableAPI } from "../../apis/common";
 import TTDataDisplay from "./TTDataDisplay";
 
 const DetailedDateContainer = styled.div`
-  /* display: flex; */
-  height: calc(100% - 40px);
-`;
+  display: flex;
+  width: 35.3rem;
+  height: 43.4rem;
+  * {
+    box-sizing: border-box;
+  }
 
-const Bar = styled.div`
-  background-color: #486284;
-  padding: 0.6rem 0.7rem 0.6rem 0.7rem;
   && h1 {
-    font-family: Pretendard;
-    font-weight: 900;
-    color: #fff;
-    text-align: right;
-    font-size: 1.8rem;
-    margin-top: 0;
-    margin-bottom: 0;
+    font-size: 2.4rem;
+  }
+
+  && h2 {
+    font-size: 1.6rem;
+  }
+
+  && h3 {
+
+    font-size: 0.96rem;
+  }
+
+  && h4 {
+    font-size: 0.96rem;
+  }
+
+  && p {
+    font-size: 0.8rem;
   }
 `;
 
-const ElementsContainer = styled.div`
+const LeftBar = styled.div`
+  background-color: #486284;
+
+  height: 3.11688rem;
+
   display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 0.9rem;
+  h2 {
+    color: #fff;
+  }
 `;
-const DetailedDate = ({ dateObj }) => {
+
+const RightBar = styled.div`
+  background-color: #486284;
+  height: 3.11688rem;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 0.9rem;
+  padding-right: 0.45rem;
+  h2 {
+    color: #fff;
+  }
+`;
+
+const LeftContainer = styled.div`
+  flex: 1;
+`;
+const RightContainer = styled.div`
+  flex: 1;
+  border-left: 1px solid black;
+  display: flex;
+  flex-direction: column;
+`;
+
+const CloseButton = styled.button`
+  background: url("/assets/close_button.svg") no-repeat center;
+  background-size: 1.12rem;
+  box-sizing: content-box;
+  width: 1.12rem;
+  height: 1.12rem;
+  padding: 0.45rem;
+
+  cursor: pointer;
+  border: none;
+  /* border-radius: 0.75rem; */
+
+  &:hover {
+    opacity: 0.9;
+  }
+  &:active {
+    opacity: 0.8;
+  }
+`;
+
+function toLocalISOString(date, type) {
+  const pad = (n) => String(n).padStart(2, "0");
+
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1); // 0부터 시작하니까 +1
+  const day = pad(date.getDate());
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+
+  if (type == 0) return `${year}-${month}-${day}T00:00`;
+  else return `${year}-${month}-${day}T23:59`;
+}
+const DetailedDate = ({ dateObj, getMonthTimeTables, onClose }) => {
   const times = [];
-  const tempDate = new Date(2004, 5, 11, 9, 0, 0);
+  const tempDate = new Date(dateObj);
+  tempDate.setHours(9);
+  tempDate.setMinutes(0);
   for (let i = 0; i < 26; i++) {
     times.push(new Date(tempDate));
     tempDate.setMinutes(tempDate.getMinutes() + 30);
@@ -43,11 +127,16 @@ const DetailedDate = ({ dateObj }) => {
 
   const callApi = async () => {
     try {
-      // 한달간 기간 설정
-      const result = await TimeTableAPI.getTimeTable();
-      const resultdata = result.data;
+      // 하루치
+      if (dateObj) {
+        const from = toLocalISOString(dateObj, 0);
+        const to = toLocalISOString(dateObj, 1);
+        const result = await TimeTableAPI.getTimeTable(from, to);
+        const resultdata = result.data;
 
-      setTimeTables(resultdata);
+        setTimeTables(resultdata);
+        getMonthTimeTables();
+      }
     } catch (error) {
       console.log("getTimeTable error ", error);
     }
@@ -70,31 +159,53 @@ const DetailedDate = ({ dateObj }) => {
   useEffect(() => {
     callApi();
   }, []);
+
+  useEffect(() => {
+    if (dataMode == UPDATE) {
+      setCells((cells) => {
+        const newCells = [...cells];
+        cells.map((cell, i) => {
+          if (cell.tt?.id == selectedTT.id)
+            newCells[i] = { ...newCells[i], isSelected: true };
+        });
+        return newCells;
+      });
+    }
+  }, [dataMode]);
   return (
-    <DetailedDateContainer>
-      <Bar>
-        <h1>
-          {dateObj.getMonth() + 1}/{dateObj.getDate()}
-        </h1>
-      </Bar>
-      <ElementsContainer>
+    <DetailedDateContainer data-testid="DetailedDate">
+      <LeftContainer>
+        <LeftBar>
+          <h2>
+            {dateObj.getMonth() + 1}/{dateObj.getDate()}
+          </h2>
+        </LeftBar>
         <DraggableTable
           times={times}
           timeTables={timeTables}
-          enableChange={dataMode === READ}
+          enableChange={dataMode !== READ}
+          selectedTT={selectedTT}
           setSelectedTT={setSelectedTT}
           cells={cells}
           setCells={setCells}
+          dataMode={dataMode}
         />
-
+      </LeftContainer>
+      <RightContainer>
+        <RightBar>
+          <h2>합주 생성 및 편집</h2>
+          <CloseButton onClick={onClose} />
+        </RightBar>
         <TTDataDisplay
           selectedTT={selectedTT}
+          setSelectedTT={setSelectedTT}
           dataMode={dataMode}
           setDataMode={setDataMode}
           cells={cells}
+          callApi={callApi}
           times={times}
         />
-      </ElementsContainer>
+      </RightContainer>
     </DetailedDateContainer>
   );
 };
