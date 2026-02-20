@@ -41,6 +41,7 @@ public class SecurityConfig {
                     "/swagger-resources/**",
                     "/webjars/**",
                     "/refresh").permitAll()
+                .requestMatchers(HttpMethod.GET, "/calendars", "/timetables", "/boards", "/posts").permitAll()
                 .requestMatchers(HttpMethod.GET).permitAll()
                 .requestMatchers("/schedules/**").hasAnyRole("MANAGER", "ADMIN")
                 .requestMatchers(HttpMethod.POST).hasAnyRole("ADMIN", "MANAGER", "MEMBER")
