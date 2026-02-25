@@ -183,6 +183,12 @@ function toLocalISOString(date) {
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
+// YYYY-MM-DD 형식 (string($date) 타입 API용)
+function toLocalDateString(date) {
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
 // 현재 달의 날짜들을 찾고 올바른 위치를 찾아주는 함수
 const createCalendarData = (startDate) => {
   const dates = [];
@@ -314,8 +320,8 @@ const Calendar = () => {
 
   const getSchedules = async () => {
     try {
-      const from = toLocalISOString(calendarState.dates[0]);
-      const to = toLocalISOString(
+      const from = toLocalDateString(calendarState.dates[0]);
+      const to = toLocalDateString(
         calendarState.dates[calendarState.dates.length - 1]
       );
 

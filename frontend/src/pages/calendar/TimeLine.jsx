@@ -199,8 +199,8 @@ const TimeLine = () => {
   const reloadClubEvents = async () => {
     try {
       const result = await TimeLineAPI.getTimeLine(
-        "2023-01-01T00:00",
-        "2050-01-01T00:00"
+        "2023-01-01",
+        "2050-01-01"
       );
       const events = result?.data?.data ?? [];
       events.sort((a, b) => new Date(a.start) - new Date(b.start));

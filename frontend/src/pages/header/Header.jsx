@@ -6,10 +6,10 @@ import MyPageDropdown from "./MyPageDropdown";
 import { logout } from "../../apis/user";
 
 const HeaderContainer = styled.header`
-  /* position: relative; */
+  position: relative;
   width: 100%;
   height: 85px;
-  overflow: hidden;
+  z-index: 1000;
   animation: ${fadeIn} 2s ease-out forwards;
 `;
 
@@ -23,7 +23,7 @@ const NavBar = styled.nav`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  z-index: 10;
+  overflow: visible;
 
   background-image: url("/assets/backgroundcolor.png");
   background-color: white;
@@ -113,9 +113,6 @@ const Header = () => {
 
             {isLoggedIn ? (
               <>
-                <button onClick={handleLogout} style={{ all: "unset" }}>
-                  Log out
-                </button>{" "}
                 <MyPageDropdown />
                 <LoginButton onClick={handleLogout}>Log out</LoginButton>
               </>

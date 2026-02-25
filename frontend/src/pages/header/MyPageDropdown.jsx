@@ -31,8 +31,8 @@ const DropdownMenu = styled.ul`
   margin: 0;
   list-style: none;
   border: 1px solid #ddd;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2)
-  z-index:999;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
 `;
 
 const MenuItem = styled.li`
