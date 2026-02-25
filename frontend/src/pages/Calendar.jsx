@@ -1,7 +1,9 @@
 import { React, useState, useEffect } from "react";
+import ReactDOM from "react-dom";
 import styled from "styled-components";
 import DateCell from "./calendar/DateCell";
-import { TimeTableAPI } from "../apis/common";
+import DetailedDate from "./calendar/DetailedDate";
+import { TimeTableAPI, ScheduleAPI } from "../apis/common";
 import { createDate } from "../tools/DateTool";
 import TimeLine from "./calendar/TimeLine";
 /* Calendar 섹션의 전체 배경 */
@@ -153,6 +155,22 @@ const MonthYearContainer = styled.div`
   }
 `;
 
+const ModalBackdrop = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ModalContainer = styled.div`
+  background: white;
+  box-shadow: 4px 4px 18px rgba(0, 0, 0, 0.6);
+  overflow: auto;
+`;
+
 function toLocalISOString(date) {
   const pad = (n) => String(n).padStart(2, "0");
 
@@ -244,6 +262,7 @@ const Calendar = () => {
     const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
     return createCalendarData(startDate);
   });
+  const [selectedDateObj, setSelectedDateObj] = useState(null);
 
   const getTimeTables = async () => {
     try {
@@ -254,13 +273,13 @@ const Calendar = () => {
       );
 
       // 응답 딜레이 시 잔상 안남기도록 제거
-      setMonthTT(() => Array.from({ length: 30 }, () => []));
+      setMonthTT(() => Array.from({ length: 42 }, () => []));
       const result = await TimeTableAPI.getTimeTable(from, to);
-      const resultdata = result.data;
+      const timetables = result?.data?.data ?? [];
 
       const newMonthTT = Array.from({ length: 42 }, () => []);
       calendarState.dates.map((date, i) => {
-        resultdata.data.map((timetable) => {
+        timetables.map((timetable) => {
           const start = createDate(timetable.start);
           const end = createDate(timetable.end);
 
@@ -283,11 +302,48 @@ const Calendar = () => {
       setMonthTT(newMonthTT);
     } catch (error) {
       console.log("getTimeTable error ", error);
+      setMonthTT(Array.from({ length: 42 }, () => []));
     }
   };
   const [monthTT, setMonthTT] = useState(() =>
-    Array.from({ length: 30 }, () => [])
+    Array.from({ length: 42 }, () => [])
   );
+  const [monthSchedules, setMonthSchedules] = useState(() =>
+    Array.from({ length: 42 }, () => [])
+  );
+
+  const getSchedules = async () => {
+    try {
+      const from = toLocalISOString(calendarState.dates[0]);
+      const to = toLocalISOString(
+        calendarState.dates[calendarState.dates.length - 1]
+      );
+
+      setMonthSchedules(() => Array.from({ length: 42 }, () => []));
+      const result = await ScheduleAPI.getSchedule(from, to);
+      const schedules = result?.data?.data ?? [];
+
+      const newMonthSchedules = Array.from({ length: 42 }, () => []);
+      calendarState.dates.forEach((date, i) => {
+        schedules.forEach((schedule) => {
+          // schedule.date는 "2023-12-25" 형식
+          const [year, month, day] = schedule.date.split("-").map(Number);
+          if (
+            date.getDate() === day &&
+            date.getMonth() === month - 1 &&
+            date.getFullYear() === year
+          ) {
+            newMonthSchedules[i].push(schedule);
+          }
+        });
+      });
+
+      setMonthSchedules(newMonthSchedules);
+    } catch (error) {
+      console.log("getSchedule error ", error);
+      setMonthSchedules(Array.from({ length: 42 }, () => []));
+    }
+  };
 
   const onMonthChange = (direction) => {
     setCalendarState((prevState) => {
@@ -297,8 +353,18 @@ const Calendar = () => {
     });
   };
 
+  const openDetailedDate = (dateObj) => {
+    setSelectedDateObj(dateObj);
+  };
+
+  const closeDetailedDate = (event) => {
+    if (event && event.target !== event.currentTarget) return;
+    setSelectedDateObj(null);
+  };
+
   useEffect(() => {
     getTimeTables();
+    getSchedules();
   }, [calendarState]);
 
   return (
@@ -329,11 +395,12 @@ const Calendar = () => {
                   key={index}
                   dateObj={calendarState.dates[index]}
                   timetables={monthTT[index]}
+                  schedules={monthSchedules[index]}
                   isSameMonth={
                     calendarState.dates[index].getMonth() ===
                     calendarState.startDate.getMonth()
                   }
-                  getMonthTimeTables={getTimeTables}
+                  onOpenDetailedDate={openDetailedDate}
                 />
               );
             })}
@@ -341,6 +408,19 @@ const Calendar = () => {
         </LeftPart>
         <TimeLine />
       </CalendarWrapper>
+      {selectedDateObj &&
+        ReactDOM.createPortal(
+          <ModalBackdrop onPointerDown={closeDetailedDate}>
+            <ModalContainer onPointerDown={(e) => e.stopPropagation()}>
+              <DetailedDate
+                dateObj={selectedDateObj}
+                getMonthTimeTables={getTimeTables}
+                onClose={() => setSelectedDateObj(null)}
+              />
+            </ModalContainer>
+          </ModalBackdrop>,
+          document.body
+        )}
     </CalendarSection>
   );
 };

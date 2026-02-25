@@ -188,28 +188,26 @@ const TimeLine = () => {
     defaultValues: {},
   });
 
+  const logApiError = (error, label = "API call error") => {
+    console.error(
+      label,
+      error?.response?.status ?? "NO_RESPONSE",
+      error?.response?.data ?? error?.message
+    );
+  };
+
   const reloadClubEvents = async () => {
     try {
       const result = await TimeLineAPI.getTimeLine(
         "2023-01-01T00:00",
         "2050-01-01T00:00"
       );
-      result.data.data.sort((a, b) => new Date(a.start) - new Date(b.start));
-      return result.data;
+      const events = result?.data?.data ?? [];
+      events.sort((a, b) => new Date(a.start) - new Date(b.start));
+      return events;
     } catch (error) {
-      console.error(
-        "API call error",
-        error.response.status,
-        error.response.data
-      );
-      return Array.from({ length: 1 }, () => ({
-        id: 0,
-        title: "개강일",
-        description: "설명",
-        color: "string",
-        start: "2025-10-19T17:37:01.057Z",
-        end: "2025-10-19T17:37:01.057Z",
-      }));
+      logApiError(error);
+      return [];
     }
   };
 
@@ -217,7 +215,7 @@ const TimeLine = () => {
   useEffect(() => {
     const load = async () => {
       const result = await reloadClubEvents();
-      setClubEvents(result.data);
+      setClubEvents(result);
     };
     load();
   }, []);
@@ -248,11 +246,7 @@ const TimeLine = () => {
           color: "000000",
         });
       } catch (error) {
-        console.error(
-          "API call error",
-          error.response.status,
-          error.response.data
-        );
+        logApiError(error);
       }
     } else if (mode == UPDATE) {
       try {
@@ -266,26 +260,18 @@ const TimeLine = () => {
           end: data.end + "T23:59",
         });
       } catch (error) {
-        console.error(
-          "API call error",
-          error.response.status,
-          error.response.data
-        );
+        logApiError(error);
       }
     } else if (mode == DELETE) {
       try {
         await TimeLineAPI.deleteTimeLine(clubEvents[selectedRow].id);
       } catch (error) {
-        console.error(
-          "API call error",
-          error.response.status,
-          error.response.data
-        );
+        logApiError(error);
       }
     }
 
     const t = await reloadClubEvents();
-    setClubEvents(t.data);
+    setClubEvents(t);
     setMode(READ);
   };
   return (

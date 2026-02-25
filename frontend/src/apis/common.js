@@ -1,4 +1,4 @@
-const baseURL = import.meta.env.VITE_API_URL;
+const baseURL = import.meta.env.VITE_API_URL ?? "";
 
 import axios from "axios";
 import { getAuthAxios } from "./authAxios";
@@ -58,6 +58,15 @@ export const TimeTableAPI = {
       color,
       start,
       end,
+    });
+    return result;
+  },
+};
+
+export const ScheduleAPI = {
+  getSchedule: async (from, to) => {
+    const result = await axios.get(`${baseURL}/api/schedules`, {
+      withCredentials: true,
     });
     return result;
   },

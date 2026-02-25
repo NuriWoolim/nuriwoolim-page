@@ -125,6 +125,7 @@ const DraggableTable = ({
 
   const [TTTCells, setTTTCells] = useState([]);
   const [TTTStyle, setTTTStyle] = useState("");
+  const tableData = Array.isArray(timeTables?.data) ? timeTables.data : [];
 
   const clearCells = () => {
     const newCells = [...cells];
@@ -145,7 +146,7 @@ const DraggableTable = ({
       tt: null,
     }));
 
-    for (let i = 0; i < timeTables.data.length; i++) {
+    for (let i = 0; i < tableData.length; i++) {
       const parseTime = (str) => {
         const [datePart, timePart] = str.split("T");
         const [year, month, day] = datePart.split("-").map(Number);
@@ -153,13 +154,13 @@ const DraggableTable = ({
         return (hour * 60 + minute - 9 * 60) / 30;
       };
 
-      const startidx = parseTime(timeTables.data[i].start);
-      const endidx = parseTime(timeTables.data[i].end);
+      const startidx = parseTime(tableData[i].start);
+      const endidx = parseTime(tableData[i].end);
 
       for (let j = startidx; j < endidx; j++) {
         newSelected[j] = {
           ...newSelected[j],
-          tt: timeTables.data[i],
+          tt: tableData[i],
         };
       }
     }
@@ -335,17 +336,17 @@ const DraggableTable = ({
         {TTTCells.map((cell, index) => (
           <TTTCell key={index}>
             {TTTCells[index] !== null && (
-              <TTTInnerBlock
-                onClick={
-                  dataMode != UPDATE && dataMode != CREATE
-                    ? () => setSelectedTT(TTTCells[index])
-                    : null
-                }
-                $color={"#" + TTTCells[index].color ?? "#000000"}
-                $isTouched={isTouched}
-                $hasBorder={selectedTT?.id == TTTCells[index]?.id}
-                $isTransperent={dataMode == UPDATE}
-              >
+                <TTTInnerBlock
+                  onClick={
+                    dataMode != UPDATE && dataMode != CREATE
+                      ? () => setSelectedTT(TTTCells[index])
+                      : null
+                  }
+                  $color={"#" + (TTTCells[index].color ?? "000000")}
+                  $isTouched={isTouched}
+                  $hasBorder={selectedTT?.id == TTTCells[index]?.id}
+                  $isTransperent={dataMode == UPDATE}
+                >
                 <div>
                   <h3>
                     {TTTCells[index] === null ? null : TTTCells[index].title}

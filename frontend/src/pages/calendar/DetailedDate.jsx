@@ -132,13 +132,18 @@ const DetailedDate = ({ dateObj, getMonthTimeTables, onClose }) => {
         const from = toLocalISOString(dateObj, 0);
         const to = toLocalISOString(dateObj, 1);
         const result = await TimeTableAPI.getTimeTable(from, to);
-        const resultdata = result.data;
-
-        setTimeTables(resultdata);
-        getMonthTimeTables();
+        const resultData = result?.data ?? {};
+        const data = Array.isArray(resultData.data) ? resultData.data : [];
+        setTimeTables({
+          from: resultData.from ?? from,
+          to: resultData.to ?? to,
+          data,
+        });
+        if (typeof getMonthTimeTables === "function") getMonthTimeTables();
       }
     } catch (error) {
       console.log("getTimeTable error ", error);
+      setTimeTables((prev) => ({ ...prev, data: [] }));
     }
   };
 

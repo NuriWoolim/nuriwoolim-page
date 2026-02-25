@@ -4,8 +4,8 @@ import { getNewRefreshToken } from "./user";
 export const getAuthAxios = () => {
   // Generate instance
   const authAxios = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
-    withCredentials: false, // 일반 API 요청에는 RefreshToken 쿠키를 포함시키지 않을 것
+    baseURL: import.meta.env.VITE_API_URL ?? "",
+    withCredentials: true,
   });
 
   // 요청 직전에 accessToken을 매번 최신으로 자동으로 붙이기
@@ -13,7 +13,7 @@ export const getAuthAxios = () => {
     const token = localStorage.getItem("accessToken");
 
     // 이때 /api/auth는 비인증 구간이므로 토큰 금지.
-    if (token && !config.url.startsWith("/api/auth")) {
+    if (token && config.url && !config.url.startsWith("/api/auth")) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -35,6 +35,7 @@ export const getAuthAxios = () => {
       //   return (await axios.get(error.config.url, error.config)).data;
       //에러가 발생한 요청의 url을 그대로 가져와서 사용하고, 필요한 데이터들은
       //error.config 객체 내에 담겨있기 때문에 그대로 다시 가져와서 get 요청
+      return Promise.reject(error);
     }
   );
   return authAxios;

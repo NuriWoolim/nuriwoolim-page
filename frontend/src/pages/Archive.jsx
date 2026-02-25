@@ -69,7 +69,7 @@ const Arrow = styled.button`
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  ${(props) => (props.right ? "right: 30px" : "left: 30px")};
+  ${(props) => (props.$right ? "right: 30px" : "left: 30px")};
 
   background: none;
   border: none;
@@ -107,7 +107,7 @@ const Archive = () => {
           <Arrow onClick={prev}>
             <img src="/assets/leftarrow.png" alt="왼쪽화살표" />
           </Arrow>
-          <Arrow right onClick={next}>
+          <Arrow $right onClick={next}>
             <img src="/assets/rightarrow.png" alt="오른쪽화살표" />
           </Arrow>
         </ImageContainer>

@@ -2,14 +2,31 @@ import axios from "axios";
 import { getAuthAxios } from "./authAxios";
 import { store, userDataState } from "../atoms";
 import { RESET } from "jotai/utils";
-const baseURL = import.meta.env.VITE_API_URL;
+const baseURL = import.meta.env.VITE_API_URL ?? "";
 
-export const signup = async (username, email, password, nickname) => {
+export const signup = async (username, email, password, code) => {
   const result = await axios.post(`${baseURL}/api/auth/signup`, {
     username,
     email,
     password,
-    nickname,
+    code,
+  });
+  return result;
+};
+
+export const sendVerification = async (email) => {
+  const result = await axios.post(`${baseURL}/api/auth/send-verification`, {
+    email,
+    type: "SIGNUP",
+  });
+  return result;
+};
+
+export const verifyEmail = async (email, code) => {
+  const result = await axios.post(`${baseURL}/api/auth/verify-email`, {
+    email,
+    code,
+    type: "SIGNUP",
   });
   return result;
 };
@@ -26,7 +43,9 @@ export const login = async (email, password) => {
     }
   );
 
-  const accessToken = result.headers["authorization"]?.split("Bearer ")[1]; // 응답 형식 : Authorization: Bearer abc.def.jhi
+  const authHeader =
+    result.headers?.authorization ?? result.headers?.Authorization ?? "";
+  const accessToken = authHeader.split("Bearer ")[1]; // 응답 형식 : Authorization: Bearer abc.def.jhi
   if (accessToken) localStorage.setItem("accessToken", accessToken);
   store.set(userDataState, result.data);
   return result.data;
