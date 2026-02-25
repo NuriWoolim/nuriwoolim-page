@@ -1,365 +1,222 @@
-import { React, useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import styled from "styled-components";
 import _ from "lodash";
-import { TTColors } from "../../data/CalendarData";
 import { lighten } from "polished";
-import { CREATE, UPDATE } from "./DetailedDate";
 
-const GridContainer = styled.div`
+const SLOT_COUNT = 13; // 9..21 = 13 hourly rows
+const HOUR_START = 9;
+
+const Grid = styled.div`
   display: grid;
-  grid-template-rows: repeat(${(props) => props.$length}, 1.55rem);
-  /* grid-template-columns: 20rem; */
-  /* border: solid 1px black; */
-  /* overflow: hidden; */
-`;
-
-const TableCell = styled.div`
-  /* box-sizing: border-box; */
-  cursor: pointer;
-
-  overflow: hidden;
-  text-overflow: clip;
-  border-bottom: ${(props) => props.$border};
-  padding: 0.2rem 0.4rem;
-
-  background-color: ${(props) => props.$color};
-
+  grid-template-rows: repeat(${SLOT_COUNT}, 1fr);
+  flex: 1;
   user-select: none;
-
-  h3 {
-    color: #486284;
-    margin-top: 0;
-    margin-bottom: 0;
-  }
+  -webkit-user-select: none;
 `;
 
-const TTTitleContainer = styled.div`
-  position: absolute;
-  top: 0;
-  display: grid;
-  width: 100%;
-  height: 100%;
-  /* grid-template-columns: 100%; */
-  /* border: solid 1px black; */
-
-  background: transparent;
-  pointer-events: none;
-`;
-
-const TTTCell = styled.div`
+const Row = styled.div`
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-
-  text-overflow: clip;
-
-  background: transparent;
-  pointer-events: none;
-
-  /* 마지막 요소는 오른쪽 보더 제거 */
-  &:last-child {
-    border-right: none;
-  }
-`;
-
-const TTTInnerBlock = styled.div`
-  /* padding: 10px; */
-  margin-left: 2.5rem;
-  width: 75%;
-  height: 80%;
-  /* height: 100%; */
-  /* box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.4); */
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-
-  border-radius: 2px;
-  background-color: ${(props) => props.$color};
-
-  border: ${(props) => (props.$hasBorder ? `3px solid #FFF7E2` : "none")};
-  box-shadow: ${(props) =>
-    props.$hasBorder ? `2px 2px 7.781px 1.5px rgba(0, 0, 0, 0.25);` : "none"};
-  opacity: ${(props) =>
-    props.$isTransperent && props.$hasBorder ? "0.5" : "none"};
-  pointer-events: ${(props) =>
-    (props.$isTransperent && props.$hasBorder) || props.$isTouched !== -1
-      ? "none"
-      : "auto"};
-
-  h3 {
-    color: ${(props) => lighten(0.5, props.$color)};
-    white-space: pre;
-  }
-
-  .noselect {
-    user-select: none;
-    -webkit-user-select: none; /* Safari */
-    -moz-user-select: none; /* Firefox */
-    -ms-user-select: none; /* IE10+ */
-  }
-`;
-const Wrapper = styled.div`
+  align-items: center;
+  cursor: pointer;
+  border-bottom: 0.6px solid #d4d8e0;
+  padding: 0 0.55rem;
+  min-height: 2.5rem;
   position: relative;
+
+  background-color: ${(p) => (p.$selected ? "#FFF7E2" : "#fff")};
 `;
 
-const Blocker = styled.div`
+const HourLabel = styled.span`
+  color: #486284;
+  font-size: 0.82rem;
+  font-weight: 700;
+  width: 2.2rem;
+  flex-shrink: 0;
+`;
+
+/* Timetable block overlay */
+const TTBlock = styled.div`
   position: absolute;
+  left: 2.8rem;
+  right: 0.4rem;
   top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: transparent;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: ${(p) => p.$color};
+  border-radius: 3px;
+  pointer-events: none;
+  z-index: 1;
+
+  span {
+    color: ${(p) => {
+      try {
+        return lighten(0.45, p.$color);
+      } catch {
+        return "#fff";
+      }
+    }};
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+  }
 `;
-const DraggableTable = ({
-  times, // 시간들
-  cells,
-  setCells,
-  timeTables, // 해당 일(날짜)의 타임테이블 데이터들
-  selectedTT,
-  setSelectedTT, // 현재 선택된 타임테이블
-  enableChange = false, // 변경 가능 여부
-  dataMode,
-}) => {
-  const [isTouched, setIsTouched] = useState(-1);
 
-  const [TTTCells, setTTTCells] = useState([]);
-  const [TTTStyle, setTTTStyle] = useState("");
-  const tableData = Array.isArray(timeTables?.data) ? timeTables.data : [];
+/* Resize handle */
+const ResizeHandle = styled.div`
+  position: absolute;
+  bottom: -4px;
+  right: 50%;
+  transform: translateX(50%);
+  width: 10px;
+  height: 10px;
+  background: #888;
+  border-radius: 50%;
+  cursor: ns-resize;
+  z-index: 2;
+`;
 
-  const clearCells = () => {
-    const newCells = [...cells];
-    for (let i = 0; i < times.length; i++) {
-      newCells[i] = {
-        ...newCells[i],
-        isSelected: false,
-      };
-    }
-    setCells(newCells);
-  };
-  useEffect(clearCells, [enableChange]);
+const DraggableTable = ({ cells, setCells, timetableData }) => {
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState(-1);
+  const [dragEnd, setDragEnd] = useState(-1);
 
-  // cells를 채워주는 useEffect
-  const initTable = useEffect(() => {
-    const newSelected = [...cells].map((cell) => ({
-      ...cell,
-      tt: null,
-    }));
-
-    for (let i = 0; i < tableData.length; i++) {
-      const parseTime = (str) => {
-        const [datePart, timePart] = str.split("T");
-        const [year, month, day] = datePart.split("-").map(Number);
-        const [hour, minute] = timePart.split(":").map(Number);
-        return (hour * 60 + minute - 9 * 60) / 30;
-      };
-
-      const startidx = parseTime(tableData[i].start);
-      const endidx = parseTime(tableData[i].end);
-
-      for (let j = startidx; j < endidx; j++) {
-        newSelected[j] = {
-          ...newSelected[j],
-          tt: tableData[i],
+  /* ── Compute occupied slots from existing timetables ── */
+  const occupied = new Set();
+  const ttBlockMap = {}; // startIndex -> tt data
+  if (Array.isArray(timetableData)) {
+    timetableData.forEach((tt) => {
+      const sHour = parseInt(tt.start.split("T")[1].split(":")[0]);
+      const eHour = parseInt(tt.end.split("T")[1].split(":")[0]);
+      for (let h = sHour; h < eHour; h++) {
+        const idx = h - HOUR_START;
+        if (idx >= 0 && idx < SLOT_COUNT) occupied.add(idx);
+      }
+      const startIdx = sHour - HOUR_START;
+      if (startIdx >= 0 && startIdx < SLOT_COUNT) {
+        ttBlockMap[startIdx] = {
+          ...tt,
+          span: eHour - sHour,
         };
       }
-    }
-    setCells(newSelected);
-  }, [timeTables]);
-
-  // 테이블 위에 표시되는 팀 이름을 표시해주는 useEffect
-  useEffect(() => {
-    if (isTouched !== -1) return;
-    let prev = null;
-    let cnt = 0;
-    let cssstr = "";
-    let cellData = [];
-
-    for (let i = 0; i < times.length; i++) {
-      if (i === 0 || cells[i].tt === prev) cnt++;
-      else {
-        cssstr += String(cnt * 1.55) + "rem ";
-
-        if (prev === null) cellData.push(null);
-        else cellData.push({ ...prev });
-        cnt = 1;
-      }
-      prev = cells[i].tt;
-    }
-    if (prev === null) cellData.push(null);
-    else cellData.push({ ...prev });
-    cssstr += String(cnt * 1.55) + "rem ";
-    setTTTStyle(cssstr);
-    setTTTCells(cellData);
-  }, [cells, isTouched]);
-
-  const handleTouchStart = useCallback((e) => {
-    // if (isTouched != -1) return;
-
-    const { clientX, clientY } = e;
-    const target =
-      document
-        .elementsFromPoint(clientX, clientY)
-        .find((el) => el.matches("[datakey], [data-key]")) || null;
-
-    if (target?.getAttribute("data-key") == null) return;
-    const col = +target.getAttribute("data-key");
-
-    setCells((prevSelected) => {
-      const newSelected = [...prevSelected];
-
-      // 처음 눌렀을 때 초기화 하는 동작을 없애려면 아래 블록 주석처리.
-      for (let i = 0; i < times.length; i++) {
-        newSelected[i] = {
-          ...newSelected[i],
-          isSelected: false,
-        };
-      }
-      //
-      newSelected[col] = {
-        ...newSelected[col],
-        isSelected: !newSelected[col].isSelected,
-      };
-      return newSelected;
     });
-    setIsTouched(col);
-    // console.log("start");
-  }, []);
+  }
 
-  const handleTouchEnd = useCallback(() => {
-    // console.log("end");
+  /* ── Pointer events for drag select ── */
+  const getSlotFromEvent = (e) => {
+    const { clientX, clientY } = e;
+    const els = document.elementsFromPoint(clientX, clientY);
+    const slot = els.find((el) => el.dataset.slot != null);
+    return slot ? parseInt(slot.dataset.slot) : -1;
+  };
 
-    setIsTouched(-1);
-  }, []);
+  const handlePointerDown = useCallback(
+    (e) => {
+      const slotIdx = parseInt(e.currentTarget.dataset.slot);
+      if (occupied.has(slotIdx)) return;
+      setIsDragging(true);
+      setDragStart(slotIdx);
+      setDragEnd(slotIdx);
 
-  const handleTouchMove = useCallback(
-    _.throttle((e) => {
-      if (isTouched === -1) return;
-
-      const { clientX, clientY } = e;
-      const target =
-        document
-          .elementsFromPoint(clientX, clientY)
-          .find((el) => el.matches("[datakey], [data-key]")) || null;
-
-      if (target.getAttribute("data-key") == null) return;
-      const cur_col = +target.getAttribute("data-key");
-
-      const st_col = isTouched;
-
-      let add_dates = true;
-      if (cells[st_col].isSelected === false) add_dates = false;
-
-      //   console.log(st_col, cur_col);
-      //////////
-
-      const minCol = Math.min(st_col, cur_col);
-      const maxCol = Math.max(st_col, cur_col);
-
-      const newSelected = cells.map((cell, idx) => {
-        const inRange = idx >= minCol && idx <= maxCol;
-
-        if (cell.isSelected == add_dates || idx == st_col) return cell;
-        if (!inRange) return cell;
-        return { ...cell, isSelected: add_dates };
-      });
-
-      // console.log(cells, newSelected);
-      let changed = false;
-      cells.forEach((cell, idx) => {
-        if (newSelected[idx].isSelected !== cell.isSelected) {
-          changed = true;
-          //   console.log("diff at", idx);
-        }
-      });
-      //   if (st_col == cur_col) console.log(changed);
-      if (changed || st_col == cur_col) {
-        setCells(newSelected);
-      }
-
-      //   console.log(newSelected);
-    }, 50),
-    [isTouched]
+      // clear previous and select this one
+      setCells((prev) =>
+        prev.map((c, i) => ({
+          ...c,
+          isSelected: i === slotIdx,
+        }))
+      );
+    },
+    [occupied]
   );
+
+  const handlePointerMove = useCallback(
+    _.throttle((e) => {
+      if (!isDragging) return;
+      const slotIdx = getSlotFromEvent(e);
+      if (slotIdx === -1) return;
+      setDragEnd(slotIdx);
+
+      const minI = Math.min(dragStart, slotIdx);
+      const maxI = Math.max(dragStart, slotIdx);
+
+      setCells((prev) =>
+        prev.map((c, i) => ({
+          ...c,
+          isSelected: i >= minI && i <= maxI && !occupied.has(i),
+        }))
+      );
+    }, 50),
+    [isDragging, dragStart, occupied]
+  );
+
+  const handlePointerUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
   useEffect(() => {
-    const preventScroll = (event) => event.preventDefault();
-
-    if (isTouched !== -1) {
-      document.addEventListener("touchmove", preventScroll, { passive: false });
-      document.addEventListener("pointermove", handleTouchMove);
-      //   document.addEventListener("mousemove", handleTouchMove);
-      //   document.addEventListener("pointerup", handleTouchEnd);
-    } else {
-      document.removeEventListener("touchmove", preventScroll);
-      document.removeEventListener("pointermove", handleTouchMove);
-      //   document.removeEventListener("mousemove", handleTouchMove);
-      //   document.removeEventListener("pointerup", handleTouchEnd);
+    if (isDragging) {
+      const moveFn = (e) => handlePointerMove(e);
+      const upFn = () => handlePointerUp();
+      document.addEventListener("pointermove", moveFn);
+      document.addEventListener("pointerup", upFn);
+      return () => {
+        document.removeEventListener("pointermove", moveFn);
+        document.removeEventListener("pointerup", upFn);
+      };
     }
+  }, [isDragging, handlePointerMove, handlePointerUp]);
 
-    return () => {
-      document.removeEventListener("touchmove", preventScroll);
-      document.removeEventListener("pointermove", handleTouchMove);
-      //   document.removeEventListener("mousemove", handleTouchMove);
-      //   document.removeEventListener("pointerup", handleTouchEnd);
-    };
-  }, [isTouched]);
+  /* ── Build TT block rendering info ── */
+  // Instead of absolute positioned multi-row, render per-row
+  const getTTForSlot = (idx) => {
+    // Find any timetable that covers this slot
+    if (!Array.isArray(timetableData)) return null;
+    for (const tt of timetableData) {
+      const sHour = parseInt(tt.start.split("T")[1].split(":")[0]);
+      const eHour = parseInt(tt.end.split("T")[1].split(":")[0]);
+      const startIdx = sHour - HOUR_START;
+      const endIdx = eHour - HOUR_START;
+      if (idx >= startIdx && idx < endIdx) {
+        return { tt, isFirst: idx === startIdx, isLast: idx === endIdx - 1 };
+      }
+    }
+    return null;
+  };
+
   return (
-    <Wrapper>
-      <GridContainer
-        onPointerDown={enableChange ? handleTouchStart : undefined}
-        onPointerUp={enableChange ? handleTouchEnd : undefined}
-        $length={times.length}
-      >
-        {times.map((time, index) => (
-          <TableCell
-            key={index}
-            data-key={index}
-            $border={index % 2 === 1 ? "solid 0.6px #acbeff" : "none"}
-            $color={cells[index]?.isSelected === false ? "white" : "#FFF7E2;"}
-          >
-            <h3>
-              {index % 2 === 0 && String(time.getHours()).padStart(2, "0")}
-            </h3>
-          </TableCell>
-        ))}
-      </GridContainer>
+    <Grid>
+      {Array.from({ length: SLOT_COUNT }, (_, i) => {
+        const hour = HOUR_START + i;
+        const ttInfo = getTTForSlot(i);
 
-      {enableChange === false && (
-        <Blocker onClick={() => setSelectedTT(null)} />
-      )}
-      <TTTitleContainer
-        id="TTTitleContainer"
-        style={{
-          gridTemplateRows: TTTStyle,
-        }}
-      >
-        {TTTCells.map((cell, index) => (
-          <TTTCell key={index}>
-            {TTTCells[index] !== null && (
-                <TTTInnerBlock
-                  onClick={
-                    dataMode != UPDATE && dataMode != CREATE
-                      ? () => setSelectedTT(TTTCells[index])
-                      : null
-                  }
-                  $color={"#" + (TTTCells[index].color ?? "000000")}
-                  $isTouched={isTouched}
-                  $hasBorder={selectedTT?.id == TTTCells[index]?.id}
-                  $isTransperent={dataMode == UPDATE}
-                >
-                <div>
-                  <h3>
-                    {TTTCells[index] === null ? null : TTTCells[index].title}
-                    {"  -  "}
-                    {TTTCells[index] === null ? null : TTTCells[index].team}
-                  </h3>
-                </div>
-              </TTTInnerBlock>
+        return (
+          <Row
+            key={i}
+            data-slot={i}
+            $selected={cells[i]?.isSelected}
+            onPointerDown={handlePointerDown}
+          >
+            <HourLabel>{hour}</HourLabel>
+            {ttInfo && (
+              <TTBlock $color={`#${ttInfo.tt.color || "486284"}`}>
+                {ttInfo.isFirst && (
+                  <span>
+                    {ttInfo.tt.team} {ttInfo.tt.title}
+                  </span>
+                )}
+              </TTBlock>
             )}
-          </TTTCell>
-        ))}
-      </TTTitleContainer>
-    </Wrapper>
+            {ttInfo?.isLast && (
+              <ResizeHandle style={{ pointerEvents: "none" }} />
+            )}
+          </Row>
+        );
+      })}
+    </Grid>
   );
 };
+
 export default DraggableTable;

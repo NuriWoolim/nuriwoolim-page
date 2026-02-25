@@ -1,222 +1,366 @@
-import React, { useState, useEffect, useCallback } from "react";
-import styled, { css } from "styled-components";
-
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
 import DraggableTable from "./DraggableTable";
 import { TimeTableAPI } from "../../apis/common";
-import TTDataDisplay from "./TTDataDisplay";
+import { TTColors } from "../../data/CalendarData";
+import CustomColorPicker from "./CustomColorPicker";
 
-const DetailedDateContainer = styled.div`
+const SLOT_COUNT = 13; // 13 hourly slots: 9-10, 10-11, ..., 21-22
+
+/* ── Layout ── */
+const Container = styled.div`
   display: flex;
-  width: 35.3rem;
-  height: 43.4rem;
+  width: 36rem;
   * {
     box-sizing: border-box;
-  }
-
-  && h1 {
-    font-size: 2.4rem;
-  }
-
-  && h2 {
-    font-size: 1.6rem;
-  }
-
-  && h3 {
-
-    font-size: 0.96rem;
-  }
-
-  && h4 {
-    font-size: 0.96rem;
-  }
-
-  && p {
-    font-size: 0.8rem;
+    font-family: "Pretendard", sans-serif;
   }
 `;
 
-const LeftBar = styled.div`
-  background-color: #486284;
-
-  height: 3.11688rem;
-
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-
-  padding: 0.9rem;
-  h2 {
-    color: #fff;
-  }
-`;
-
-const RightBar = styled.div`
-  background-color: #486284;
-  height: 3.11688rem;
-
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-
-  padding: 0.9rem;
-  padding-right: 0.45rem;
-  h2 {
-    color: #fff;
-  }
-`;
-
-const LeftContainer = styled.div`
-  flex: 1;
-`;
-const RightContainer = styled.div`
-  flex: 1;
-  border-left: 1px solid black;
+const LeftPanel = styled.div`
+  flex: 2;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+`;
+
+const RightPanel = styled.div`
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid #333;
+  min-width: 0;
+`;
+
+/* ── Header Bars ── */
+const HeaderBar = styled.div`
+  background-color: #486284;
+  height: 3.1rem;
+  display: flex;
+  align-items: center;
+  padding: 0 0.9rem;
+  flex-shrink: 0;
+`;
+
+const LeftHeader = styled(HeaderBar)`
+  justify-content: space-between;
+`;
+
+const RightHeader = styled(HeaderBar)`
+  justify-content: center;
+  padding: 0 0.6rem;
+`;
+
+const HeaderTitle = styled.h2`
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -0.02em;
 `;
 
 const CloseButton = styled.button`
   background: url("/assets/close_button.svg") no-repeat center;
-  background-size: 1.12rem;
+  background-size: 1.1rem;
   box-sizing: content-box;
   width: 1.12rem;
   height: 1.12rem;
   padding: 0.45rem;
-
-  cursor: pointer;
   border: none;
-  /* border-radius: 0.75rem; */
-
+  cursor: pointer;
   &:hover {
-    opacity: 0.9;
+    opacity: 0.8;
   }
   &:active {
+    opacity: 0.7;
+  }
+`;
+
+/* ── Right Panel Form ── */
+const FormContainer = styled.div`
+  flex: 1;
+  background: #fff7e2;
+  display: flex;
+  flex-direction: column;
+  padding: 1.8rem 1.3rem 1.5rem;
+  overflow-y: auto;
+`;
+
+const SectionTitle = styled.h3`
+  color: #486284;
+  font-size: 0.96rem;
+  font-weight: 800;
+  margin: 0 0 0.35rem 0;
+  letter-spacing: -0.02em;
+  text-align: ${(p) => (p.$center ? "center" : "left")};
+`;
+
+const GuideText = styled.p`
+  color: #486284;
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.55;
+  margin: 0 0 1.5rem 0;
+`;
+
+const FieldGroup = styled.div`
+  margin-bottom: 1.2rem;
+`;
+
+const TextInput = styled.input`
+  width: 100%;
+  border: none;
+  box-shadow: 1px 1px 4.1px 0 rgba(72, 98, 132, 0.2) inset;
+  height: 2.3rem;
+  padding: 0 0.6rem;
+  font-size: 0.85rem;
+  font-family: "Pretendard", sans-serif;
+  background: #fff;
+  outline: none;
+  margin-top: 0.3rem;
+`;
+
+const BottomArea = styled.div`
+  margin-top: auto;
+`;
+
+const SubmitBtn = styled.button`
+  width: 100%;
+  padding: 0.75rem 0;
+  background: ${(p) => (p.disabled ? "#999" : "#486284")};
+  border: none;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: "Pretendard", sans-serif;
+  cursor: ${(p) => (p.disabled ? "not-allowed" : "pointer")};
+  box-shadow: 1.4px 1.4px 4.2px 0 rgba(0, 0, 0, 0.15) inset;
+  letter-spacing: -0.02em;
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+  &:active:not(:disabled) {
     opacity: 0.8;
   }
 `;
 
-function toLocalISOString(date, type) {
-  const pad = (n) => String(n).padStart(2, "0");
+const LoginHint = styled.p`
+  color: #863d3d;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-align: right;
+  margin: 0.35rem 0 0 0;
+`;
 
-  const year = date.getFullYear();
-  const month = pad(date.getMonth() + 1); // 0부터 시작하니까 +1
-  const day = pad(date.getDate());
-  const hours = pad(date.getHours());
-  const minutes = pad(date.getMinutes());
+const ErrorMsg = styled.p`
+  color: #c0392b;
+  font-size: 0.75rem;
+  text-align: center;
+  margin: 0 0 0.5rem 0;
+`;
 
-  if (type == 0) return `${year}-${month}-${day}T00:00`;
-  else return `${year}-${month}-${day}T23:59`;
+/* ── Helpers ── */
+function padTwo(n) {
+  return String(n).padStart(2, "0");
 }
+
+/* ── Component ── */
 const DetailedDate = ({ dateObj, getMonthTimeTables, onClose }) => {
-  const times = [];
-  const tempDate = new Date(dateObj);
-  tempDate.setHours(9);
-  tempDate.setMinutes(0);
-  for (let i = 0; i < 26; i++) {
-    times.push(new Date(tempDate));
-    tempDate.setMinutes(tempDate.getMinutes() + 30);
-  }
+  const isLogged = localStorage.getItem("accessToken") !== null;
 
-  const [timeTables, setTimeTables] = useState({
-    from: "2023-12-25T16:00",
-    to: "2023-12-25T16:00",
-    data: [],
-  });
+  // 13 hourly slots
+  const [cells, setCells] = useState(
+    Array.from({ length: SLOT_COUNT }, () => ({ isSelected: false }))
+  );
 
-  const callApi = async () => {
+  const [timetableData, setTimetableData] = useState([]);
+  const [teamName, setTeamName] = useState("");
+  const [songName, setSongName] = useState("");
+  const [selectedColor, setSelectedColor] = useState(TTColors[0][0]);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  /* ── Fetch existing timetables for this date ── */
+  const fetchTimetables = async () => {
     try {
-      // 하루치
-      if (dateObj) {
-        const from = toLocalISOString(dateObj, 0);
-        const to = toLocalISOString(dateObj, 1);
-        const result = await TimeTableAPI.getTimeTable(from, to);
-        const resultData = result?.data ?? {};
-        const data = Array.isArray(resultData.data) ? resultData.data : [];
-        setTimeTables({
-          from: resultData.from ?? from,
-          to: resultData.to ?? to,
-          data,
-        });
-        if (typeof getMonthTimeTables === "function") getMonthTimeTables();
-      }
+      const dateStr = `${dateObj.getFullYear()}-${padTwo(dateObj.getMonth() + 1)}-${padTwo(dateObj.getDate())}`;
+      const from = `${dateStr}T00:00`;
+      const to = `${dateStr}T23:59`;
+      const result = await TimeTableAPI.getTimeTable(from, to);
+      const data = result?.data?.data ?? [];
+      setTimetableData(data);
     } catch (error) {
-      console.log("getTimeTable error ", error);
-      setTimeTables((prev) => ({ ...prev, data: [] }));
+      console.log("fetchTimetables error", error);
+      setTimetableData([]);
     }
   };
 
-  // 드래그테이블의 상태
-  const [cells, setCells] = useState(
-    Array.from({ length: times.length }, () => ({
-      isSelected: false,
-      tt: null,
-    }))
-  );
-
-  // 현재 선택된 타임테이블
-  const [selectedTT, setSelectedTT] = useState(null);
-
-  // 현재 상태(읽기, 수정, 생성)
-  const [dataMode, setDataMode] = useState(READ);
-
   useEffect(() => {
-    callApi();
+    fetchTimetables();
   }, []);
 
-  useEffect(() => {
-    if (dataMode == UPDATE) {
-      setCells((cells) => {
-        const newCells = [...cells];
-        cells.map((cell, i) => {
-          if (cell.tt?.id == selectedTT.id)
-            newCells[i] = { ...newCells[i], isSelected: true };
-        });
-        return newCells;
-      });
+  /* ── Get the selected time range from cells ── */
+  const getSelectedRange = () => {
+    let first = -1;
+    let last = -1;
+    let isContiguous = true;
+
+    cells.forEach((cell, i) => {
+      if (cell.isSelected) {
+        if (first === -1) first = i;
+        else if (i > last + 1) isContiguous = false;
+        last = i;
+      }
+    });
+
+    if (first === -1) return null;
+    return {
+      startHour: 9 + first,
+      endHour: 9 + last + 1,
+      count: last - first + 1,
+      isContiguous,
+    };
+  };
+
+  /* ── Validation ── */
+  const validate = () => {
+    const range = getSelectedRange();
+    if (!range) return "시간을 선택해주세요.";
+    if (!range.isContiguous) return "연속된 시간을 선택해주세요.";
+    if (range.endHour <= range.startHour)
+      return "종료 시간이 시작 시간보다 빨라야 합니다.";
+    if (range.count > 2) return "총 시간이 2시간을 초과할 수 없습니다.";
+
+    // Check overlap with existing timetables
+    for (const tt of timetableData) {
+      const ttStart = parseInt(tt.start.split("T")[1].split(":")[0]);
+      const ttEnd = parseInt(tt.end.split("T")[1].split(":")[0]);
+      if (range.startHour < ttEnd && range.endHour > ttStart) {
+        return "선택한 시간이 기존 일정과 겹칩니다.";
+      }
     }
-  }, [dataMode]);
+
+    if (!teamName.trim()) return "팀명을 입력해주세요.";
+    if (!songName.trim()) return "곡 이름을 입력해주세요.";
+
+    return null;
+  };
+
+  /* ── Submit ── */
+  const handleSubmit = async () => {
+    setErrorMsg("");
+    const error = validate();
+    if (error) {
+      alert(error);
+      setErrorMsg(error);
+      return;
+    }
+
+    const range = getSelectedRange();
+    const dateStr = `${dateObj.getFullYear()}-${padTwo(dateObj.getMonth() + 1)}-${padTwo(dateObj.getDate())}`;
+
+    const data = {
+      title: songName.trim(),
+      team: teamName.trim(),
+      description: "",
+      color: selectedColor.replace("#", ""),
+      start: `${dateStr}T${padTwo(range.startHour)}:00`,
+      end: `${dateStr}T${padTwo(range.endHour)}:00`,
+    };
+
+    try {
+      await TimeTableAPI.createTimeTable(data);
+      await fetchTimetables();
+      if (typeof getMonthTimeTables === "function") getMonthTimeTables();
+
+      // Reset form
+      setCells(
+        Array.from({ length: SLOT_COUNT }, () => ({ isSelected: false }))
+      );
+      setTeamName("");
+      setSongName("");
+      setErrorMsg("");
+    } catch (error) {
+      const msg =
+        error.response?.data?.message || "합주 생성 중 오류가 발생했습니다.";
+      alert(msg);
+      setErrorMsg(msg);
+    }
+  };
+
+  /* ── Render ── */
   return (
-    <DetailedDateContainer data-testid="DetailedDate">
-      <LeftContainer>
-        <LeftBar>
-          <h2>
+    <Container data-testid="DetailedDate">
+      <LeftPanel>
+        <LeftHeader>
+          <CloseButton onClick={onClose} />
+          <HeaderTitle>
             {dateObj.getMonth() + 1}/{dateObj.getDate()}
-          </h2>
-        </LeftBar>
+          </HeaderTitle>
+        </LeftHeader>
         <DraggableTable
-          times={times}
-          timeTables={timeTables}
-          enableChange={dataMode !== READ}
-          selectedTT={selectedTT}
-          setSelectedTT={setSelectedTT}
           cells={cells}
           setCells={setCells}
-          dataMode={dataMode}
+          timetableData={timetableData}
         />
-      </LeftContainer>
-      <RightContainer>
-        <RightBar>
-          <h2>합주 생성 및 편집</h2>
-          <CloseButton onClick={onClose} />
-        </RightBar>
-        <TTDataDisplay
-          selectedTT={selectedTT}
-          setSelectedTT={setSelectedTT}
-          dataMode={dataMode}
-          setDataMode={setDataMode}
-          cells={cells}
-          callApi={callApi}
-          times={times}
-        />
-      </RightContainer>
-    </DetailedDateContainer>
+      </LeftPanel>
+
+      <RightPanel>
+        <RightHeader>
+          <HeaderTitle>합주 생성 및 편집하기</HeaderTitle>
+        </RightHeader>
+        <FormContainer>
+          <SectionTitle $center>이용 안내</SectionTitle>
+          <GuideText>
+            좌측 시트에서 원하는 시간 드래그 후,
+            <br />
+            우측 정보란에 해당하는 정보 입력한 뒤
+            <br />
+            하단의 합주 생성하기 버튼을 눌러주시면 됩니다.
+          </GuideText>
+
+          <FieldGroup>
+            <SectionTitle>팀명</SectionTitle>
+            <TextInput
+              value={teamName}
+              onChange={(e) => setTeamName(e.target.value)}
+            />
+          </FieldGroup>
+
+          <FieldGroup>
+            <SectionTitle>곡 이름</SectionTitle>
+            <TextInput
+              value={songName}
+              onChange={(e) => setSongName(e.target.value)}
+            />
+          </FieldGroup>
+
+          <FieldGroup>
+            <SectionTitle>팀 색상</SectionTitle>
+            <CustomColorPicker
+              colors={TTColors.map((x) => x[0])}
+              color={selectedColor}
+              onChange={setSelectedColor}
+            />
+          </FieldGroup>
+
+          <BottomArea>
+            {errorMsg && <ErrorMsg>{errorMsg}</ErrorMsg>}
+            <SubmitBtn onClick={handleSubmit} disabled={!isLogged}>
+              합주 생성하기
+            </SubmitBtn>
+            {!isLogged && <LoginHint>로그인 후 이용하세요!</LoginHint>}
+          </BottomArea>
+        </FormContainer>
+      </RightPanel>
+    </Container>
   );
 };
 
 export default DetailedDate;
 
+// Keep exports for backward compatibility (used by TTDataDisplay)
 export const CREATE = 0;
 export const READ = 1;
 export const UPDATE = 2;
