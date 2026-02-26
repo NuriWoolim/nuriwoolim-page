@@ -227,8 +227,8 @@ const TimeLine = () => {
       reset({
         title,
         description,
-        start: start.split("T")[0], // 날짜 형식 정리
-        end: end.split("T")[0],
+        start: start?.split("T")[0] ?? "", // 날짜 형식 정리
+        end: end?.split("T")[0] ?? "",
       });
     } else reset({});
   }, [selectedRow, clubEvents, reset]);
@@ -281,7 +281,7 @@ const TimeLine = () => {
           <button onClick={() => setIsEditWindowOpen(true)}>일정 추가</button>
         )}
         <Line $height={clubEvents.length * 9.56}>
-          {clubEvents.map((clubEvent, i) => (
+          {clubEvents.filter((e) => e.start).map((clubEvent, i) => (
             <ClubEventContainer key={i}>
               <h2>
                 {clubEvent.start.split("T")[0].split("-")[1]}.
