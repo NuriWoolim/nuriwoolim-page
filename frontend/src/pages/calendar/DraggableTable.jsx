@@ -1,15 +1,17 @@
-import React, { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import styled from "styled-components";
 import _ from "lodash";
 import { lighten } from "polished";
 
 const SLOT_COUNT = 13; // 9..21 = 13 hourly rows
 const HOUR_START = 9;
+const LABEL_WIDTH = "2.75rem"; // hour label area width
 
 const Grid = styled.div`
   display: grid;
   grid-template-rows: repeat(${SLOT_COUNT}, 1fr);
   flex: 1;
+  position: relative;
   user-select: none;
   -webkit-user-select: none;
 `;
@@ -21,8 +23,6 @@ const Row = styled.div`
   border-bottom: 0.6px solid #d4d8e0;
   padding: 0 0.55rem;
   min-height: 2.5rem;
-  position: relative;
-
   background-color: ${(p) => (p.$selected ? "#FFF7E2" : "#fff")};
 `;
 
@@ -34,21 +34,21 @@ const HourLabel = styled.span`
   flex-shrink: 0;
 `;
 
-/* Timetable block overlay */
+/* Timetable block — absolutely positioned */
 const TTBlock = styled.div`
   position: absolute;
-  left: 2.8rem;
-  right: 0.4rem;
-  top: 0;
-  bottom: 0;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   background-color: ${(p) => p.$color};
-  border-radius: 3px;
-  pointer-events: none;
+  cursor: pointer;
+  pointer-events: auto;
   z-index: 1;
+  overflow: visible;
+  box-sizing: border-box;
+  border: ${(p) => (p.$isSelected ? "4px solid #FFD04E" : "none")};
+  box-shadow: ${(p) =>
+    p.$isSelected ? "4px 5px 8px 1px rgba(0, 0, 0, 0.3)" : "none"};
 
   span {
     color: ${(p) => {
@@ -62,31 +62,55 @@ const TTBlock = styled.div`
     font-weight: 700;
     text-align: center;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 0.3rem;
   }
 `;
 
-/* Resize handle */
-const ResizeHandle = styled.div`
+const SelectionDot = styled.div`
   position: absolute;
-  bottom: -4px;
-  right: 50%;
-  transform: translateX(50%);
-  width: 10px;
-  height: 10px;
-  background: #888;
+  width: 12px;
+  height: 12px;
+  background: #FFD04E;
   border-radius: 50%;
-  cursor: ns-resize;
   z-index: 2;
+  pointer-events: none;
 `;
 
-const DraggableTable = ({ cells, setCells, timetableData }) => {
+/* ── Assign columns so overlapping blocks render side-by-side ── */
+function assignColumns(blocks) {
+  // Sort by start time
+  const sorted = [...blocks].sort((a, b) => a.startIdx - b.startIdx);
+  const result = [];
+
+  for (const block of sorted) {
+    const overlapping = result.filter(
+      (b) => b.startIdx < block.endIdx && b.endIdx > block.startIdx
+    );
+    const usedCols = new Set(overlapping.map((b) => b.col));
+    let col = 0;
+    while (usedCols.has(col)) col++;
+    result.push({ ...block, col });
+  }
+
+  // Determine the number of columns needed at each block's time range
+  for (const block of result) {
+    const siblings = result.filter(
+      (b) => b.startIdx < block.endIdx && b.endIdx > block.startIdx
+    );
+    block.maxCols = Math.max(...siblings.map((b) => b.col)) + 1;
+  }
+
+  return result;
+}
+
+const DraggableTable = ({ cells, setCells, timetableData, onSelectTT, selectedTTId }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState(-1);
-  const [dragEnd, setDragEnd] = useState(-1);
 
-  /* ── Compute occupied slots from existing timetables ── */
+  /* ── Compute occupied slots ── */
   const occupied = new Set();
-  const ttBlockMap = {}; // startIndex -> tt data
   if (Array.isArray(timetableData)) {
     timetableData.forEach((tt) => {
       const sHour = parseInt(tt.start.split("T")[1].split(":")[0]);
@@ -94,13 +118,6 @@ const DraggableTable = ({ cells, setCells, timetableData }) => {
       for (let h = sHour; h < eHour; h++) {
         const idx = h - HOUR_START;
         if (idx >= 0 && idx < SLOT_COUNT) occupied.add(idx);
-      }
-      const startIdx = sHour - HOUR_START;
-      if (startIdx >= 0 && startIdx < SLOT_COUNT) {
-        ttBlockMap[startIdx] = {
-          ...tt,
-          span: eHour - sHour,
-        };
       }
     });
   }
@@ -119,14 +136,8 @@ const DraggableTable = ({ cells, setCells, timetableData }) => {
       if (occupied.has(slotIdx)) return;
       setIsDragging(true);
       setDragStart(slotIdx);
-      setDragEnd(slotIdx);
-
-      // clear previous and select this one
       setCells((prev) =>
-        prev.map((c, i) => ({
-          ...c,
-          isSelected: i === slotIdx,
-        }))
+        prev.map((c, i) => ({ ...c, isSelected: i === slotIdx }))
       );
     },
     [occupied]
@@ -137,7 +148,6 @@ const DraggableTable = ({ cells, setCells, timetableData }) => {
       if (!isDragging) return;
       const slotIdx = getSlotFromEvent(e);
       if (slotIdx === -1) return;
-      setDragEnd(slotIdx);
 
       const minI = Math.min(dragStart, slotIdx);
       const maxI = Math.max(dragStart, slotIdx);
@@ -169,29 +179,26 @@ const DraggableTable = ({ cells, setCells, timetableData }) => {
     }
   }, [isDragging, handlePointerMove, handlePointerUp]);
 
-  /* ── Build TT block rendering info ── */
-  // Instead of absolute positioned multi-row, render per-row
-  const getTTForSlot = (idx) => {
-    // Find any timetable that covers this slot
-    if (!Array.isArray(timetableData)) return null;
-    for (const tt of timetableData) {
-      const sHour = parseInt(tt.start.split("T")[1].split(":")[0]);
-      const eHour = parseInt(tt.end.split("T")[1].split(":")[0]);
-      const startIdx = sHour - HOUR_START;
-      const endIdx = eHour - HOUR_START;
-      if (idx >= startIdx && idx < endIdx) {
-        return { tt, isFirst: idx === startIdx, isLast: idx === endIdx - 1 };
-      }
-    }
-    return null;
-  };
+  /* ── Build timetable block layout ── */
+  const rawBlocks = Array.isArray(timetableData)
+    ? timetableData.map((tt) => {
+        const sHour = parseInt(tt.start.split("T")[1].split(":")[0]);
+        const eHour = parseInt(tt.end.split("T")[1].split(":")[0]);
+        return {
+          tt,
+          startIdx: Math.max(sHour - HOUR_START, 0),
+          endIdx: Math.min(eHour - HOUR_START, SLOT_COUNT),
+        };
+      })
+    : [];
+
+  const ttBlocks = assignColumns(rawBlocks);
 
   return (
     <Grid>
+      {/* Time slot rows */}
       {Array.from({ length: SLOT_COUNT }, (_, i) => {
         const hour = HOUR_START + i;
-        const ttInfo = getTTForSlot(i);
-
         return (
           <Row
             key={i}
@@ -200,19 +207,45 @@ const DraggableTable = ({ cells, setCells, timetableData }) => {
             onPointerDown={handlePointerDown}
           >
             <HourLabel>{hour}</HourLabel>
-            {ttInfo && (
-              <TTBlock $color={`#${ttInfo.tt.color || "486284"}`}>
-                {ttInfo.isFirst && (
-                  <span>
-                    {ttInfo.tt.team} {ttInfo.tt.title}
-                  </span>
-                )}
-              </TTBlock>
-            )}
-            {ttInfo?.isLast && (
-              <ResizeHandle style={{ pointerEvents: "none" }} />
-            )}
           </Row>
+        );
+      })}
+
+      {/* Timetable blocks — side-by-side when overlapping, full-width when alone */}
+      {ttBlocks.map(({ tt, startIdx, endIdx, col, maxCols }) => {
+        const topPct = (startIdx / SLOT_COUNT) * 100;
+        const heightPct = ((endIdx - startIdx) / SLOT_COUNT) * 100;
+
+        // Available width = 100% - label area
+        // Divide by maxCols, offset by col
+        const left = `calc(${LABEL_WIDTH} + ${col / maxCols} * (100% - ${LABEL_WIDTH}))`;
+        const width = `calc((100% - ${LABEL_WIDTH}) / ${maxCols})`;
+
+        const isSelected = tt.id === selectedTTId;
+
+        return (
+          <TTBlock
+            key={tt.id}
+            $color={`#${tt.color || "486284"}`}
+            $isSelected={isSelected}
+            style={{ top: `${topPct}%`, height: `${heightPct}%`, left, width }}
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              if (onSelectTT) onSelectTT(tt);
+            }}
+          >
+            <span>
+              {tt.team} {tt.title}
+            </span>
+            {isSelected && (
+              <>
+                {/* top dot — left side, slightly inward */}
+                <SelectionDot style={{ top: -9, left: 8 }} />
+                {/* bottom dot — right side, slightly inward */}
+                <SelectionDot style={{ bottom: -9, right: 8 }} />
+              </>
+            )}
+          </TTBlock>
         );
       })}
     </Grid>

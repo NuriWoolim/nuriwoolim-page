@@ -11,6 +11,7 @@ const SLOT_COUNT = 13; // 13 hourly slots: 9-10, 10-11, ..., 21-22
 const Container = styled.div`
   display: flex;
   width: 36rem;
+  height: 44rem;
   * {
     box-sizing: border-box;
     font-family: "Pretendard", sans-serif;
@@ -18,14 +19,14 @@ const Container = styled.div`
 `;
 
 const LeftPanel = styled.div`
-  flex: 2;
+  flex: 1;
   display: flex;
   flex-direction: column;
   min-width: 0;
 `;
 
 const RightPanel = styled.div`
-  flex: 3;
+  flex: 1;
   display: flex;
   flex-direction: column;
   border-left: 1px solid #333;
@@ -47,14 +48,14 @@ const LeftHeader = styled(HeaderBar)`
 `;
 
 const RightHeader = styled(HeaderBar)`
-  justify-content: center;
+  justify-content: flex-end;
   padding: 0 0.6rem;
 `;
 
 const HeaderTitle = styled.h2`
-  color: #fff;
-  font-size: 1.25rem;
-  font-weight: 800;
+  color: #FFF7E2;
+  font-size: 1.45rem;
+  font-weight: 900;
   margin: 0;
   letter-spacing: -0.02em;
 `;
@@ -65,7 +66,7 @@ const CloseButton = styled.button`
   box-sizing: content-box;
   width: 1.12rem;
   height: 1.12rem;
-  padding: 0.45rem;
+  padding: 0;
   border: none;
   cursor: pointer;
   &:hover {
@@ -100,7 +101,7 @@ const GuideText = styled.p`
   font-size: 0.72rem;
   font-weight: 500;
   text-align: center;
-  line-height: 1.55;
+  line-height: 1.25;
   margin: 0 0 1.5rem 0;
 `;
 
@@ -121,27 +122,66 @@ const TextInput = styled.input`
   margin-top: 0.3rem;
 `;
 
+const HintText = styled.p`
+  color: #c0392b;
+  font-size: 0.68rem;
+  font-weight: 500;
+  text-align: right;
+  margin: 0.25rem 0 0 0;
+`;
+
 const BottomArea = styled.div`
+  margin-top: 1.2rem;
+`;
+
+const DeleteBtnWrapper = styled.div`
   margin-top: auto;
+  padding-top: 0.6rem;
+  display: flex;
+  justify-content: flex-end;
 `;
 
 const SubmitBtn = styled.button`
   width: 100%;
   padding: 0.75rem 0;
-  background: ${(p) => (p.disabled ? "#999" : "#486284")};
+  background: #486284;
   border: none;
   color: #fff;
   font-size: 0.95rem;
   font-weight: 700;
   font-family: "Pretendard", sans-serif;
   cursor: ${(p) => (p.disabled ? "not-allowed" : "pointer")};
-  box-shadow: 1.4px 1.4px 4.2px 0 rgba(0, 0, 0, 0.15) inset;
+  box-shadow: ${(p) =>
+    p.disabled
+      ? "3.12px 3.12px 11.94px 0px #00000033 inset"
+      : "1.4px 1.4px 4.2px 0 rgba(0, 0, 0, 0.15) inset"};
   letter-spacing: -0.02em;
 
   &:hover:not(:disabled) {
     opacity: 0.9;
   }
   &:active:not(:disabled) {
+    opacity: 0.8;
+  }
+`;
+
+const DeleteBtn = styled.button`
+  padding: 0.45rem 1rem;
+  background: #863d3d;
+  border: none;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-family: "Pretendard", sans-serif;
+  cursor: pointer;
+  letter-spacing: -0.02em;
+  float: right;
+  margin-top: 0.6rem;
+
+  &:hover {
+    opacity: 0.9;
+  }
+  &:active {
     opacity: 0.8;
   }
 `;
@@ -170,7 +210,6 @@ function padTwo(n) {
 const DetailedDate = ({ dateObj, getMonthTimeTables, onClose }) => {
   const isLogged = localStorage.getItem("accessToken") !== null;
 
-  // 13 hourly slots
   const [cells, setCells] = useState(
     Array.from({ length: SLOT_COUNT }, () => ({ isSelected: false }))
   );
@@ -180,6 +219,11 @@ const DetailedDate = ({ dateObj, getMonthTimeTables, onClose }) => {
   const [songName, setSongName] = useState("");
   const [selectedColor, setSelectedColor] = useState(TTColors[0][0]);
   const [errorMsg, setErrorMsg] = useState("");
+  const [teamTouched, setTeamTouched] = useState(false);
+  const [songTouched, setSongTouched] = useState(false);
+
+  // Editing state: null = create mode, object = edit mode
+  const [editingTT, setEditingTT] = useState(null);
 
   /* ── Fetch existing timetables for this date ── */
   const fetchTimetables = async () => {
@@ -199,6 +243,39 @@ const DetailedDate = ({ dateObj, getMonthTimeTables, onClose }) => {
   useEffect(() => {
     fetchTimetables();
   }, []);
+
+  /* ── Handle selecting an existing timetable block ── */
+  const handleSelectTT = (tt) => {
+    setEditingTT(tt);
+    setTeamName(tt.team || "");
+    setSongName(tt.title || "");
+    setSelectedColor(`#${tt.color || "486284"}`);
+    setErrorMsg("");
+
+    // Highlight the selected timetable's time range
+    const sHour = parseInt(tt.start.split("T")[1].split(":")[0]);
+    const eHour = parseInt(tt.end.split("T")[1].split(":")[0]);
+    setCells((prev) =>
+      prev.map((c, i) => ({
+        ...c,
+        isSelected: i >= sHour - 9 && i < eHour - 9,
+      }))
+    );
+  };
+
+  /* ── Reset to create mode ── */
+  const resetToCreateMode = () => {
+    setEditingTT(null);
+    setTeamName("");
+    setSongName("");
+    setSelectedColor(TTColors[0][0]);
+    setErrorMsg("");
+    setTeamTouched(false);
+    setSongTouched(false);
+    setCells(
+      Array.from({ length: SLOT_COUNT }, () => ({ isSelected: false }))
+    );
+  };
 
   /* ── Get the selected time range from cells ── */
   const getSelectedRange = () => {
@@ -232,8 +309,9 @@ const DetailedDate = ({ dateObj, getMonthTimeTables, onClose }) => {
       return "종료 시간이 시작 시간보다 빨라야 합니다.";
     if (range.count > 2) return "총 시간이 2시간을 초과할 수 없습니다.";
 
-    // Check overlap with existing timetables
+    // Check overlap with existing timetables (exclude the one being edited)
     for (const tt of timetableData) {
+      if (editingTT && tt.id === editingTT.id) continue;
       const ttStart = parseInt(tt.start.split("T")[1].split(":")[0]);
       const ttEnd = parseInt(tt.end.split("T")[1].split(":")[0]);
       if (range.startHour < ttEnd && range.endHour > ttStart) {
@@ -247,13 +325,16 @@ const DetailedDate = ({ dateObj, getMonthTimeTables, onClose }) => {
     return null;
   };
 
-  /* ── Submit ── */
-  const handleSubmit = async () => {
+  /* ── Submit (Create) ── */
+  const FIELD_ERRORS = new Set(["팀명을 입력해주세요.", "곡 이름을 입력해주세요."]);
+
+  const handleCreate = async () => {
+    setTeamTouched(true);
+    setSongTouched(true);
     setErrorMsg("");
     const error = validate();
     if (error) {
-      alert(error);
-      setErrorMsg(error);
+      if (!FIELD_ERRORS.has(error)) setErrorMsg(error);
       return;
     }
 
@@ -273,18 +354,64 @@ const DetailedDate = ({ dateObj, getMonthTimeTables, onClose }) => {
       await TimeTableAPI.createTimeTable(data);
       await fetchTimetables();
       if (typeof getMonthTimeTables === "function") getMonthTimeTables();
-
-      // Reset form
-      setCells(
-        Array.from({ length: SLOT_COUNT }, () => ({ isSelected: false }))
-      );
-      setTeamName("");
-      setSongName("");
-      setErrorMsg("");
-    } catch (error) {
+      resetToCreateMode();
+    } catch (err) {
       const msg =
-        error.response?.data?.message || "합주 생성 중 오류가 발생했습니다.";
-      alert(msg);
+        err.response?.data?.message || "합주 생성 중 오류가 발생했습니다.";
+      setErrorMsg(msg);
+    }
+  };
+
+  /* ── Update ── */
+  const handleUpdate = async () => {
+    setTeamTouched(true);
+    setSongTouched(true);
+    setErrorMsg("");
+    const error = validate();
+    if (error) {
+      if (!FIELD_ERRORS.has(error)) setErrorMsg(error);
+      return;
+    }
+    if (!window.confirm("정말 변경하시겠습니까?")) return;
+
+    const range = getSelectedRange();
+    const dateStr = `${dateObj.getFullYear()}-${padTwo(dateObj.getMonth() + 1)}-${padTwo(dateObj.getDate())}`;
+
+    const data = {
+      id: editingTT.id,
+      title: songName.trim(),
+      team: teamName.trim(),
+      description: editingTT.description || "",
+      color: selectedColor.replace("#", ""),
+      start: `${dateStr}T${padTwo(range.startHour)}:00`,
+      end: `${dateStr}T${padTwo(range.endHour)}:00`,
+    };
+
+    try {
+      await TimeTableAPI.updateTimeTable(data);
+      await fetchTimetables();
+      if (typeof getMonthTimeTables === "function") getMonthTimeTables();
+      resetToCreateMode();
+    } catch (err) {
+      const msg =
+        err.response?.data?.message || "합주 변경 중 오류가 발생했습니다.";
+      setErrorMsg(msg);
+    }
+  };
+
+  /* ── Delete ── */
+  const handleDelete = async () => {
+    if (!editingTT) return;
+    if (!window.confirm("정말 삭제하시겠습니까?")) return;
+
+    try {
+      await TimeTableAPI.deleteTimeTable(editingTT.id);
+      await fetchTimetables();
+      if (typeof getMonthTimeTables === "function") getMonthTimeTables();
+      resetToCreateMode();
+    } catch (err) {
+      const msg =
+        err.response?.data?.message || "합주 삭제 중 오류가 발생했습니다.";
       setErrorMsg(msg);
     }
   };
@@ -301,14 +428,24 @@ const DetailedDate = ({ dateObj, getMonthTimeTables, onClose }) => {
         </LeftHeader>
         <DraggableTable
           cells={cells}
-          setCells={setCells}
+          setCells={(updater) => {
+            // When user drags on the grid, exit edit mode
+            setEditingTT(null);
+            setTeamName("");
+            setSongName("");
+            setSelectedColor(TTColors[0][0]);
+            setErrorMsg("");
+            setCells(updater);
+          }}
           timetableData={timetableData}
+          onSelectTT={handleSelectTT}
+          selectedTTId={editingTT?.id}
         />
       </LeftPanel>
 
       <RightPanel>
         <RightHeader>
-          <HeaderTitle>합주 생성 및 편집하기</HeaderTitle>
+          <HeaderTitle>합주 생성하기</HeaderTitle>
         </RightHeader>
         <FormContainer>
           <SectionTitle $center>이용 안내</SectionTitle>
@@ -325,7 +462,9 @@ const DetailedDate = ({ dateObj, getMonthTimeTables, onClose }) => {
             <TextInput
               value={teamName}
               onChange={(e) => setTeamName(e.target.value)}
+              onBlur={() => setTeamTouched(true)}
             />
+            <HintText style={{ visibility: teamTouched && !teamName ? "visible" : "hidden" }}>팀명을 입력하세요.</HintText>
           </FieldGroup>
 
           <FieldGroup>
@@ -333,10 +472,12 @@ const DetailedDate = ({ dateObj, getMonthTimeTables, onClose }) => {
             <TextInput
               value={songName}
               onChange={(e) => setSongName(e.target.value)}
+              onBlur={() => setSongTouched(true)}
             />
+            <HintText style={{ visibility: songTouched && !songName ? "visible" : "hidden" }}>곡 이름을 입력하세요.</HintText>
           </FieldGroup>
 
-          <FieldGroup>
+          <FieldGroup style={{ marginTop: "1.2rem" }}>
             <SectionTitle>팀 색상</SectionTitle>
             <CustomColorPicker
               colors={TTColors.map((x) => x[0])}
@@ -347,11 +488,25 @@ const DetailedDate = ({ dateObj, getMonthTimeTables, onClose }) => {
 
           <BottomArea>
             {errorMsg && <ErrorMsg>{errorMsg}</ErrorMsg>}
-            <SubmitBtn onClick={handleSubmit} disabled={!isLogged}>
-              합주 생성하기
-            </SubmitBtn>
+
+            {editingTT ? (
+              <SubmitBtn onClick={handleUpdate} disabled={!isLogged}>
+                합주 변경하기
+              </SubmitBtn>
+            ) : (
+              <SubmitBtn onClick={handleCreate} disabled={!isLogged}>
+                합주 생성하기
+              </SubmitBtn>
+            )}
+
             {!isLogged && <LoginHint>로그인 후 이용하세요!</LoginHint>}
           </BottomArea>
+
+          {isLogged && editingTT && (
+            <DeleteBtnWrapper>
+              <DeleteBtn onClick={handleDelete}>합주 삭제하기</DeleteBtn>
+            </DeleteBtnWrapper>
+          )}
         </FormContainer>
       </RightPanel>
     </Container>

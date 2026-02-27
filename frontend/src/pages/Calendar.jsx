@@ -5,7 +5,6 @@ import DateCell from "./calendar/DateCell";
 import DetailedDate from "./calendar/DetailedDate";
 import { TimeTableAPI, ScheduleAPI } from "../apis/common";
 import { createDate } from "../tools/DateTool";
-import TimeLine from "./calendar/TimeLine";
 /* Calendar 섹션의 전체 배경 */
 const CalendarSection = styled.section`
   h1 {
@@ -168,7 +167,7 @@ const ModalBackdrop = styled.div`
 const ModalContainer = styled.div`
   background: white;
   box-shadow: 4px 4px 18px rgba(0, 0, 0, 0.6);
-  overflow: auto;
+  overflow: hidden;
 `;
 
 function toLocalISOString(date) {
@@ -377,7 +376,7 @@ const Calendar = () => {
     <CalendarSection>
       <h1 className="calendarTitle">CALENDAR</h1>
       <CalendarWrapper>
-        <LeftPart>
+        <LeftPart style={{ alignItems: "center" }}>
           <MonthYearContainer>
             <button onClick={() => onMonthChange(-1)}>
               <img src="/assets/rightarrow_blue.svg" className="down" />
@@ -412,7 +411,6 @@ const Calendar = () => {
             })}
           </GridContainer>
         </LeftPart>
-        <TimeLine />
       </CalendarWrapper>
       {selectedDateObj &&
         ReactDOM.createPortal(

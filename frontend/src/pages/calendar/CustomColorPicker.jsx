@@ -24,15 +24,18 @@ const Circle = styled.div`
 const Row = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-
-  width: 11.5rem;
-  margin: ${(props) => props.$margin};
-  /* align-items: center; */
+  justify-content: center;
+  gap: 0.2rem;
+  width: 100%;
+  margin: 0;
+  transform: translateX(${(p) => (p.$even ? "-0.6rem" : "0.6rem")});
 `;
 const CCPContainer = styled.div`
-  width: 13.106rem;
-  margin: 0.4rem 0.5rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0.4rem 0;
 `;
 const CustomColorPicker = ({ colors, color, onChange }) => {
   const cols = 5;
@@ -44,7 +47,7 @@ const CustomColorPicker = ({ colors, color, onChange }) => {
     <>
       <CCPContainer>
         {Array.from({ length: rows }, (_, i) => (
-          <Row key={i} $margin={i % 2 == 0 ? "0 1rem 0 0" : "0 0 0 1rem"}>
+          <Row key={i} $even={i % 2 === 0}>
             {Array.from({ length: 5 }, (_, j) => (
               <button
                 key={i * 5 + j}

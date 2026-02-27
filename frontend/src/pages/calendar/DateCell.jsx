@@ -44,7 +44,7 @@ const ScheduleItem = styled.div`
 
 /* 타임테이블 태그 (칸 형식) */
 const TimeTableTag = styled.div`
-  width: 130px;
+  width: 100%;
   height: 20px;
   min-width: 0;
   display: flex;
@@ -77,15 +77,14 @@ const TimeTableTag = styled.div`
   .title {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
     flex: 1;
+    min-width: 0;
     padding: 3px 4px;
     font-family: "Pretendard";
     font-size: 12px;
     font-weight: 600;
     line-height: 100%;
     letter-spacing: -0.06em;
-    text-align: left;
     border-radius: 6px;
     background-color: ${(props) => props.$color || "#486284"};
     color: #fff;
@@ -139,10 +138,22 @@ const TimeSpacer = styled.div`
   flex-shrink: 0;
   white-space: nowrap;
 `;
+const ScheduleMoreText = styled.div`
+  font-family: "Pretendard";
+  font-size: 11px;
+  font-weight: 700;
+  color: #222;
+  letter-spacing: -0.05em;
+  padding: 0 0.3rem;
+  line-height: 1.4;
+`;
+
 // 각 항목의 실제 픽셀 높이 (CSS 고정값 기준)
-const SCHEDULE_H = 14;  // 0.85rem ≈ 14px
-const BLOCK_H = 32;     // TimeTableTag 30px + margin-top 2px
-const OVERFLOW_H = 32;  // OverflowText 30px + margin-top 2px
+const SCHEDULE_H = 14;      // 0.85rem ≈ 14px
+const SCHEDULE_MORE_H = 16; // ScheduleMoreText 높이
+const BLOCK_H = 22;         // TimeTableTag height:20px + margin-top:2px
+const OVERFLOW_H = 22;      // 동일 (TimeTableTag 안에 렌더)
+const MAX_SCHEDULES = 2;
 
 const DateCell = ({
   dateObj,
@@ -181,59 +192,39 @@ const DateCell = ({
 
   const allSchedules = schedules || [];
   const allTimetables = timetables || [];
-  const allItems = [
-    ...allSchedules.map((s) => ({ type: "s", item: s })),
-    ...allTimetables.map((t) => ({ type: "t", item: t })),
-  ];
 
-  let visibleScheduleCount = 0;
+  // 일정(schedule): 최대 2개 고정
+  const visibleSchedules = allSchedules.slice(0, MAX_SCHEDULES);
+  const scheduleOverflow = allSchedules.length - visibleSchedules.length;
+
+  // 일정이 차지하는 높이
+  const scheduleUsedH =
+    visibleSchedules.length * SCHEDULE_H +
+    (scheduleOverflow > 0 ? SCHEDULE_MORE_H : 0);
+
+  // 합주(timetable): 남은 높이 기반으로 계산
+  const remainingForTT =
+    availableHeight !== null ? availableHeight - scheduleUsedH : null;
+
   let visibleTimetableCount = 0;
-
-  if (availableHeight !== null) {
-    const totalH = allItems.reduce(
-      (sum, i) => sum + (i.type === "s" ? SCHEDULE_H : BLOCK_H),
-      0
-    );
-
-    if (totalH <= availableHeight) {
-      // 모든 항목이 들어감
-      visibleScheduleCount = allSchedules.length;
-      visibleTimetableCount = allTimetables.length;
-    } else {
-      // 들어갈 수 있는 만큼만 표시, 나머지는 더보기로
-      let used = 0;
-      let count = 0;
-      for (let i = 0; i < allItems.length; i++) {
-        const itemH = allItems[i].type === "s" ? SCHEDULE_H : BLOCK_H;
-        const remaining = allItems.length - i - 1;
-        // 이 항목 이후에도 항목이 있으면 더보기 블록 공간 확보
-        const overflowReserve = remaining > 0 ? OVERFLOW_H : 0;
-        if (used + itemH + overflowReserve <= availableHeight) {
-          used += itemH;
-          count = i + 1;
-        } else {
-          break;
-        }
+  if (remainingForTT !== null) {
+    let used = 0;
+    for (let i = 0; i < allTimetables.length; i++) {
+      const remaining = allTimetables.length - i - 1;
+      const overflowReserve = remaining > 0 ? OVERFLOW_H : 0;
+      if (used + BLOCK_H + overflowReserve <= remainingForTT) {
+        used += BLOCK_H;
+        visibleTimetableCount = i + 1;
+      } else {
+        break;
       }
-      visibleScheduleCount = Math.min(count, allSchedules.length);
-      visibleTimetableCount = Math.max(0, count - allSchedules.length);
     }
   } else {
-    // 측정 전 보수적 기본값
-    visibleScheduleCount = Math.min(allSchedules.length, 2);
-    visibleTimetableCount = Math.min(
-      allTimetables.length,
-      Math.max(0, 2 - visibleScheduleCount)
-    );
+    visibleTimetableCount = Math.min(allTimetables.length, 1);
   }
 
-  const visibleSchedules = allSchedules.slice(0, visibleScheduleCount);
   const visibleTimetables = allTimetables.slice(0, visibleTimetableCount);
-  const overflowCount =
-    allSchedules.length -
-    visibleScheduleCount +
-    allTimetables.length -
-    visibleTimetableCount;
+  const ttOverflowCount = allTimetables.length - visibleTimetableCount;
 
   return (
     <DateCellContainer
@@ -249,15 +240,18 @@ const DateCell = ({
         )}
       </p>
 
-      {/* 스케줄 (일정) 표시 */}
+      {/* 스케줄 (일정) 표시 — 최대 2개 */}
       {visibleSchedules.map((schedule) => (
         <ScheduleItem key={`s-${schedule.id}`}>
           {schedule.title}
         </ScheduleItem>
       ))}
+      {scheduleOverflow > 0 && (
+        <ScheduleMoreText>더보기 +{scheduleOverflow}</ScheduleMoreText>
+      )}
 
-      {/* schedule과 timetable 사이 spacer - timetable을 아래로 밀기 */}
-      {visibleSchedules.length > 0 && visibleTimetables.length > 0 && (
+      {/* schedule과 timetable 사이 spacer */}
+      {visibleTimetables.length > 0 && (
         <div style={{ flex: 1 }} />
       )}
 
@@ -281,10 +275,11 @@ const DateCell = ({
         );
       })}
 
-      {overflowCount > 0 && availableHeight !== null && availableHeight >= OVERFLOW_H && (
+      {/* 합주 더보기 — 기존 다크박스 스타일 유지 */}
+      {ttOverflowCount > 0 && availableHeight !== null && remainingForTT >= OVERFLOW_H && (
         <TimeTableTag $color="transparent" $overflow>
           <TimeSpacer>00-00</TimeSpacer>
-          <OverflowText>더보기 +{overflowCount}</OverflowText>
+          <OverflowText>더보기 +{ttOverflowCount}</OverflowText>
         </TimeTableTag>
       )}
     </DateCellContainer>
