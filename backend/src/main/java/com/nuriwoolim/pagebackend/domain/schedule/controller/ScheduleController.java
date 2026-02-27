@@ -48,7 +48,7 @@ public class ScheduleController {
         return ResponseEntity.ok(scheduleService.findCalendarList(from, to));
     }
 
-    @DeleteMapping("/{calendarId}")
+    @DeleteMapping("/{calendarId}") //TODO: calendarId 변경
     public ResponseEntity<Void> delete(@PathVariable Long calendarId,
         @AuthenticationPrincipal JwtPrincipal principal) {
         scheduleService.deleteCalendarById(calendarId, principal.getId());
