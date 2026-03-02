@@ -45,13 +45,13 @@ public class BoardService {
     }
 
     @Transactional(readOnly = true)
-    public Board getById(Long id){ //service layer에서 쓸 함수 (특히 updateById)
+    public Board getBoardById(Long id){ //service layer에서 쓸 함수 (특히 updateById)
         return boardRepository.findById(id).orElseThrow(ErrorCode.DATA_NOT_FOUND::toException);
     }
 
     @Transactional(readOnly = true)
     public BoardResponse findById(Long id){ //controller에서 쓸 함수
-        return BoardMapper.toBoardResponse(getById(id));
+        return BoardMapper.toBoardResponse(getBoardById(id));
     }
 
     @Transactional
@@ -63,7 +63,7 @@ public class BoardService {
     @Transactional
     public BoardResponse updateById(Long boardId, BoardUpdateRequest request, Long actorId){
         validatePermission(actorId);
-        Board board = getById(boardId);
+        Board board = getBoardById(boardId);
 
         board.update(request);
         return BoardMapper.toBoardResponse(board);

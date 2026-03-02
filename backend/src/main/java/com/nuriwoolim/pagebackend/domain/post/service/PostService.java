@@ -31,13 +31,9 @@ public class PostService {
         User writer = userService.getUserById(actorId);
         Board board  = boardService.getBoardById(boardId);
 
-        validatePermission(actorId, board.getType());
+        validatePostCreatePermission(actorId, board.getType());
 
-        if (postRepository.existsByBoardIdAndTitle(boardId, request.title())){
-            throw ErrorCode.POST_TITLE_CONFLICT.toException();
-        }
-
-        Post post = PostMapper.fromBoardCreateRequest(request, writer, board);
+        Post post = PostMapper.fromPostCreateRequest(request, writer, board);
         Post savedPost = postRepository.save(post);
         return PostMapper.toPostResponse(savedPost);
     }
@@ -50,33 +46,34 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public Post getPostById(Long boardId, Long postId){ //service layer에서 쓸 함수
-        return postRepository.findByIdAndBoardId(postId, boardId).orElseThrow(ErrorCode.DATA_NOT_FOUND::toException);
+    public Post getPostById(Long postId){ //service layer에서 쓸 함수
+        return postRepository.findById(postId).orElseThrow(ErrorCode.DATA_NOT_FOUND::toException);
     }
 
     @Transactional(readOnly = true)
-    public PostResponse getById(Long boardId, Long postId){ //controller에서 쓸 함수
-        return PostMapper.toPostResponse(getPostById(boardId, postId));
+    public PostResponse getById(Long postId){ //controller에서 쓸 함수
+        return PostMapper.toPostResponse(getPostById(postId));
     }
 
     @Transactional
-    public void deleteById(Long boardId, Long postId, Long actorId){
-        Post post = getPostById(boardId, postId);
+    public void deleteById(Long postId, Long actorId){
+        Post post = getPostById(postId);
         validatePostDeletePermission(actorId, post);
         postRepository.delete(post);
     }
 
     @Transactional
-    public PostResponse updateById(Long boardId, Long postId, PostUpdateRequest request, Long actorId){
-        Post post = getPostById(boardId, postId);
+    public PostResponse updateById(Long postId, PostUpdateRequest request, Long actorId){
+        Post post = getPostById(postId);
         validatePostUpdatePermission(actorId, post);
 
         post.update(request);
         return PostMapper.toPostResponse(post);
     }
 
-    private void validatePermission(Long actorId, BoardType boardType) {
-        if (boardType == BoardType.ANNOUNCEMENT && !userService.isAdmin(actorId)) {
+    private void validatePostCreatePermission(Long actorId, BoardType boardType) {
+        if (boardType == BoardType.ANNOUNCEMENT &&
+                !(userService.isAdmin(actorId) || userService.isManager(actorId))) {
             throw ErrorCode.DATA_FORBIDDEN.toException();
         } // 공지는 ADMIN만 작성 가능
     }

@@ -24,14 +24,13 @@ public class PostMapper {
                 .build();
     }
 
-    public static Post fromBoardCreateRequest(PostCreateRequest request, User writer, Board board) {
-        Post.PostBuilder builder = Post.builder()
-                                    .title(request.title())
-                                    .content(request.content())
-                                    .type(request.type())
-                                    .writer(writer)
-                                    .board(board);
-
-        return builder.build();
+    public static Post fromPostCreateRequest(PostCreateRequest request, User writer, Board board) {
+        return Post.builder()
+                .title(request.title())
+                .content(request.content())
+                .type(request.type())
+                .writer(writer)
+                .board(board)
+                .build();
     }
 }
