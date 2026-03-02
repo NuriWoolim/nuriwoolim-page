@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { fadeIn } from "../../style/fadeIn";
 import MyPageDropdown from "./MyPageDropdown";
-import { logout } from "../../apis/user";
+
 
 const HeaderContainer = styled.header`
   position: relative;
@@ -25,8 +25,9 @@ const NavBar = styled.nav`
   justify-content: space-between;
   overflow: visible;
 
-  background-image: url("/assets/backgroundcolor.png");
-  background-color: white;
+  background-image: url("/assets/navigator.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
 `;
 
 const Logo = styled.div`
@@ -84,12 +85,6 @@ const Header = () => {
   const navigate = useNavigate();
   const isLoggedIn = !!localStorage.getItem("accessToken");
 
-  const handleLogout = () => {
-    logout();
-    localStorage.removeItem("accessToken");
-    navigate("/");
-  };
-
   return (
     <>
       <HeaderContainer>
@@ -112,10 +107,7 @@ const Header = () => {
             </NavLinks>
 
             {isLoggedIn ? (
-              <>
-                <MyPageDropdown />
-                <LoginButton onClick={handleLogout}>Log out</LoginButton>
-              </>
+              <MyPageDropdown />
             ) : (
               <LoginButton onClick={() => navigate("/login")}>
                 Log In

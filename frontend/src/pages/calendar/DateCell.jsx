@@ -1,12 +1,15 @@
 import { useRef, useLayoutEffect, useState } from "react";
 import styled from "styled-components";
+import { getColorPair } from "../../data/CalendarData";
 
 const DateCellContainer = styled.div`
   padding: 0.4rem;
   border-right: 1px solid #033148;
   border-bottom: 1px solid #033148;
-  background-color: ${({ $isSameMonth }) =>
-    $isSameMonth ? "#fff" : "#EFE7D1"};
+  background-color: ${({ $isSelected, $isSameMonth }) =>
+    $isSelected ? "rgba(255, 208, 78, 0.08)" : $isSameMonth ? "#fff" : "#EFE7D1"};
+  outline: ${({ $isSelected }) => $isSelected ? "2px solid #FFD04E" : "none"};
+  outline-offset: -2px;
   color: rgba(0, 0, 0, ${({ $isSameMonth }) => ($isSameMonth ? "1" : "0.4")});
   cursor: pointer;
   overflow: hidden;
@@ -20,7 +23,7 @@ const DateCellContainer = styled.div`
 
 /* 스케줄 아이템 (일정 텍스트) */
 const ScheduleItem = styled.div`
-  height: 0.85rem;
+  height: 1rem;
   width: 100%;
   min-width: 0;
   display: flex;
@@ -29,7 +32,7 @@ const ScheduleItem = styled.div`
   padding: 0 0.3rem;
   margin-top: 0;
   font-family: "Pretendard";
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   line-height: 1;
   letter-spacing: -0.06em;
@@ -45,7 +48,7 @@ const ScheduleItem = styled.div`
 /* 타임테이블 태그 (칸 형식) */
 const TimeTableTag = styled.div`
   width: 100%;
-  height: 20px;
+  height: 24px;
   min-width: 0;
   display: flex;
   gap: 3px;
@@ -57,19 +60,19 @@ const TimeTableTag = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 38px;
-    min-width: 38px;
+    width: 44px;
+    min-width: 44px;
     box-sizing: border-box;
     padding: 3px 4px;
     font-family: "Pretendard";
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 600;
     line-height: 100%;
     letter-spacing: -0.06em;
     text-align: center;
     border-radius: 6px;
-    background-color: ${(props) => props.$color || "#486284"};
-    color: #fff;
+    background-color: ${(props) => props.$bgColor || "#E8EEF1"};
+    color: ${(props) => props.$color || "#3D5286"};
     white-space: nowrap;
     flex-shrink: 0;
   }
@@ -81,13 +84,13 @@ const TimeTableTag = styled.div`
     min-width: 0;
     padding: 3px 4px;
     font-family: "Pretendard";
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 600;
     line-height: 100%;
     letter-spacing: -0.06em;
     border-radius: 6px;
-    background-color: ${(props) => props.$color || "#486284"};
-    color: #fff;
+    background-color: ${(props) => props.$bgColor || "#E8EEF1"};
+    color: ${(props) => props.$color || "#3D5286"};
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -110,29 +113,29 @@ const OverflowText = styled.div`
   align-items: center;
   justify-content: flex-start;
   flex: 1;
-  height: 20px;
+  height: 24px;
   box-sizing: border-box;
   padding: 3px 4px;
   border-radius: 6px;
-  background-color: #424242;
+  background-color: #EEEEEE;
   font-family: "Pretendard";
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   line-height: 100%;
   letter-spacing: -0.06em;
-  color: #F5F5F5;
+  color: #424242;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 `;
 /* 더보기를 title 영역에만 맞추기 위한 투명 spacer */
 const TimeSpacer = styled.div`
-  width: 38px;
-  min-width: 38px;
+  width: 44px;
+  min-width: 44px;
   box-sizing: border-box;
   padding: 3px 4px;
   font-family: "Pretendard";
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   visibility: hidden;
   flex-shrink: 0;
@@ -149,10 +152,10 @@ const ScheduleMoreText = styled.div`
 `;
 
 // 각 항목의 실제 픽셀 높이 (CSS 고정값 기준)
-const SCHEDULE_H = 14;      // 0.85rem ≈ 14px
+const SCHEDULE_H = 16;      // 1rem ≈ 16px
 const SCHEDULE_MORE_H = 16; // ScheduleMoreText 높이
-const BLOCK_H = 22;         // TimeTableTag height:20px + margin-top:2px
-const OVERFLOW_H = 22;      // 동일 (TimeTableTag 안에 렌더)
+const BLOCK_H = 26;         // TimeTableTag height:24px + margin-top:2px
+const OVERFLOW_H = 26;      // 동일 (TimeTableTag 안에 렌더)
 const MAX_SCHEDULES = 2;
 
 const DateCell = ({
@@ -160,6 +163,7 @@ const DateCell = ({
   timetables,
   schedules,
   isSameMonth,
+  isSelected,
   onOpenDetailedDate,
 }) => {
   const containerRef = useRef(null);
@@ -231,6 +235,7 @@ const DateCell = ({
       ref={containerRef}
       onClick={openDetailedDate}
       $isSameMonth={isSameMonth}
+      $isSelected={isSelected}
     >
       <p ref={dateLabelRef}>
         {isToday ? (
@@ -257,7 +262,7 @@ const DateCell = ({
 
       {/* 타임테이블 (합주) 표시 - 칸 형식 태그 */}
       {visibleTimetables.map((timetable) => {
-        const color = timetable.color ? `#${timetable.color}` : "#486284";
+        const [color, bgColor] = getColorPair(timetable.color);
         const startHour = timetable.start?.split("T")[1]?.split(":")[0];
         const endHour = timetable.end?.split("T")[1]?.split(":")[0];
         const fmt = (h) => String(parseInt(h)).padStart(2, "0");
@@ -268,7 +273,7 @@ const DateCell = ({
             ? `${fmt(startHour)}`
             : null;
         return (
-          <TimeTableTag key={`t-${timetable.id}`} $color={color}>
+          <TimeTableTag key={`t-${timetable.id}`} $color={color} $bgColor={bgColor}>
             {timeLabel && <div className="time">{timeLabel}</div>}
             <div className="title">{timetable.title}</div>
           </TimeTableTag>

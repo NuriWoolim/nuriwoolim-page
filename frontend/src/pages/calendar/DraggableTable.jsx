@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import styled from "styled-components";
 import _ from "lodash";
-import { lighten } from "polished";
+import { getColorPair } from "../../data/CalendarData";
 
 const SLOT_COUNT = 13; // 9..21 = 13 hourly rows
 const HOUR_START = 9;
@@ -20,7 +20,7 @@ const Row = styled.div`
   display: flex;
   align-items: center;
   cursor: pointer;
-  border-bottom: 0.6px solid #d4d8e0;
+  border-bottom: ${(p) => p.$hideBorder ? "none" : "0.6px solid #d4d8e0"};
   padding: 0 0.55rem;
   min-height: 2.5rem;
   background-color: ${(p) => (p.$selected ? "#FFF7E2" : "#fff")};
@@ -40,24 +40,20 @@ const TTBlock = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: ${(p) => p.$color};
+  --tt-text-color: ${(p) => p.$color};
+  background-color: ${(p) => p.$bgColor};
   cursor: pointer;
   pointer-events: auto;
   z-index: 1;
   overflow: visible;
   box-sizing: border-box;
+  border-radius: 5px;
   border: ${(p) => (p.$isSelected ? "4px solid #FFD04E" : "none")};
   box-shadow: ${(p) =>
     p.$isSelected ? "4px 5px 8px 1px rgba(0, 0, 0, 0.3)" : "none"};
 
   span {
-    color: ${(p) => {
-      try {
-        return lighten(0.45, p.$color);
-      } catch {
-        return "#fff";
-      }
-    }};
+    color: var(--tt-text-color);
     font-size: 0.78rem;
     font-weight: 700;
     text-align: center;
@@ -199,11 +195,12 @@ const DraggableTable = ({ cells, setCells, timetableData, onSelectTT, selectedTT
       {/* Time slot rows */}
       {Array.from({ length: SLOT_COUNT }, (_, i) => {
         const hour = HOUR_START + i;
+        const isSelected = cells[i]?.isSelected;
         return (
           <Row
             key={i}
             data-slot={i}
-            $selected={cells[i]?.isSelected}
+            $selected={isSelected}
             onPointerDown={handlePointerDown}
           >
             <HourLabel>{hour}</HourLabel>
@@ -222,13 +219,15 @@ const DraggableTable = ({ cells, setCells, timetableData, onSelectTT, selectedTT
         const width = `calc((100% - ${LABEL_WIDTH}) / ${maxCols})`;
 
         const isSelected = tt.id === selectedTTId;
+        const [ttColor, ttBgColor] = getColorPair(tt.color);
 
         return (
           <TTBlock
             key={tt.id}
-            $color={`#${tt.color || "486284"}`}
+            $color={ttColor}
+            $bgColor={ttBgColor}
             $isSelected={isSelected}
-            style={{ top: `${topPct}%`, height: `${heightPct}%`, left, width }}
+            style={{ top: `calc(${topPct}% + 7px)`, height: `calc(${heightPct}% - 15px)`, left, width: `calc(${width} - 8px)` }}
             onPointerDown={(e) => {
               e.stopPropagation();
               if (onSelectTT) onSelectTT(tt);

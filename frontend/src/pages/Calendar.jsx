@@ -87,9 +87,9 @@ const LeftPart = styled.div`
 // 전체 테이블
 const GridContainer = styled.div`
   display: grid;
-  width: 63rem;
-  grid-template-columns: repeat(7, 9rem);
-  grid-template-rows: 2.7rem repeat(6, 8.5rem);
+  width: 105rem;
+  grid-template-columns: repeat(7, 15rem);
+  grid-template-rows: 4.5rem repeat(6, 14.2rem);
 
   border-top: 1px solid #033148;
   border-left: 1px solid #033148;
@@ -111,7 +111,7 @@ const WeekDayCell = styled.div`
 // 현재 년월 라벨과 버튼들을 감싸는 컨테이너
 const MonthYearContainer = styled.div`
   display: flex;
-  width: 63rem;
+  width: 105rem;
   align-items: center;
   padding: 1.2rem 0 1.2rem 0;
 
@@ -405,6 +405,7 @@ const Calendar = () => {
                     calendarState.dates[index].getMonth() ===
                     calendarState.startDate.getMonth()
                   }
+                  isSelected={selectedDateObj === calendarState.dates[index]}
                   onOpenDetailedDate={openDetailedDate}
                 />
               );

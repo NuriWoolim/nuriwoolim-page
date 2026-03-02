@@ -16,7 +16,8 @@ const Circle = styled.div`
 
   background-color: ${(props) => props.$color};
   flex-shrink: 0;
-
+  position: relative;
+  z-index: ${(props) => (props.$isSelected ? 1 : 0)};
   transform: ${(props) => (props.$isSelected ? `scale(1.1)` : null)};
   /* padding: 0.2rem; */
 `;

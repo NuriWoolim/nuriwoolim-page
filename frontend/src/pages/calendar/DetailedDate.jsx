@@ -10,8 +10,8 @@ const SLOT_COUNT = 13; // 13 hourly slots: 9-10, 10-11, ..., 21-22
 /* ── Layout ── */
 const Container = styled.div`
   display: flex;
-  width: 36rem;
-  height: 44rem;
+  width: 45rem;
+  height: 55rem;
   * {
     box-sizing: border-box;
     font-family: "Pretendard", sans-serif;
@@ -36,10 +36,10 @@ const RightPanel = styled.div`
 /* ── Header Bars ── */
 const HeaderBar = styled.div`
   background-color: #486284;
-  height: 3.1rem;
+  height: 3.9rem;
   display: flex;
   align-items: center;
-  padding: 0 0.9rem;
+  padding: 0 1.1rem;
   flex-shrink: 0;
 `;
 
@@ -49,12 +49,12 @@ const LeftHeader = styled(HeaderBar)`
 
 const RightHeader = styled(HeaderBar)`
   justify-content: flex-end;
-  padding: 0 0.6rem;
+  padding: 0 0.75rem;
 `;
 
 const HeaderTitle = styled.h2`
   color: #FFF7E2;
-  font-size: 1.45rem;
+  font-size: 1.8rem;
   font-weight: 900;
   margin: 0;
   letter-spacing: -0.02em;
@@ -62,10 +62,10 @@ const HeaderTitle = styled.h2`
 
 const CloseButton = styled.button`
   background: url("/assets/close_button.svg") no-repeat center;
-  background-size: 1.1rem;
+  background-size: 1.4rem;
   box-sizing: content-box;
-  width: 1.12rem;
-  height: 1.12rem;
+  width: 1.4rem;
+  height: 1.4rem;
   padding: 0;
   border: none;
   cursor: pointer;
@@ -83,51 +83,51 @@ const FormContainer = styled.div`
   background: #fff7e2;
   display: flex;
   flex-direction: column;
-  padding: 1.8rem 1.3rem 1.5rem;
+  padding: 2.25rem 1.6rem 1.9rem;
   overflow-y: auto;
 `;
 
 const SectionTitle = styled.h3`
   color: #486284;
-  font-size: 0.96rem;
+  font-size: 1.2rem;
   font-weight: 800;
-  margin: 0 0 0.35rem 0;
+  margin: 0 0 0.44rem 0;
   letter-spacing: -0.02em;
   text-align: ${(p) => (p.$center ? "center" : "left")};
 `;
 
 const GuideText = styled.p`
   color: #486284;
-  font-size: 0.72rem;
+  font-size: 0.9rem;
   font-weight: 500;
   text-align: center;
   line-height: 1.25;
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 1.9rem 0;
 `;
 
 const FieldGroup = styled.div`
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.5rem;
 `;
 
 const TextInput = styled.input`
   width: 100%;
   border: none;
   box-shadow: 1px 1px 4.1px 0 rgba(72, 98, 132, 0.2) inset;
-  height: 2.3rem;
-  padding: 0 0.6rem;
-  font-size: 0.85rem;
+  height: 2.9rem;
+  padding: 0 0.75rem;
+  font-size: 1.05rem;
   font-family: "Pretendard", sans-serif;
   background: #fff;
   outline: none;
-  margin-top: 0.3rem;
+  margin-top: 0.375rem;
 `;
 
 const HintText = styled.p`
   color: #c0392b;
-  font-size: 0.68rem;
+  font-size: 0.85rem;
   font-weight: 500;
   text-align: right;
-  margin: 0.25rem 0 0 0;
+  margin: 0.3rem 0 0 0;
 `;
 
 const BottomArea = styled.div`
@@ -143,11 +143,11 @@ const DeleteBtnWrapper = styled.div`
 
 const SubmitBtn = styled.button`
   width: 100%;
-  padding: 0.75rem 0;
+  padding: 0.94rem 0;
   background: #486284;
   border: none;
   color: #fff;
-  font-size: 0.95rem;
+  font-size: 1.2rem;
   font-weight: 700;
   font-family: "Pretendard", sans-serif;
   cursor: ${(p) => (p.disabled ? "not-allowed" : "pointer")};
@@ -166,11 +166,11 @@ const SubmitBtn = styled.button`
 `;
 
 const DeleteBtn = styled.button`
-  padding: 0.45rem 1rem;
+  padding: 0.56rem 1.25rem;
   background: #863d3d;
   border: none;
   color: #fff;
-  font-size: 0.8rem;
+  font-size: 1rem;
   font-weight: 700;
   font-family: "Pretendard", sans-serif;
   cursor: pointer;
@@ -188,17 +188,17 @@ const DeleteBtn = styled.button`
 
 const LoginHint = styled.p`
   color: #863d3d;
-  font-size: 0.72rem;
+  font-size: 0.9rem;
   font-weight: 600;
   text-align: right;
-  margin: 0.35rem 0 0 0;
+  margin: 0.44rem 0 0 0;
 `;
 
 const ErrorMsg = styled.p`
   color: #c0392b;
-  font-size: 0.75rem;
+  font-size: 0.94rem;
   text-align: center;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.625rem 0;
 `;
 
 /* ── Helpers ── */
