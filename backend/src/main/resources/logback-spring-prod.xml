@@ -1,53 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-  <!-- prod 프로파일일 때만 커스텀 로깅 설정 적용 -->
-  <springProfile name="prod">
-    <!-- Spring Boot 기본 콘솔 설정 포함 -->
-    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+  <!-- Spring Boot 기본 콘솔 설정 포함 -->
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
-    <!-- 콘솔 출력: Spring Boot 기본 형식, INFO 레벨까지 -->
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-      <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-        <level>INFO</level>
-      </filter>
-      <encoder>
-        <pattern>${CONSOLE_LOG_PATTERN}</pattern>
-      </encoder>
-    </appender>
+  <!-- 콘솔 출력: Spring Boot 기본 형식, INFO 레벨까지 -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>INFO</level>
+    </filter>
+    <encoder>
+      <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+    </encoder>
+  </appender>
 
-    <!-- 파일 출력: 커스텀 형식, DEBUG 레벨까지 -->
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-      <file>logs/application.log</file>
-      <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-        <level>INFO</level>
-      </filter>
+  <!-- 파일 출력: 커스텀 형식, INFO 레벨까지 (Docker 볼륨 마운트 경로 /logs 사용) -->
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>/logs/application.log</file>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>INFO</level>
+    </filter>
 
-      <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-        <fileNamePattern>logs/application-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-        <timeBasedFileNamingAndTriggeringPolicy
-          class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-          <maxFileSize>10MB</maxFileSize>
-        </timeBasedFileNamingAndTriggeringPolicy>
-        <maxHistory>50</maxHistory>
-        <totalSizeCap>1GB</totalSizeCap>
-      </rollingPolicy>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>/logs/application-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy
+        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <maxFileSize>10MB</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+      <maxHistory>50</maxHistory>
+      <totalSizeCap>1GB</totalSizeCap>
+    </rollingPolicy>
 
-      <encoder>
-        <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{40} - %msg%n</pattern>
-      </encoder>
-    </appender>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{40} - %msg%n</pattern>
+    </encoder>
+  </appender>
 
-    <!-- 루트 로거 -->
-    <root level="DEBUG">
-      <appender-ref ref="CONSOLE"/>
-      <appender-ref ref="FILE"/>
-    </root>
+  <!-- 루트 로거 -->
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
+  </root>
 
-    <!-- 외부 라이브러리 로그 레벨 조정 -->
-    <logger name="org.springframework" level="INFO"/>
-    <logger name="org.hibernate" level="INFO"/>
-    <logger name="com.zaxxer.hikari" level="INFO"/>
-    <logger name="org.apache" level="INFO"/>
-  </springProfile>
+  <!-- 외부 라이브러리 로그 레벨 조정 -->
+  <logger name="org.springframework" level="INFO"/>
+  <logger name="org.hibernate" level="INFO"/>
+  <logger name="com.zaxxer.hikari" level="INFO"/>
+  <logger name="org.apache" level="INFO"/>
+
 </configuration>
