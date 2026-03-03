@@ -31,8 +31,8 @@ public class ScheduleSeeder {
     };
 
     private static final String[] SCHEDULE_COLORS = {
-        "FF6B6B", "4ECDC4", "45B7D1", "FFA07A", "98D8C8",
-        "F7DC6F", "BB8FCE", "85C1E2", "F8B739", "52B788"
+        "3D5286", "60863D", "EDBB13", "A10B56", "5F3D86",
+        "86573D", "3D7486", "3D867F", "3D4443", "FF3838"
     };
 
     public List<Schedule> seed() {
