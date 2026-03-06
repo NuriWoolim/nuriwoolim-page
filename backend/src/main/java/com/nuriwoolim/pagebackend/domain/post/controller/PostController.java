@@ -32,9 +32,12 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PostResponse>> getAll(@RequestParam Long boardId){
-        List<PostResponse> posts = postService.getAll(boardId);
-        return ResponseEntity.ok(posts);
+    public ResponseEntity<List<PostResponse>> getPosts(
+            @RequestParam Long boardId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        return ResponseEntity.ok(postService.findPostList(boardId, page, size));
     }
 
     @GetMapping("/{postId}")

@@ -13,6 +13,8 @@ import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import com.nuriwoolim.pagebackend.domain.user.service.UserService;
 import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,9 +40,21 @@ public class PostService {
         return PostMapper.toPostResponse(savedPost);
     }
 
+    /*
     @Transactional(readOnly = true)
     public List<PostResponse> getAll(Long boardId){
         return postRepository.findByBoardId(boardId).stream()
+                .map(PostMapper::toPostResponse)
+                .collect(Collectors.toList());
+    }
+    */
+
+    @Transactional(readOnly = true)
+    public List<PostResponse> findPostList(Long boardId, Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<Post> posts = postRepository.findByBoardId(boardId, pageable).getContent();
+
+        return posts.stream()
                 .map(PostMapper::toPostResponse)
                 .collect(Collectors.toList());
     }
