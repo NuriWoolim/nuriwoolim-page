@@ -1,9 +1,16 @@
 package com.nuriwoolim.pagebackend.domain.post.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.annotations.SQLRestriction;
+
 import com.nuriwoolim.pagebackend.core.BaseEntity;
 import com.nuriwoolim.pagebackend.domain.Comment;
 import com.nuriwoolim.pagebackend.domain.board.entity.Board;
+import com.nuriwoolim.pagebackend.domain.post.dto.PostUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
@@ -20,59 +27,68 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLRestriction;
 
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-    indexes = {
-        @Index(name = "idx_post_writer", columnList = "writer_id"),
-        @Index(name = "idx_post_board", columnList = "board_id")
-    }
+	indexes = {
+		@Index(name = "idx_post_writer", columnList = "writer_id"),
+		@Index(name = "idx_post_board", columnList = "board_id")
+	}
 )
 @Builder
 @AllArgsConstructor
 @SQLRestriction("deleted = false")
 public class Post extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(unique = true, length = 20, nullable = false)
-    private String title;
+	@Column(unique = true, length = 20, nullable = false)
+	private String title;
 
-    @Column(length = 65_535, nullable = false)
-    @Lob
-    private String content;
+	@Column(length = 65_535, nullable = false)
+	@Lob
+	private String content;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    @Builder.Default
-    private PostType type = PostType.GENERAL;
+	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	@Builder.Default
+	private PostType type = PostType.GENERAL;
 
-    @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY, optional = false)
-    @JoinColumn(
-        nullable = false,
-        foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private User writer;
+	@ManyToOne(fetch = jakarta.persistence.FetchType.LAZY, optional = false)
+	@JoinColumn(
+		nullable = false,
+		foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	private User writer;
 
-    @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY, optional = false)
-    @JoinColumn(
-        nullable = false,
-        foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Board board;
+	@ManyToOne(fetch = jakarta.persistence.FetchType.LAZY, optional = false)
+	@JoinColumn(
+		nullable = false,
+		foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	private Board board;
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true,
-        cascade = {jakarta.persistence.CascadeType.REMOVE})
-    @Builder.Default
-    private List<Comment> commentList = new ArrayList<>();
+	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true,
+		cascade = {jakarta.persistence.CascadeType.REMOVE})
+	@Builder.Default
+	private List<Comment> commentList = new ArrayList<>();
+
+	public void update(PostUpdateRequest request) {
+		if (request.title() != null) {
+			this.title = request.title();
+		}
+		if (request.content() != null) {
+			this.content = request.content();
+		}
+		if (request.type() != null) {
+			this.type = request.type();
+		}
+	}
 }

@@ -1,13 +1,13 @@
-package com.nuriwoolim.pagebackend.domain.calendar.dto;
+package com.nuriwoolim.pagebackend.domain.schedule.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import lombok.Builder;
 
 @Builder
-public record CalendarCreateRequest(
+public record ScheduleCreateRequest(
     @NotBlank
     String title,
     String description,
@@ -17,9 +17,7 @@ public record CalendarCreateRequest(
     String color,
 
     @NotNull
-    LocalDateTime start,
-    @NotNull
-    LocalDateTime end
+    LocalDate date
 ) {
 
 }

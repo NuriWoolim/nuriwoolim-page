@@ -31,6 +31,9 @@ public enum ErrorCode {
      */
     AUTHORITY_FORBIDDEN(HttpStatus.FORBIDDEN, "인가 실패"),
     DATA_FORBIDDEN(HttpStatus.FORBIDDEN, "데이터에 권한이 없습니다."),
+    ANNOUNCEMENT_CREATE_FORBIDDEN(HttpStatus.FORBIDDEN, "공지 작성 권한이 없습니다."),
+    POST_UPDATE_FORBIDDEN(HttpStatus.FORBIDDEN, "게시물 수정 권한이 없습니다."),
+    POST_DELETE_FORBIDDEN(HttpStatus.FORBIDDEN, "게시물 삭제 권한이 없습니다."),
 
     /*
      * 404 NOT_FOUND: 리소스를 찾을 수 없음
@@ -50,6 +53,7 @@ public enum ErrorCode {
     DATA_CONFLICT(HttpStatus.CONFLICT, "적절하지 않은 데이터입니다."),
     USERNAME_CONFLICT(HttpStatus.CONFLICT, "존재하는 회원 이름입니다."),
     BOARD_TITLE_CONFLICT(HttpStatus.CONFLICT, "이미 존재하는 게시판입니다."),
+    POST_TITLE_CONFLICT(HttpStatus.CONFLICT, "이미 존재하는 게시글입니다."),
 
     /*
      * 500 INTERNAL_SERVER_ERROR: 내부 서버 오류
