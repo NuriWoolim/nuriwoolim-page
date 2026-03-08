@@ -1,5 +1,6 @@
 package com.nuriwoolim.pagebackend.util.seed;
 
+import com.nuriwoolim.pagebackend.domain.board.entity.Board;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import com.nuriwoolim.pagebackend.domain.user.repository.UserRepository;
 import java.util.List;
@@ -21,6 +22,8 @@ public class DataSeeder implements CommandLineRunner {
     private final UserSeeder userSeeder;
     private final ScheduleSeeder scheduleSeeder;
     private final TimeTableSeeder timeTableSeeder;
+    private final BoardSeeder boardSeeder;
+    private final PostSeeder postSeeder;
     private final ConfigurableApplicationContext context;
 
     @Override
@@ -43,6 +46,12 @@ public class DataSeeder implements CommandLineRunner {
 
         // 3. TimeTable 시딩 (1000개 이상, 2026년 전반에 걸쳐, 9~22시 사이)
         timeTableSeeder.seed(users);
+
+        // 4. Board 시딩 (10개)
+        List<Board> boards = boardSeeder.seed();
+
+        // 5. Post 시딩 (약 1000개)
+        postSeeder.seed(boards, users);
 
         log.info("=== 데이터 시딩 완료 ===");
 
