@@ -4,6 +4,7 @@ import static com.nuriwoolim.pagebackend.domain.board.util.BoardMapper.*;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -41,9 +42,10 @@ public class BoardService {
 	@Transactional(readOnly = true)
 	public BoardListResponse findBoardList(int page, int size) {
 		Pageable pageable = PageRequest.of(page, size);
-		List<Board> boards = boardRepository.findAll(pageable).getContent();
+		//paging metadata 보존
+		Page<Board> boardPage = boardRepository.findAll(pageable);
 
-		return toBoardListResponse(boards);
+		return toBoardListResponse(boardPage);
 	}
 
 	@Transactional(readOnly = true)
@@ -58,8 +60,9 @@ public class BoardService {
 
 	@Transactional
 	public void deleteById(Long boardId, Long actorId) {
+		Board board = getBoardById(boardId);
 		validatePermission(actorId);
-		boardRepository.deleteById(boardId);
+		boardRepository.delete(board);
 	}
 
 	@Transactional

@@ -2,6 +2,8 @@ package com.nuriwoolim.pagebackend.domain.board.util;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+
 import com.nuriwoolim.pagebackend.domain.board.dto.BoardCreateRequest;
 import com.nuriwoolim.pagebackend.domain.board.dto.BoardListResponse;
 import com.nuriwoolim.pagebackend.domain.board.dto.BoardResponse;
@@ -30,9 +32,16 @@ public class BoardMapper {
 			.build();
 	} //request 가 response 가 되기 전에는 entity를 거쳐야됨 (db에 저장)
 
-	public static BoardListResponse toBoardListResponse(List<Board> boards) {
+	public static BoardListResponse toBoardListResponse(Page<Board> boardPage) {
+		List<BoardResponse> data = boardPage.getContent().stream()
+			.map(BoardMapper::toBoardResponse)
+			.toList();
+
 		return BoardListResponse.builder()
-			.data(boards.stream().map(BoardMapper::toBoardResponse).toList())
+			.data(data)
+			.totalElements(boardPage.getTotalElements())
+			.totalPages(boardPage.getTotalPages())
+			.currentPage(boardPage.getNumber())
 			.build();
 	}
 
