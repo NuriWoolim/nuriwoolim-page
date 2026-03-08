@@ -51,9 +51,9 @@ public class CommentSeeder {
 
 		List<Comment> comments = new ArrayList<>();
 
-		// 각 Post당 0~10개의 Comment 생성
+		// 각 Post당 21~40개의 Comment 생성
 		for (Post post : posts) {
-			int commentCount = random.nextInt(11); // 0 to 10
+			int commentCount = random.nextInt(22) + 19; // 0 to 10
 
 			for (int i = 0; i < commentCount; i++) {
 				String content = COMMENT_CONTENTS[random.nextInt(COMMENT_CONTENTS.length)];
