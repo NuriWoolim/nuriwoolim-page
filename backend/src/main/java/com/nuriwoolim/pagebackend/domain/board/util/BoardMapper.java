@@ -1,7 +1,6 @@
 package com.nuriwoolim.pagebackend.domain.board.util;
 
 import java.util.List;
-import java.util.function.Function;
 
 import org.springframework.data.domain.Page;
 
