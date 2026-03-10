@@ -53,6 +53,7 @@ public class BoardService {
 		return boardRepository.findById(id).orElseThrow(ErrorCode.DATA_NOT_FOUND::toException);
 	}
 
+	@Transactional(readOnly = true)
 	public BoardResponse findById(Long id) { //controller에서 쓸 함수
 		return BoardMapper.toBoardResponse(getBoardById(id));
 	}
