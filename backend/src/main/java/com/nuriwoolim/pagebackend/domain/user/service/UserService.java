@@ -6,7 +6,9 @@ import com.nuriwoolim.pagebackend.domain.user.entity.UserType;
 import com.nuriwoolim.pagebackend.domain.user.repository.UserRepository;
 import com.nuriwoolim.pagebackend.domain.user.util.UserMapper;
 import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,48 +16,53 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository userRepository;
+	private final UserRepository userRepository;
 
-    @Transactional(readOnly = true)
-    public UserResponse findById(Long userId) {
-        User user = getUserById(userId);
-        return UserMapper.toUserResponse(user);
-    }
+	@Transactional(readOnly = true)
+	public UserResponse findById(Long userId) {
+		User user = getUserById(userId);
+		return UserMapper.toUserResponse(user);
+	}
 
-    @Transactional
-    public void delete(Long id) {
-        userRepository.deleteById(id);
-    }
+	@Transactional
+	public void delete(Long id) {
+		userRepository.deleteById(id);
+	}
 
-    @Transactional(readOnly = true)
-    public User getUserById(Long userId) {
-        return userRepository.findById(userId)
-            .orElseThrow(ErrorCode.USER_NOT_FOUND::toException);
-    }
+	@Transactional(readOnly = true)
+	public User getUserById(Long userId) {
+		return userRepository.findById(userId)
+			.orElseThrow(ErrorCode.USER_NOT_FOUND::toException);
+	}
 
-    @Transactional(readOnly = true)
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-            .orElseThrow(ErrorCode.USER_NOT_FOUND::toException);
-    }
+	@Transactional(readOnly = true)
+	public User getUserByEmail(String email) {
+		return userRepository.findByEmail(email)
+			.orElseThrow(ErrorCode.USER_NOT_FOUND::toException);
+	}
 
-    @Transactional(readOnly = true)
-    public boolean isManager(Long userId) {
-        User user = getUserById(userId);
-        return user.getType() == UserType.ADMIN || user.getType() == UserType.MANAGER;
-    }
+	@Transactional(readOnly = true)
+	public boolean isManager(Long userId) {
+		User user = getUserById(userId);
+		return user.getType() == UserType.ADMIN || user.getType() == UserType.MANAGER;
+	}
 
-    @Transactional(readOnly = true)
-    public boolean isAdmin(Long userId) {
-        User user = getUserById(userId);
-        return user.getType() == UserType.ADMIN;
-    }
+	@Transactional(readOnly = true)
+	public boolean isAdmin(Long userId) {
+		User user = getUserById(userId);
+		return user.getType() == UserType.ADMIN;
+	}
 
-    //TODO: 운영시 제거
-    @Transactional
-    public void DEVchangeRole(String email, UserType userType) {
-        User user = getUserByEmail(email);
-        user.updateRole(userType);
-    }
+	@Transactional(readOnly = true)
+	public UserType getUserTypeById(Long userId) {
+		return getUserById(userId).getType();
+	}
+
+	//TODO: 운영시 제거
+	@Transactional
+	public void DEVchangeRole(String email, UserType userType) {
+		User user = getUserByEmail(email);
+		user.updateRole(userType);
+	}
 
 }

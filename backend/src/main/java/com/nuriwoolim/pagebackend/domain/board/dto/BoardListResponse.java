@@ -6,7 +6,7 @@ import lombok.Builder;
 
 @Builder
 public record BoardListResponse(
-	List<BoardResponse> data,
+	List<BoardPreviewResponse> data,
 	long totalElements,
 	int totalPages,
 	int currentPage

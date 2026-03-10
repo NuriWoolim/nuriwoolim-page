@@ -1,16 +1,14 @@
 package com.nuriwoolim.pagebackend.domain.board.dto;
 
 import com.nuriwoolim.pagebackend.domain.board.entity.BoardType;
-import com.nuriwoolim.pagebackend.global.permission.dto.PermissionDto;
 
 import lombok.Builder;
 
 @Builder
-public record BoardResponse(
+public record BoardPreviewResponse(
 	Long id,
 	String title,
 	String description,
-	BoardType type,
-	PermissionDto permission
+	BoardType type
 ) {
 }
