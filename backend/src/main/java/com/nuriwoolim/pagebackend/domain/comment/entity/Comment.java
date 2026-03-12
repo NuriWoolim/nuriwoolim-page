@@ -1,5 +1,7 @@
 package com.nuriwoolim.pagebackend.domain.comment.entity;
 
+import org.hibernate.annotations.SQLRestriction;
+
 import com.nuriwoolim.pagebackend.core.BaseEntity;
 import com.nuriwoolim.pagebackend.domain.comment.dto.CommentUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.post.entity.Post;
@@ -25,8 +27,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import org.hibernate.annotations.SQLRestriction;
 
 @Getter
 @Entity

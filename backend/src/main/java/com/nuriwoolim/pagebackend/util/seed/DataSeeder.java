@@ -1,20 +1,20 @@
 package com.nuriwoolim.pagebackend.util.seed;
 
-import com.nuriwoolim.pagebackend.domain.board.entity.Board;
-import com.nuriwoolim.pagebackend.domain.post.entity.Post;
-import com.nuriwoolim.pagebackend.domain.user.entity.User;
-import com.nuriwoolim.pagebackend.domain.user.repository.UserRepository;
-
 import java.util.List;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.nuriwoolim.pagebackend.domain.board.entity.Board;
+import com.nuriwoolim.pagebackend.domain.post.entity.Post;
+import com.nuriwoolim.pagebackend.domain.user.entity.User;
+import com.nuriwoolim.pagebackend.domain.user.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component

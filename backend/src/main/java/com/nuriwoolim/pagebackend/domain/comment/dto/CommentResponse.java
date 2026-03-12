@@ -1,7 +1,5 @@
 package com.nuriwoolim.pagebackend.domain.comment.dto;
 
-import com.nuriwoolim.pagebackend.domain.post.entity.PostType;
-
 import lombok.Builder;
 
 @Builder

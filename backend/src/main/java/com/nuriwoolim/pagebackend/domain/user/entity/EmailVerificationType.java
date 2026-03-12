@@ -1,5 +1,5 @@
 package com.nuriwoolim.pagebackend.domain.user.entity;
 
 public enum EmailVerificationType {
-    SIGNUP, RESET_PASSWORD
+	SIGNUP, RESET_PASSWORD
 }

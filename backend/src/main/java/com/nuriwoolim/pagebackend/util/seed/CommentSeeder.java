@@ -1,19 +1,18 @@
 package com.nuriwoolim.pagebackend.util.seed;
 
-import com.nuriwoolim.pagebackend.domain.comment.entity.Comment;
-import com.nuriwoolim.pagebackend.domain.comment.repository.CommentRepository;
-import com.nuriwoolim.pagebackend.domain.post.entity.Post;
-import com.nuriwoolim.pagebackend.domain.post.entity.PostType;
-import com.nuriwoolim.pagebackend.domain.user.entity.User;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.springframework.stereotype.Component;
+
+import com.nuriwoolim.pagebackend.domain.comment.entity.Comment;
+import com.nuriwoolim.pagebackend.domain.comment.repository.CommentRepository;
+import com.nuriwoolim.pagebackend.domain.post.entity.Post;
+import com.nuriwoolim.pagebackend.domain.user.entity.User;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component

@@ -1,10 +1,15 @@
 package com.nuriwoolim.pagebackend.domain.user.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.annotations.SQLRestriction;
+
 import com.nuriwoolim.pagebackend.core.BaseEntity;
 import com.nuriwoolim.pagebackend.core.jwt.entity.RefreshToken;
-import com.nuriwoolim.pagebackend.domain.comment.entity.Comment;
 import com.nuriwoolim.pagebackend.domain.UserSchedule;
 import com.nuriwoolim.pagebackend.domain.UserWeekSchedule;
+import com.nuriwoolim.pagebackend.domain.comment.entity.Comment;
 import com.nuriwoolim.pagebackend.domain.post.entity.Post;
 import com.nuriwoolim.pagebackend.domain.timeTable.entity.TimeTable;
 
@@ -21,18 +26,12 @@ import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import org.hibernate.annotations.SQLRestriction;
 
 @Getter
 @Entity

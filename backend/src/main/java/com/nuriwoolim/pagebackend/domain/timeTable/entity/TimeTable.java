@@ -1,8 +1,13 @@
 package com.nuriwoolim.pagebackend.domain.timeTable.entity;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.SQLRestriction;
+
 import com.nuriwoolim.pagebackend.core.BaseEntity;
 import com.nuriwoolim.pagebackend.domain.timeTable.dto.TimeTableUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
@@ -15,72 +20,70 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLRestriction;
 
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-    indexes = {
-        @Index(name = "idx_schedule_user", columnList = "user_id"),
-    }
+	indexes = {
+		@Index(name = "idx_schedule_user", columnList = "user_id"),
+	}
 )
 @Builder
 @AllArgsConstructor
 @SQLRestriction("deleted = false")
 public class TimeTable extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(length = 20, nullable = false)
-    private String title;
+	@Column(length = 20, nullable = false)
+	private String title;
 
-    @Column(nullable = false)
-    private String team;
+	@Column(nullable = false)
+	private String team;
 
-    @Column(length = 100)
-    private String description;
+	@Column(length = 100)
+	private String description;
 
-    @Column(length = 6)
-    private String color;
+	@Column(length = 6)
+	private String color;
 
-    @Column(nullable = false)
-    private LocalDateTime start;
-    @Column(nullable = false)
-    private LocalDateTime end;
+	@Column(nullable = false)
+	private LocalDateTime start;
+	@Column(nullable = false)
+	private LocalDateTime end;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(
-        nullable = false,
-        foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private User user;
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(
+		nullable = false,
+		foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	private User user;
 
-    public void update(TimeTableUpdateRequest request) {
-        if (request.title() != null) {
-            this.title = request.title();
-        }
-        if (request.team() != null) {
-            this.team = request.team();
-        }
-        if (request.description() != null) {
-            this.description = request.description();
-        }
-        if (request.start() != null) {
-            this.start = request.start();
-        }
-        if (request.end() != null) {
-            this.end = request.end();
-        }
-        if (request.color() != null) {
-            this.color = request.color();
-        }
-    }
+	public void update(TimeTableUpdateRequest request) {
+		if (request.title() != null) {
+			this.title = request.title();
+		}
+		if (request.team() != null) {
+			this.team = request.team();
+		}
+		if (request.description() != null) {
+			this.description = request.description();
+		}
+		if (request.start() != null) {
+			this.start = request.start();
+		}
+		if (request.end() != null) {
+			this.end = request.end();
+		}
+		if (request.color() != null) {
+			this.color = request.color();
+		}
+	}
 }

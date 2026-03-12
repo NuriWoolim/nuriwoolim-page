@@ -4,9 +4,9 @@ import lombok.Builder;
 
 @Builder
 public record TokenBody(
-    Long id,
-    String email,
-    String type
+	Long id,
+	String email,
+	String type
 ) {
 
 }

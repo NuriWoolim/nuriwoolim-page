@@ -6,8 +6,8 @@ import java.util.List;
 import org.hibernate.annotations.SQLRestriction;
 
 import com.nuriwoolim.pagebackend.core.BaseEntity;
-import com.nuriwoolim.pagebackend.domain.comment.entity.Comment;
 import com.nuriwoolim.pagebackend.domain.board.entity.Board;
+import com.nuriwoolim.pagebackend.domain.comment.entity.Comment;
 import com.nuriwoolim.pagebackend.domain.post.dto.PostUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 

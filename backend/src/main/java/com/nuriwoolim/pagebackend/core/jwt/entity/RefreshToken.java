@@ -1,6 +1,12 @@
 package com.nuriwoolim.pagebackend.core.jwt.entity;
 
+import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
@@ -14,47 +20,44 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-        indexes = {
-                @Index(name = "idx_refreshToken_user", columnList = "user_id"),
-        }
+	indexes = {
+		@Index(name = "idx_refreshToken_user", columnList = "user_id"),
+	}
 )
 public class RefreshToken {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(updatable = false, nullable = false)
-    private String token;
+	@Column(updatable = false, nullable = false)
+	private String token;
 
-    @CreatedDate
-    @Column(updatable = false, nullable = false)
-    private LocalDateTime issuedAt;
+	@CreatedDate
+	@Column(updatable = false, nullable = false)
+	private LocalDateTime issuedAt;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(
-            nullable = false,
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT),
-            unique = true
-    )
-    private User user;
+	@OneToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(
+		nullable = false,
+		foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT),
+		unique = true
+	)
+	private User user;
 
-    @Builder
-    public RefreshToken(String token, User user) {
-        this.token = token;
-        this.user = user;
-    }
+	@Builder
+	public RefreshToken(String token, User user) {
+		this.token = token;
+		this.user = user;
+	}
 }

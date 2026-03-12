@@ -2,7 +2,7 @@ package com.nuriwoolim.pagebackend.global.exception;
 
 import java.util.HashMap;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,107 +17,108 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
 
-    /*
-     * Custom Exception
-     * */
-    @ExceptionHandler(CustomException.class)
-    protected ResponseEntity<ErrorResponse> handleCustomException(final CustomException e) {
-        log.debug("handleCustomException: {}", e.getErrorCode());
-        return ResponseEntity
-            .status(e.getErrorCode().getStatus())
-            .body(new ErrorResponse(e));
-    }
+	/*
+	 * Custom Exception
+	 * */
+	@ExceptionHandler(CustomException.class)
+	protected ResponseEntity<ErrorResponse> handleCustomException(final CustomException e) {
+		log.debug("handleCustomException: {}", e.getErrorCode());
+		return ResponseEntity
+			.status(e.getErrorCode().getStatus())
+			.body(new ErrorResponse(e));
+	}
 
-    /*
-     * 유효성 검사 오류 메시지 반환
-     * */
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected ResponseEntity<Map<String, String>> handleValidationExceptions(
-        MethodArgumentNotValidException e) {
-        log.debug("handleValidationExceptions: {}", e.getMessage());
-        Map<String, String> errors = new HashMap<>();
-        e.getBindingResult().getFieldErrors().forEach((error) -> {
-            String fieldName = error.getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
-    }
+	/*
+	 * 유효성 검사 오류 메시지 반환
+	 * */
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	protected ResponseEntity<Map<String, String>> handleValidationExceptions(
+		MethodArgumentNotValidException e) {
+		log.debug("handleValidationExceptions: {}", e.getMessage());
+		Map<String, String> errors = new HashMap<>();
+		e.getBindingResult().getFieldErrors().forEach((error) -> {
+			String fieldName = error.getField();
+			String errorMessage = error.getDefaultMessage();
+			errors.put(fieldName, errorMessage);
+		});
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+	}
 
-    // 인증은 되었지만 권한이 없는 경우
-    @ExceptionHandler(AccessDeniedException.class)
-    protected ResponseEntity<ErrorResponse> handleAccessDeniedException(
-        final AccessDeniedException e) {
-        log.debug("handleAccessDeniedException: {}", e.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-            .body(new ErrorResponse(ErrorCode.AUTHORITY_FORBIDDEN.toException()));
-    }
+	// 인증은 되었지만 권한이 없는 경우
+	@ExceptionHandler(AccessDeniedException.class)
+	protected ResponseEntity<ErrorResponse> handleAccessDeniedException(
+		final AccessDeniedException e) {
+		log.debug("handleAccessDeniedException: {}", e.getMessage());
+		return ResponseEntity.status(HttpStatus.FORBIDDEN)
+			.body(new ErrorResponse(ErrorCode.AUTHORITY_FORBIDDEN.toException()));
+	}
 
-    // 인증 자체가 실패한 경우 (로그인 안 됨, 토큰 만료 등)
-    @ExceptionHandler(AuthenticationException.class)
-    protected ResponseEntity<ErrorResponse> handleAuthenticationException(
-        final AuthenticationException e) {
-        log.debug("handleAuthenticationException: {}", e.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-            .body(new ErrorResponse(ErrorCode.UNAUTHORIZED.toException()));
-    }
+	// 인증 자체가 실패한 경우 (로그인 안 됨, 토큰 만료 등)
+	@ExceptionHandler(AuthenticationException.class)
+	protected ResponseEntity<ErrorResponse> handleAuthenticationException(
+		final AuthenticationException e) {
+		log.debug("handleAuthenticationException: {}", e.getMessage());
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+			.body(new ErrorResponse(ErrorCode.UNAUTHORIZED.toException()));
+	}
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    protected ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(
-        DataIntegrityViolationException e) {
-        log.debug("handleDataIntegrityViolationException: {}", e.getCause().getMessage());
+	@ExceptionHandler(DataIntegrityViolationException.class)
+	protected ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(
+		DataIntegrityViolationException e) {
+		log.debug("handleDataIntegrityViolationException: {}", e.getCause().getMessage());
 
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(
-            new ErrorResponse(ErrorCode.DATA_CONFLICT.toException()));
-    }
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(
+			new ErrorResponse(ErrorCode.DATA_CONFLICT.toException()));
+	}
 
+	/*
+	 * HTTP 404 잘못된 api 경로
+	 */
+	@ExceptionHandler({NoHandlerFoundException.class, NoResourceFoundException.class})
+	protected ResponseEntity<ErrorResponse> handleNoHandlerFoundException(final Exception e) {
+		log.trace("handleNoHandlerFoundException: {}", e.getMessage());
+		return ResponseEntity
+			.status(ErrorCode.API_NOT_FOUND.getStatus())
+			.body(new ErrorResponse(ErrorCode.API_NOT_FOUND.toException()));
+	}
 
-    /*
-     * HTTP 404 잘못된 api 경로
-     */
-    @ExceptionHandler({NoHandlerFoundException.class, NoResourceFoundException.class})
-    protected ResponseEntity<ErrorResponse> handleNoHandlerFoundException(final Exception e) {
-        log.trace("handleNoHandlerFoundException: {}", e.getMessage());
-        return ResponseEntity
-            .status(ErrorCode.API_NOT_FOUND.getStatus())
-            .body(new ErrorResponse(ErrorCode.API_NOT_FOUND.toException()));
-    }
+	/*
+	 * HTTP 400 쿼리 파라미터가 없는 경우
+	 */
+	@ExceptionHandler({MissingServletRequestParameterException.class})
+	protected ResponseEntity<ErrorResponse> handleMissingParameterException(final Exception e) {
+		log.trace("handleMissingParameterException: {}", e.getMessage());
+		return ResponseEntity
+			.status(ErrorCode.BAD_REQUEST.getStatus())
+			.body(new ErrorResponse(ErrorCode.BAD_REQUEST.toException(e.getMessage())));
+	}
 
-    /*
-     * HTTP 400 쿼리 파라미터가 없는 경우
-     */
-    @ExceptionHandler({MissingServletRequestParameterException.class})
-    protected ResponseEntity<ErrorResponse> handleMissingParameterException(final Exception e) {
-        log.trace("handleMissingParameterException: {}", e.getMessage());
-        return ResponseEntity
-            .status(ErrorCode.BAD_REQUEST.getStatus())
-            .body(new ErrorResponse(ErrorCode.BAD_REQUEST.toException(e.getMessage())));
-    }
+	/*
+	 * HTTP 400 파라미터 타입이 맞지 않는 경우
+	 */
+	@ExceptionHandler({MethodArgumentTypeMismatchException.class})
+	protected ResponseEntity<ErrorResponse> handleTypeMismatchException(final Exception e) {
+		log.trace("handleTypeMismatchException: {}", e.getMessage());
+		return ResponseEntity
+			.status(ErrorCode.BAD_REQUEST.getStatus())
+			.body(new ErrorResponse(ErrorCode.BAD_REQUEST.toException("타입이 올바르지 않습니다.")));
+	}
 
-    /*
-     * HTTP 400 파라미터 타입이 맞지 않는 경우
-     */
-    @ExceptionHandler({MethodArgumentTypeMismatchException.class})
-    protected ResponseEntity<ErrorResponse> handleTypeMismatchException(final Exception e) {
-        log.trace("handleTypeMismatchException: {}", e.getMessage());
-        return ResponseEntity
-            .status(ErrorCode.BAD_REQUEST.getStatus())
-            .body(new ErrorResponse(ErrorCode.BAD_REQUEST.toException("타입이 올바르지 않습니다.")));
-    }
-
-    /*
-     * HTTP 500 Exception
-     * */
-    @ExceptionHandler(Exception.class)
-    protected ResponseEntity<ErrorResponse> handleException(final Exception e) {
-        log.error("handleException: {}", e.getMessage());
-        return ResponseEntity
-            .status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
-            .body(new ErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR.toException()));
-    }
+	/*
+	 * HTTP 500 Exception
+	 * */
+	@ExceptionHandler(Exception.class)
+	protected ResponseEntity<ErrorResponse> handleException(final Exception e) {
+		log.error("handleException: {}", e.getMessage());
+		return ResponseEntity
+			.status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
+			.body(new ErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR.toException()));
+	}
 }

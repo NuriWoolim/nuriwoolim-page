@@ -17,6 +17,7 @@ services:
       - SERVER_PORT=8080
     volumes:
       - ./logs:/logs
+      - nurim-file-data:/home/backend/nurim-file
     networks:
       - app-network
     restart: unless-stopped
@@ -45,6 +46,7 @@ services:
       retries: 10
 volumes:
   db-data:
+  nurim-file-data:
 
 networks:
   app-network:
