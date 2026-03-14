@@ -3,6 +3,7 @@ package com.nuriwoolim.pagebackend.domain.post.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -12,14 +13,19 @@ import com.nuriwoolim.pagebackend.domain.board.entity.Board;
 import com.nuriwoolim.pagebackend.domain.board.entity.BoardType;
 import com.nuriwoolim.pagebackend.domain.board.service.BoardService;
 import com.nuriwoolim.pagebackend.domain.post.dto.PostCreateRequest;
+import com.nuriwoolim.pagebackend.domain.post.dto.PostListResponse;
 import com.nuriwoolim.pagebackend.domain.post.dto.PostResponse;
 import com.nuriwoolim.pagebackend.domain.post.dto.PostUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.post.entity.Post;
+import com.nuriwoolim.pagebackend.domain.post.permission.PostPermissionContext;
+import com.nuriwoolim.pagebackend.domain.post.permission.PostPermissionEvaluator;
 import com.nuriwoolim.pagebackend.domain.post.repository.PostRepository;
 import com.nuriwoolim.pagebackend.domain.post.util.PostMapper;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
+import com.nuriwoolim.pagebackend.domain.user.entity.UserType;
 import com.nuriwoolim.pagebackend.domain.user.service.UserService;
 import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
+import com.nuriwoolim.pagebackend.global.permission.dto.PermissionDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,6 +35,7 @@ public class PostService {
 	private final PostRepository postRepository;
 	private final UserService userService;
 	private final BoardService boardService;
+	private final PostPermissionEvaluator postPermissionEvaluator;
 
 	@Transactional
 	public PostResponse create(Long boardId, PostCreateRequest request, Long actorId) {
@@ -39,26 +46,15 @@ public class PostService {
 
 		Post post = PostMapper.fromPostCreateRequest(request, writer, board);
 		Post savedPost = postRepository.save(post);
-		return PostMapper.toPostResponse(savedPost);
+		return PostMapper.toPostResponse(savedPost, resolvePermission(savedPost, actorId));
 	}
 
-    /*
-    @Transactional(readOnly = true)
-    public List<PostResponse> getAll(Long boardId){
-        return postRepository.findByBoardId(boardId).stream()
-                .map(PostMapper::toPostResponse)
-                .collect(Collectors.toList());
-    }
-    */
-
 	@Transactional(readOnly = true)
-	public List<PostResponse> findPostList(Long boardId, Integer page, Integer size) {
+	public PostListResponse findPostList(Long boardId, Integer page, Integer size) {
 		Pageable pageable = PageRequest.of(page, size);
-		List<Post> posts = postRepository.findByBoardId(boardId, pageable).getContent();
+		Page<Post> postPage = postRepository.findAll(pageable);
 
-		return posts.stream()
-			.map(PostMapper::toPostResponse)
-			.collect(Collectors.toList());
+		return PostMapper.toPostListResponse(postPage);
 	}
 
 	@Transactional(readOnly = true)
@@ -67,8 +63,9 @@ public class PostService {
 	}
 
 	@Transactional(readOnly = true)
-	public PostResponse getById(Long postId) { //controller에서 쓸 함수
-		return PostMapper.toPostResponse(getPostById(postId));
+	public PostResponse getById(Long postId, Long actorId) { //controller에서 쓸 함수
+		Post post = getPostById(postId);
+		return PostMapper.toPostResponse(post, resolvePermission(post, actorId));
 	}
 
 	@Transactional
@@ -84,7 +81,7 @@ public class PostService {
 		validatePostUpdatePermission(actorId, post);
 
 		post.update(request);
-		return PostMapper.toPostResponse(post);
+		return PostMapper.toPostResponse(post, resolvePermission(post, actorId));
 	}
 
 	private void validatePostCreatePermission(Long actorId, BoardType boardType) {
@@ -104,5 +101,11 @@ public class PostService {
 		if (!post.getWriter().getId().equals(actorId)) {
 			throw ErrorCode.DATA_FORBIDDEN.toException();
 		} // 원 작성자만이 게시물 수정 가능
+	}
+
+	private PermissionDto resolvePermission(Post post, Long actorId) {
+		UserType role = userService.getUserTypeById(actorId);
+		PostPermissionContext context = new PostPermissionContext(post, actorId);
+		return postPermissionEvaluator.evaluate(role, context);
 	}
 }
