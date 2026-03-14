@@ -50,14 +50,14 @@ public class BoardService {
 	}
 
 	@Transactional(readOnly = true)
-	public Board getBoardById(Long id) { //service layer에서 쓸 함수 (특히 updateById)
-		return boardRepository.findById(id).orElseThrow(ErrorCode.DATA_NOT_FOUND::toException);
+	public Board getBoardById(Long boardId) { //service layer에서 쓸 함수 (특히 updateById)
+		return boardRepository.findById(boardId).orElseThrow(ErrorCode.DATA_NOT_FOUND::toException);
 	}
 
 	@Transactional(readOnly = true)
-	public BoardResponse findById(Long id) { //controller에서 쓸 함수
-		Board board = getBoardById(id);
-		return BoardMapper.toBoardResponse(board, resolvePermission(board, id));
+	public BoardResponse findById(Long boardId, Long actorId) { //controller에서 쓸 함수
+		Board board = getBoardById(boardId);
+		return BoardMapper.toBoardResponse(board, resolvePermission(board, actorId));
 	}
 
 	@Transactional

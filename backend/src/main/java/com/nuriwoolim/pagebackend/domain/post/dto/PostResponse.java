@@ -1,6 +1,9 @@
 package com.nuriwoolim.pagebackend.domain.post.dto;
 
+import java.security.Permission;
+
 import com.nuriwoolim.pagebackend.domain.post.entity.PostType;
+import com.nuriwoolim.pagebackend.global.permission.dto.PermissionDto;
 
 import lombok.Builder;
 
@@ -13,6 +16,7 @@ public record PostResponse(
 	Long writerId,
 	String writerName,
 	Long boardId,
-	String boardTitle
+	String boardTitle,
+	PermissionDto permission
 ) {
 }
