@@ -1,9 +1,11 @@
-package com.nuriwoolim.pagebackend.domain;
+package com.nuriwoolim.pagebackend.domain.comment.entity;
 
 import com.nuriwoolim.pagebackend.core.BaseEntity;
+import com.nuriwoolim.pagebackend.domain.comment.dto.CommentUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.post.entity.Post;
 import com.nuriwoolim.pagebackend.domain.post.entity.PostType;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
@@ -23,43 +25,51 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import org.hibernate.annotations.SQLRestriction;
 
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-    indexes = {
-        @Index(name = "idx_comment_writer", columnList = "writer_id"),
-        @Index(name = "idx_comment_post", columnList = "post_id")
-    }
+	indexes = {
+		@Index(name = "idx_comment_writer", columnList = "writer_id"),
+		@Index(name = "idx_comment_post", columnList = "post_id")
+	}
 )
 @Builder
 @AllArgsConstructor
 @SQLRestriction("deleted = false")
 public class Comment extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(length = 65_535, nullable = false)
-    @Lob
-    private String content;
+	@Column(length = 65_535, nullable = false)
+	@Lob
+	private String content;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    @Builder.Default
-    private PostType type = PostType.GENERAL;
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	@Builder.Default
+	private PostType type = PostType.GENERAL;
 
-    @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY, optional = false)
-    @JoinColumn(
-        nullable = false,
-        foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private User writer;
-    @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY, optional = false)
-    @JoinColumn(
-        nullable = false,
-        foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Post post;
+	@ManyToOne(fetch = jakarta.persistence.FetchType.LAZY, optional = false)
+	@JoinColumn(
+		nullable = false,
+		foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	private User writer;
+
+	@ManyToOne(fetch = jakarta.persistence.FetchType.LAZY, optional = false)
+	@JoinColumn(
+		nullable = false,
+		foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	private Post post;
+
+	public void update(CommentUpdateRequest request) {
+		if (request.content() != null) {
+			this.content = request.content();
+		}
+	}
 }

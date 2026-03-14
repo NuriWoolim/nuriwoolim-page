@@ -36,8 +36,8 @@ public class TimeTableSeeder {
     };
 
     private static final String[] COLORS = {
-        "FF6B6B", "4ECDC4", "45B7D1", "FFA07A", "98D8C8",
-        "F7DC6F", "BB8FCE", "85C1E2", "F8B739", "52B788"
+        "3D5286", "60863D", "EDBB13", "A10B56", "5F3D86",
+        "86573D", "3D7486", "3D867F", "3D4443", "FF3838"
     };
 
     public List<TimeTable> seed(List<User> users) {
@@ -56,14 +56,29 @@ public class TimeTableSeeder {
         // 2026년 전반에 걸쳐 최대 3000개 타임테이블을 겹치지 않게 순차적으로 생성
         while (count < targetCount && !currentDate.isAfter(endDate)) {
             i++;
+
+            // 현재 시작 시간이 유효 범위(9시~22시)를 벗어나면 다음 날 9시로 이동
+            if (currentDateTime.getHour() < 9 || currentDateTime.getHour() >= 22) {
+                // 22시 이후면 다음 날로, 9시 이전이면 같은 날 9시로
+                if (currentDateTime.getHour() >= 22) {
+                    currentDate = currentDate.plusDays(1);
+                }
+                if (currentDate.isAfter(endDate)) {
+                    break;
+                }
+                currentDateTime = LocalDateTime.of(currentDate, LocalTime.of(9, 0));
+                continue;
+            }
+
             // 1시간 또는 2시간 duration
             int duration = random.nextBoolean() ? 1 : 2;
 
             LocalDateTime start = currentDateTime;
             LocalDateTime end = start.plusHours(duration);
 
-            // 종료 시간이 22시를 넘으면 다음 날 9시로 이동
-            if (end.getHour() > 22 || (end.getHour() == 22 && end.getMinute() > 0)) {
+            // 종료 시간이 22시를 넘거나 9시 미만이면 다음 날 9시로 이동
+            if (end.getHour() > 22 || (end.getHour() == 22 && end.getMinute() > 0)
+                || end.getHour() < 9) {
                 currentDate = currentDate.plusDays(1);
                 if (currentDate.isAfter(endDate)) {
                     break;
@@ -89,18 +104,18 @@ public class TimeTableSeeder {
                 .user(user)
                 .build());
 
-            // 다음 타임테이블 시작 시간은 현재 종료 시간 + 랜덤 간격(0~3시간)
-            int gap = random.nextInt(4); // 0, 1, 2, 3시간 중 랜덤
-            currentDateTime = end.plusHours(gap);
             count++;
 
-            // 간격 추가 후 시간이 22시를 넘으면 다음 날 9시로 이동
-            if (currentDateTime.getHour() >= 22) {
-                currentDate = currentDate.plusDays(1);
+            // 다음 타임테이블 시작 시간은 현재 종료 시간 + 랜덤 간격(0~3시간) - 겹침 방지
+            int gap = random.nextInt(4); // 0, 1, 2, 3시간 중 랜덤
+            currentDateTime = end.plusHours(gap);
+
+            // 다음 루프 시작 시 유효 범위 체크가 이루어지므로 여기서는 날짜만 업데이트
+            if (!currentDateTime.toLocalDate().equals(currentDate)) {
+                currentDate = currentDateTime.toLocalDate();
                 if (currentDate.isAfter(endDate)) {
                     break;
                 }
-                currentDateTime = LocalDateTime.of(currentDate, LocalTime.of(9, 0));
             }
         }
 
