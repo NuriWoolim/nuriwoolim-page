@@ -45,8 +45,8 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
 
-    // https://mvnrepository.com/artifact/me.paulschwarz/spring-dotenv
-    implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+    implementation(platform("me.paulschwarz:spring-dotenv-bom:5.1.0"))
+    developmentOnly("me.paulschwarz:springboot3-dotenv")
 }
 
 tasks.named('test') {
