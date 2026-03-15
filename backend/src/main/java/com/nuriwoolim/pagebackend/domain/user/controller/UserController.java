@@ -38,7 +38,7 @@ public class UserController {
 	public ResponseEntity<Void> changePassword(@AuthenticationPrincipal JwtPrincipal principal,
 		@Valid @RequestBody ChangePasswordRequest request) {
 		userService.changePassword(principal.getId(), request);
-		return ResponseEntity.noContent().build();
+		return ResponseEntity.ok().build();
 	}
 
 	@GetMapping("/me")
