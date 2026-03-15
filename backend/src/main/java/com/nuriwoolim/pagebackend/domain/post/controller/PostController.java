@@ -20,6 +20,7 @@ import com.nuriwoolim.pagebackend.domain.post.dto.PostCreateRequest;
 import com.nuriwoolim.pagebackend.domain.post.dto.PostResponse;
 import com.nuriwoolim.pagebackend.domain.post.dto.PostUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.post.service.PostService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/posts")
+@Tag(name = "Post", description = "게시글 관리 API")
 public class PostController {
 
 	private final PostService postService;

@@ -18,6 +18,7 @@ public enum ErrorCode {
     TOO_MANY_RESEND(HttpStatus.BAD_REQUEST, "인증 메일 재전송 요청이 너무 많습니다."),
     INVALID_EMAIL_CODE(HttpStatus.BAD_REQUEST, "이메일 인증 코드가 적절하지 않습니다"),
     EXPIRED_EMAIL_CODE(HttpStatus.BAD_REQUEST, "이메일 인증 코드가 만료되었습니다."),
+    SIGNUP_NOT_VERIFIED(HttpStatus.BAD_REQUEST, "회원가입 이메일 인증이 완료되지 않았습니다."),
 
     /*
      *  401 Unauthroized

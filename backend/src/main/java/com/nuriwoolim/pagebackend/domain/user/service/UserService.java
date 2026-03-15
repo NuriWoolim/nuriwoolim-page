@@ -1,5 +1,6 @@
 package com.nuriwoolim.pagebackend.domain.user.service;
 
+import com.nuriwoolim.pagebackend.domain.user.dto.ChangePasswordRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import com.nuriwoolim.pagebackend.domain.user.entity.UserType;
@@ -9,6 +10,7 @@ import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,11 +19,37 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
 	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
 
 	@Transactional(readOnly = true)
 	public UserResponse findById(Long userId) {
 		User user = getUserById(userId);
 		return UserMapper.toUserResponse(user);
+	}
+
+	/**
+	 * 현재 비밀번호를 확인한 뒤 새 비밀번호로 변경한다.
+	 *
+	 * @param userId 비밀번호를 변경할 사용자 ID
+	 * @param request 비밀번호 변경 요청
+	 */
+	@Transactional
+	public void changePassword(Long userId, ChangePasswordRequest request) {
+		User user = getUserById(userId);
+
+		if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
+			throw ErrorCode.PASSWORD_BAD_REQUEST.toException("현재 비밀번호가 일치하지 않습니다.");
+		}
+
+		if (!request.newPassword().equals(request.newPasswordConfirm())) {
+			throw ErrorCode.PASSWORD_BAD_REQUEST.toException("새 비밀번호 확인이 일치하지 않습니다.");
+		}
+
+		if (passwordEncoder.matches(request.newPassword(), user.getPassword())) {
+			throw ErrorCode.PASSWORD_BAD_REQUEST.toException("새 비밀번호는 현재 비밀번호와 달라야 합니다.");
+		}
+
+		user.updatePassword(passwordEncoder.encode(request.newPassword()));
 	}
 
 	@Transactional
