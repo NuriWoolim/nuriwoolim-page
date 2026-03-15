@@ -1,6 +1,8 @@
 package com.nuriwoolim.pagebackend.domain.user.controller;
 
 import com.nuriwoolim.pagebackend.core.jwt.util.TokenResponseHandler;
+import com.nuriwoolim.pagebackend.domain.user.dto.EmailRequest;
+import com.nuriwoolim.pagebackend.domain.user.dto.EmailVerifyRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.LoginDTO;
 import com.nuriwoolim.pagebackend.domain.user.dto.LoginRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.PasswordResetRequest;
@@ -13,23 +15,18 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
-@Validated
 @Tag(name = "Auth", description = "인증 및 계정 보안 API")
 public class AuthController {
 
@@ -51,54 +48,52 @@ public class AuthController {
     /**
      * 이메일 중복 여부를 확인한다.
      *
-     * @param email 확인할 이메일
+     * @param request 확인할 이메일 요청
      * @return 처리 결과
      */
     @Operation(summary = "이메일 중복 확인", description = "회원가입 가능 여부를 위해 이메일 사용 여부를 확인합니다.")
-    @GetMapping("/check-email")
-    public ResponseEntity<Void> checkEmail(@RequestParam @Email String email) {
-        authService.checkEmail(email);
+    @PostMapping("/check-email")
+    public ResponseEntity<Void> checkEmail(@Valid @RequestBody EmailRequest request) {
+        authService.checkEmail(request.email());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     /**
      * 회원가입용 인증 메일을 발송한다.
      *
-     * @param email 인증 코드를 받을 이메일
+     * @param request 인증 코드를 받을 이메일 요청
      * @return 처리 결과
      */
     @Operation(summary = "회원가입 인증 메일 전송", description = "회원가입 절차에 사용할 이메일 인증 코드를 발송합니다.")
-    @GetMapping("/signup/send-verification")
-    public ResponseEntity<Void> sendSignupVerification(@RequestParam @Email String email) {
-        authService.sendSignupVerification(email);
+    @PostMapping("/signup/send-verification")
+    public ResponseEntity<Void> sendSignupVerification(@Valid @RequestBody EmailRequest request) {
+        authService.sendSignupVerification(request.email());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     /**
      * 회원가입용 인증 코드를 검증한다.
      *
-     * @param email 인증 대상 이메일
-     * @param code 메일로 전달된 인증 코드
+     * @param request 인증 대상 이메일과 인증 코드 요청
      * @return 처리 결과
      */
     @Operation(summary = "회원가입 이메일 인증", description = "회원가입용으로 발송된 인증 코드를 검증하고 가입 가능 상태로 전환합니다.")
-    @GetMapping("/signup/verify-email")
-    public ResponseEntity<Void> verifySignupEmail(@RequestParam @Email String email,
-        @RequestParam String code) {
-        authService.verifySignupEmail(email, code);
+    @PostMapping("/signup/verify-email")
+    public ResponseEntity<Void> verifySignupEmail(@Valid @RequestBody EmailVerifyRequest request) {
+        authService.verifySignupEmail(request.email(), request.code());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     /**
      * 비밀번호 초기화용 인증 메일을 발송한다.
      *
-     * @param email 인증 코드를 받을 이메일
+     * @param request 인증 코드를 받을 이메일 요청
      * @return 처리 결과
      */
     @Operation(summary = "비밀번호 초기화 인증 메일 전송", description = "비밀번호 초기화에 사용할 이메일 인증 코드를 발송합니다.")
-    @GetMapping("/password-reset/send-verification")
-    public ResponseEntity<Void> sendPasswordResetVerification(@RequestParam @Email String email) {
-        authService.sendPasswordResetVerification(email);
+    @PostMapping("/password-reset/send-verification")
+    public ResponseEntity<Void> sendPasswordResetVerification(@Valid @RequestBody EmailRequest request) {
+        authService.sendPasswordResetVerification(request.email());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

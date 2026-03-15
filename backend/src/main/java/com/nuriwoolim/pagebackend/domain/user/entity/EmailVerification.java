@@ -37,7 +37,7 @@ public class EmailVerification extends BaseEntity {
     @Column(nullable = false)
     private String code;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     private EmailVerificationType type;
 
