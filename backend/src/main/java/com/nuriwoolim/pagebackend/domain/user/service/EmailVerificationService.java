@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +16,8 @@ import com.nuriwoolim.pagebackend.domain.user.entity.EmailVerificationType;
 import com.nuriwoolim.pagebackend.domain.user.repository.EmailVerificationRepository;
 import com.nuriwoolim.pagebackend.domain.user.util.CodeGenerator;
 import com.nuriwoolim.pagebackend.domain.user.util.UserMapper;
-import com.nuriwoolim.pagebackend.global.email.service.EmailService;
+import com.nuriwoolim.pagebackend.global.email.event.PasswordResetEmailEvent;
+import com.nuriwoolim.pagebackend.global.email.event.SignupVerificationEmailEvent;
 import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
@@ -31,7 +33,7 @@ public class EmailVerificationService {
 		EmailVerificationType.SIGNUP_VERIFIED);
 
 	private final EmailVerificationRepository emailVerificationRepository;
-	private final EmailService emailService;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Value("${custom.resendTime}")
 	private int resendTime;
@@ -56,7 +58,7 @@ public class EmailVerificationService {
 
 		String code = CodeGenerator.generateCode();
 		createNewVerification(email, code, EmailVerificationType.SIGNUP);
-		emailService.sendVerificationEmail(email, code);
+		eventPublisher.publishEvent(new SignupVerificationEmailEvent(email, code));
 	}
 
 	/**
@@ -76,7 +78,7 @@ public class EmailVerificationService {
 
 		String code = CodeGenerator.generateCode();
 		createNewVerification(email, code, EmailVerificationType.PASSWORD_RESET);
-		emailService.sendPasswordResetEmail(email, code);
+		eventPublisher.publishEvent(new PasswordResetEmailEvent(email, code));
 	}
 
 	/**
