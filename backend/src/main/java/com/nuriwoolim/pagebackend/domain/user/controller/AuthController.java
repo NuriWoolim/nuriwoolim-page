@@ -10,6 +10,7 @@ import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserSignupRequest;
 import com.nuriwoolim.pagebackend.domain.user.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 @Validated
+@Tag(name = "Auth", description = "인증 및 계정 보안 API")
 public class AuthController {
 
     private final AuthService authService;

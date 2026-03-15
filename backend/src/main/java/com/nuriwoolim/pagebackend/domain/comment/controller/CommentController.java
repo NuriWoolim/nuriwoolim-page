@@ -20,12 +20,14 @@ import com.nuriwoolim.pagebackend.domain.comment.dto.CommentResponse;
 import com.nuriwoolim.pagebackend.domain.comment.dto.CommentUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.comment.service.CommentService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/comments")
+@Tag(name = "Comment", description = "댓글 관리 API")
 public class CommentController {
 
 	private final CommentService commentService;
