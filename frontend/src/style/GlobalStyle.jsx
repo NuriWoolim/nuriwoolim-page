@@ -7,7 +7,9 @@ export const GlobalStyle = createGlobalStyle`
     src: url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/woff2/Pretendard-Regular.woff2') format('woff2');
   }
 
+  html,
   body {
     font-family: 'Pretendard', sans-serif;
+    overflow-x: hidden;
   }
 `;

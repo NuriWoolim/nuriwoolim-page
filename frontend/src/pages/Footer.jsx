@@ -143,8 +143,8 @@ const Footer = () => {
         <RightPart>
           <h2>About</h2>
           <p>서울시 동작구 흑석로 84 107관 609호 누리울림</p>
-          <p>TEL. 회장 정지섭</p>
-          <p>TEL. 부회장 박지은</p>
+          <p>TEL. 회장 현진우</p>
+          <p>TEL. 부회장 윤성빈</p>
           <p>EMAIL. caunuriwoolim@gmail.com</p>
         </RightPart>
       </SSibalContainer>

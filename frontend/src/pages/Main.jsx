@@ -1,6 +1,7 @@
 import React from "react";
 import Notice from "./Notice";
 import Archive from "./Archive";
+import HowToUse from "./HowToUse";
 import Calendar from "./Calendar";
 import styled from "styled-components";
 
@@ -38,10 +39,10 @@ const ImgBackground = styled.img`
   position: absolute;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   object-fit: cover;
-  z-index: 0;
+  z-index: -1;
 `;
 
 const ImgContainer = styled.div`
@@ -66,6 +67,7 @@ const Main = () => {
 
       <Notice />
       <Archive />
+      <HowToUse />
       <Calendar />
     </MainContainer>
   );
