@@ -44,6 +44,7 @@ public class SecurityConfig {
 					"/webjars/**",
 					"/refresh").permitAll()
 				.requestMatchers(HttpMethod.GET).permitAll()
+				.requestMatchers("/admin/**").hasAnyRole("ADMIN", "MANAGER")
 				.requestMatchers("/users/**").authenticated()
 				.requestMatchers("/schedules/**").hasAnyRole("MANAGER", "ADMIN")
 				.requestMatchers(HttpMethod.POST).hasAnyRole("ADMIN", "MANAGER", "MEMBER")

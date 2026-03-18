@@ -17,7 +17,7 @@ import com.nuriwoolim.pagebackend.domain.post.entity.Post;
 import com.nuriwoolim.pagebackend.domain.post.service.PostService;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import com.nuriwoolim.pagebackend.domain.user.service.UserService;
-import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
+import com.nuriwoolim.pagebackend.global.exception.GlobalErrorCode;
 
 import lombok.RequiredArgsConstructor;
 
@@ -50,7 +50,7 @@ public class CommentService {
 	@Transactional(readOnly = true)
 	public Comment getCommentById(Long commentId) {
 		return commentRepository.findById(commentId)
-			.orElseThrow(ErrorCode.DATA_NOT_FOUND::toException);
+			.orElseThrow(GlobalErrorCode.DATA_NOT_FOUND::toException);
 	}
 
 	@Transactional(readOnly = true)
@@ -76,14 +76,14 @@ public class CommentService {
 
 	private void validateCommentDeletePermission(Long actorId, Comment comment) {
 		if (!comment.getWriter().getId().equals(actorId) && !userService.isAdmin(actorId)) {
-			throw ErrorCode.DATA_FORBIDDEN.toException();
-		} // 작성자 & ADMIN은 댓글 삭제 가능
+			throw GlobalErrorCode.DATA_FORBIDDEN.toException();
+		}
 	}
 
 	private void validateCommentUpdatePermission(Long actorId, Comment comment) {
 		if (!comment.getWriter().getId().equals(actorId)) {
-			throw ErrorCode.DATA_FORBIDDEN.toException();
-		} // 원 작성자만이 댓글 수정 가능
+			throw GlobalErrorCode.DATA_FORBIDDEN.toException();
+		}
 	}
 }
 

@@ -14,7 +14,8 @@ import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import com.nuriwoolim.pagebackend.domain.user.repository.UserRepository;
 import com.nuriwoolim.pagebackend.domain.user.util.CodeGenerator;
 import com.nuriwoolim.pagebackend.domain.user.util.UserMapper;
-import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
+import com.nuriwoolim.pagebackend.global.exception.GlobalErrorCode;
+import com.nuriwoolim.pagebackend.domain.user.exception.UserErrorCode;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -98,7 +99,7 @@ public class AuthService {
     @Transactional
     public void checkEmail(String email) {
         if (userRepository.existsByEmail(email)) {
-            throw ErrorCode.DATA_CONFLICT.toException("이미 존재하는 사용자입니다.");
+            throw GlobalErrorCode.DATA_CONFLICT.toException("이미 존재하는 사용자입니다.");
         }
     }
 
@@ -142,7 +143,7 @@ public class AuthService {
         try {
             jwtTokenProvider.validate(refreshToken);
         } catch (Exception e) {
-            throw ErrorCode.INVALID_TOKEN.toException();
+            throw GlobalErrorCode.INVALID_TOKEN.toException();
         }
 
         Optional<RefreshToken> userRefreshToken = refreshTokenRepository.findByToken(refreshToken);
@@ -158,7 +159,7 @@ public class AuthService {
             return tokenPair;
         }
 
-        throw ErrorCode.INVALID_TOKEN.toException();
+        throw GlobalErrorCode.INVALID_TOKEN.toException();
     }
 
     /**
@@ -186,7 +187,7 @@ public class AuthService {
         try {
             jwtTokenProvider.validate(refreshToken);
         } catch (Exception e) {
-            throw ErrorCode.INVALID_TOKEN.toException();
+            throw GlobalErrorCode.INVALID_TOKEN.toException();
         }
         refreshTokenRepository.deleteByToken(refreshToken);
     }
