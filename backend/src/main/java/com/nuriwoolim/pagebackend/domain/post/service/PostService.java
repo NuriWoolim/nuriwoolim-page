@@ -1,8 +1,5 @@
 package com.nuriwoolim.pagebackend.domain.post.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,10 +14,10 @@ import com.nuriwoolim.pagebackend.domain.post.dto.PostListResponse;
 import com.nuriwoolim.pagebackend.domain.post.dto.PostResponse;
 import com.nuriwoolim.pagebackend.domain.post.dto.PostUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.post.entity.Post;
-import com.nuriwoolim.pagebackend.domain.post.permission.PostPermissionContext;
-import com.nuriwoolim.pagebackend.domain.post.permission.PostPermissionEvaluator;
+import com.nuriwoolim.pagebackend.domain.post.dto.PostPermissionContext;
 import com.nuriwoolim.pagebackend.domain.post.repository.PostRepository;
 import com.nuriwoolim.pagebackend.domain.post.util.PostMapper;
+import com.nuriwoolim.pagebackend.domain.post.util.PostPermissionResolver;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import com.nuriwoolim.pagebackend.domain.user.entity.UserType;
 import com.nuriwoolim.pagebackend.domain.user.service.UserService;
@@ -35,7 +32,7 @@ public class PostService {
 	private final PostRepository postRepository;
 	private final UserService userService;
 	private final BoardService boardService;
-	private final PostPermissionEvaluator postPermissionEvaluator;
+	private final PostPermissionResolver postPermissionResolver;
 
 	@Transactional
 	public PostResponse create(Long boardId, PostCreateRequest request, Long actorId) {
@@ -106,6 +103,6 @@ public class PostService {
 	private PermissionDto resolvePermission(Post post, Long actorId) {
 		UserType role = userService.getUserTypeById(actorId);
 		PostPermissionContext context = new PostPermissionContext(post, actorId);
-		return postPermissionEvaluator.evaluate(role, context);
+		return postPermissionResolver.resolve(role, context);
 	}
 }

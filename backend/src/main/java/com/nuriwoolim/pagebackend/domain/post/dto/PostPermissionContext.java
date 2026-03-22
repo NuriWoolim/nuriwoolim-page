@@ -1,4 +1,4 @@
-package com.nuriwoolim.pagebackend.domain.post.permission;
+package com.nuriwoolim.pagebackend.domain.post.dto;
 
 import com.nuriwoolim.pagebackend.domain.post.entity.Post;
 
