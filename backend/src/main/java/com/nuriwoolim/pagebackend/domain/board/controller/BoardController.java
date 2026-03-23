@@ -49,8 +49,10 @@ public class BoardController {
 	}
 
 	@GetMapping("/{boardId}")
-	public ResponseEntity<BoardResponse> getById(@PathVariable Long boardId) {
-		return ResponseEntity.ok(boardService.findById(boardId));
+	public ResponseEntity<BoardResponse> getById(
+		@PathVariable Long boardId,
+		@AuthenticationPrincipal JwtPrincipal jwtPrincipal) {
+		return ResponseEntity.ok(boardService.findById(boardId, jwtPrincipal.getId()));
 	}
 
 	@DeleteMapping("/{boardId}")
