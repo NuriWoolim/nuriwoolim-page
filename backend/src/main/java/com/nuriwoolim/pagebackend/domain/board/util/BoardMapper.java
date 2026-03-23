@@ -56,5 +56,4 @@ public class BoardMapper {
 			.currentPage(boardPage.getNumber())
 			.build();
 	}
-
 }

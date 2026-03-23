@@ -56,9 +56,9 @@ public class BoardService {
 	}
 
 	@Transactional(readOnly = true)
-	public BoardResponse findById(Long id) { //controller에서 쓸 함수
-		Board board = getBoardById(id);
-		return BoardMapper.toBoardResponse(board, resolvePermission(board, id));
+	public BoardResponse findById(Long boardId, Long actorId) { //controller에서 쓸 함수
+		Board board = getBoardById(boardId);
+		return BoardMapper.toBoardResponse(board, resolvePermission(board, actorId));
 	}
 
 	@Transactional

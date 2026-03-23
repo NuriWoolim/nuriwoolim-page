@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nuriwoolim.pagebackend.core.jwt.dto.JwtPrincipal;
 import com.nuriwoolim.pagebackend.domain.post.dto.PostCreateRequest;
+import com.nuriwoolim.pagebackend.domain.post.dto.PostListResponse;
 import com.nuriwoolim.pagebackend.domain.post.dto.PostResponse;
 import com.nuriwoolim.pagebackend.domain.post.dto.PostUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.post.service.PostService;
@@ -43,7 +44,7 @@ public class PostController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<PostResponse>> getPosts(
+	public ResponseEntity<PostListResponse> getPosts(
 		@RequestParam Long boardId,
 		@RequestParam(defaultValue = "0") int page,
 		@RequestParam(defaultValue = "10") int size
@@ -53,8 +54,9 @@ public class PostController {
 
 	@GetMapping("/{postId}")
 	public ResponseEntity<PostResponse> getById(
-		@PathVariable Long postId) {
-		return ResponseEntity.ok(postService.getById(postId));
+		@PathVariable Long postId,
+		@AuthenticationPrincipal JwtPrincipal jwtPrincipal) {
+		return ResponseEntity.ok(postService.getById(postId, jwtPrincipal.getId()));
 	}
 
 	@DeleteMapping("/{postId}")
