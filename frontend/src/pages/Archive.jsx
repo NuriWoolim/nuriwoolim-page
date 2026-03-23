@@ -7,12 +7,10 @@ const ArchiveSection = styled.section`
 `;
 
 const ArchiveWrapper = styled.div`
-  width: 95%;
-  margin: 0 auto;
+  width: 100%;
   position: relative;
-
-  background-color: #ffffff;
-  border: 4px solid #033148;
+  border-top: 4px solid #033148;
+  border-bottom: 4px solid #033148;
 
   h2 {
     font-family: Plus Jakarta Sans;
@@ -56,7 +54,7 @@ const OverlayText = styled.div`
 const ImageContainer = styled.div`
   position: relative;
   width: 100%;
-  height: 900px;
+  height: 100vh;
   overflow: hidden;
 `;
 
@@ -71,7 +69,7 @@ const Arrow = styled.button`
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  ${(props) => (props.right ? "right: 30px" : "left: 30px")};
+  ${(props) => (props.$right ? "right: 30px" : "left: 30px")};
 
   background: none;
   border: none;
@@ -109,7 +107,7 @@ const Archive = () => {
           <Arrow onClick={prev}>
             <img src="/assets/leftarrow.png" alt="왼쪽화살표" />
           </Arrow>
-          <Arrow right onClick={next}>
+          <Arrow $right onClick={next}>
             <img src="/assets/rightarrow.png" alt="오른쪽화살표" />
           </Arrow>
         </ImageContainer>

@@ -1,4 +1,4 @@
-const baseURL = import.meta.env.VITE_API_URL;
+const baseURL = import.meta.env.VITE_API_URL ?? "";
 
 import axios from "axios";
 import { getAuthAxios } from "./authAxios";
@@ -63,9 +63,19 @@ export const TimeTableAPI = {
   },
 };
 
+export const ScheduleAPI = {
+  getSchedule: async (from, to) => {
+    const result = await axios.get(`${baseURL}/api/schedules`, {
+      params: { from, to },
+      withCredentials: true,
+    });
+    return result;
+  },
+};
+
 export const TimeLineAPI = {
   createTimeLine: async ({ title, description, color, start, end }) => {
-    const result = await api.post(`${baseURL}/api/calendars`, {
+    const result = await api.post(`${baseURL}/api/schedules`, {
       title,
       description,
       color,
@@ -77,7 +87,7 @@ export const TimeLineAPI = {
   },
   getTimeLine: async (from, to) => {
     // get은 토큰 필요 없어서 auth 아닌 일반 axious로
-    const result = await axios.get(`${baseURL}/api/calendars`, {
+    const result = await axios.get(`${baseURL}/api/schedules`, {
       params: {
         from,
         to,
@@ -87,11 +97,11 @@ export const TimeLineAPI = {
     return result;
   },
   deleteTimeLine: async (id) => {
-    const result = await api.delete(`${baseURL}/api/calendars/${id}`);
+    const result = await api.delete(`${baseURL}/api/schedules/${id}`);
     return result;
   },
   updateTimeLine: async ({ title, description, color, start, end, id }) => {
-    const result = await api.patch(`${baseURL}/api/calendars/${id}`, {
+    const result = await api.patch(`${baseURL}/api/schedules/${id}`, {
       title,
       description,
       color,

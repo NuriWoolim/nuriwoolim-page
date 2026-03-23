@@ -1,8 +1,8 @@
 package com.nuriwoolim.pagebackend.core.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
 import com.nuriwoolim.pagebackend.global.exception.ErrorResponse;
+import com.nuriwoolim.pagebackend.global.exception.GlobalErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -26,7 +26,7 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
 
         log.info("authException.getMessage() == {}", authException.getMessage());
 
-        ErrorResponse error = new ErrorResponse(ErrorCode.UNAUTHORIZED.toException(authException.getMessage()));
+        ErrorResponse error = new ErrorResponse(GlobalErrorCode.UNAUTHORIZED.toException(authException.getMessage()));
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(error.getStatus());
         try (PrintWriter w = response.getWriter()) {
@@ -35,7 +35,7 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
     }
 
     public void commenceExpiredToken(HttpServletResponse response) throws IOException {
-        ErrorResponse error = new ErrorResponse(ErrorCode.EXPIRED_TOKEN.toException("access token expired"));
+        ErrorResponse error = new ErrorResponse(GlobalErrorCode.EXPIRED_TOKEN.toException("access token expired"));
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(error.getStatus());
         try (PrintWriter w = response.getWriter()) {

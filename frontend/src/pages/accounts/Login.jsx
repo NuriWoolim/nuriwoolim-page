@@ -4,8 +4,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "../../hooks/useForm";
 import { login } from "../../apis/user";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { useAtom } from "jotai";
-import { userDataState } from "../../atoms";
 
 const Body = styled.div`
   background: linear-gradient(to right, #daf0f6, #fff2ce);
@@ -156,7 +154,7 @@ const SignupLink = styled(Link)`
 `;
 
 const Login = () => {
-  const [username, onChangeUsername] = useForm();
+  const [email, onChangeEmail] = useForm();
   const [password, onChangePassword] = useForm();
   const [showPassword, setShowPassoword] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -165,7 +163,7 @@ const Login = () => {
 
   const onClick = async () => {
     try {
-      const result = await login(username, password);
+      await login(email, password);
       // 아래 코드가 토큰을 undefined로 만들어버려서 일단 지움
     //   localStorage.setItem("accessToken", result.accessToken);
       navigate("/");
@@ -185,11 +183,12 @@ const Login = () => {
         <Title>LOG-IN</Title>
         <Form>
           <Inputs>
-            <p>사용자명(아이디)</p>
+            <p>이메일</p>
             <input
-              value={username}
-              placeholder="아이디를 입력해주세요."
-              onChange={onChangeUsername}
+              value={email}
+              type="email"
+              placeholder="이메일을 입력해주세요."
+              onChange={onChangeEmail}
             ></input>
             <p>비밀번호</p>
 
@@ -202,7 +201,7 @@ const Login = () => {
               />
               <ShowPwBtn
                 type="button"
-                class="fa fa-eye fa-lg"
+                className="fa fa-eye fa-lg"
                 onClick={() => setShowPassoword(!showPassword)}
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -211,9 +210,9 @@ const Login = () => {
           </Inputs>
           <RowWrapper>
             <ErrorMessage visible={hasError}>
-              아이디 또는 비밀번호가 잘못되었습니다.
+              이메일 또는 비밀번호가 잘못되었습니다.
               <br />
-              아이디와 비밀번호를 다시 확인해주세요.
+              이메일과 비밀번호를 다시 확인해주세요.
             </ErrorMessage>
             <button onClick={onClick}>로그인</button>
           </RowWrapper>

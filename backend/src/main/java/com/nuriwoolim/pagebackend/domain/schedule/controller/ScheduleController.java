@@ -6,6 +6,7 @@ import com.nuriwoolim.pagebackend.domain.schedule.dto.ScheduleListResponse;
 import com.nuriwoolim.pagebackend.domain.schedule.dto.ScheduleResponse;
 import com.nuriwoolim.pagebackend.domain.schedule.dto.ScheduleUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.schedule.service.ScheduleService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/schedules")
+@Tag(name = "Schedule", description = "일정 관리 API")
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
