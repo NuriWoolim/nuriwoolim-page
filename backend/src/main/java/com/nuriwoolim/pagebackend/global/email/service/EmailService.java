@@ -4,7 +4,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
+import com.nuriwoolim.pagebackend.domain.user.exception.UserErrorCode;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -34,7 +34,7 @@ public class EmailService {
 			mailSender.send(message);
 
 		} catch (MessagingException e) {
-			throw ErrorCode.MAIL_ERROR.toException();
+			throw UserErrorCode.MAIL_ERROR.toException();
 		}
 	}
 
@@ -54,7 +54,7 @@ public class EmailService {
 			mailSender.send(message);
 
 		} catch (MessagingException e) {
-			throw ErrorCode.MAIL_ERROR.toException();
+			throw UserErrorCode.MAIL_ERROR.toException();
 		}
 	}
 

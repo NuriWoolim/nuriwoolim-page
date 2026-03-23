@@ -18,7 +18,8 @@ import com.nuriwoolim.pagebackend.domain.user.util.CodeGenerator;
 import com.nuriwoolim.pagebackend.domain.user.util.UserMapper;
 import com.nuriwoolim.pagebackend.global.email.event.PasswordResetEmailEvent;
 import com.nuriwoolim.pagebackend.global.email.event.SignupVerificationEmailEvent;
-import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
+import com.nuriwoolim.pagebackend.domain.user.exception.UserErrorCode;
+import com.nuriwoolim.pagebackend.global.exception.GlobalErrorCode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -106,7 +107,7 @@ public class EmailVerificationService {
 
 		LocalDateTime cooldownEndTime = existingVerification.get().getUpdatedAt().plusSeconds(resendTime);
 		if (LocalDateTime.now().isBefore(cooldownEndTime)) {
-			throw ErrorCode.TOO_MANY_RESEND.toException("Request After " + cooldownEndTime);
+			throw UserErrorCode.TOO_MANY_RESEND.toException("Request After " + cooldownEndTime);
 		}
 	}
 
@@ -121,15 +122,15 @@ public class EmailVerificationService {
 		EmailVerification emailVerification = emailVerificationRepository.findByEmailAndType(
 			email,
 			EmailVerificationType.SIGNUP
-		).orElseThrow(ErrorCode.DATA_NOT_FOUND::toException);
+		).orElseThrow(GlobalErrorCode.DATA_NOT_FOUND::toException);
 
 		if (emailVerification.isExpired()) {
 			emailVerificationRepository.deleteByEmailAndTypeIn(email, SIGNUP_TYPES);
-			throw ErrorCode.EXPIRED_EMAIL_CODE.toException();
+			throw UserErrorCode.EXPIRED_EMAIL_CODE.toException();
 		}
 
 		if (!emailVerification.getCode().equals(code)) {
-			throw ErrorCode.INVALID_EMAIL_CODE.toException();
+			throw UserErrorCode.INVALID_EMAIL_CODE.toException();
 		}
 
 		emailVerificationRepository.deleteByEmailAndType(email, EmailVerificationType.SIGNUP_VERIFIED);
@@ -151,10 +152,10 @@ public class EmailVerificationService {
 			email,
 			code,
 			EmailVerificationType.SIGNUP_VERIFIED
-		).orElseThrow(() -> ErrorCode.SIGNUP_NOT_VERIFIED.toException("먼저 이메일 인증을 완료해주세요."));
+		).orElseThrow(() -> UserErrorCode.SIGNUP_NOT_VERIFIED.toException("먼저 이메일 인증을 완료해주세요."));
 
 		if (emailVerification.isExpired()) {
-			throw ErrorCode.EXPIRED_EMAIL_CODE.toException();
+			throw UserErrorCode.EXPIRED_EMAIL_CODE.toException();
 		}
 	}
 
@@ -169,14 +170,14 @@ public class EmailVerificationService {
 		EmailVerification emailVerification = emailVerificationRepository.findByEmailAndType(
 			email,
 			EmailVerificationType.PASSWORD_RESET
-		).orElseThrow(ErrorCode.DATA_NOT_FOUND::toException);
+		).orElseThrow(GlobalErrorCode.DATA_NOT_FOUND::toException);
 
 		if (emailVerification.isExpired()) {
-			throw ErrorCode.EXPIRED_EMAIL_CODE.toException();
+			throw UserErrorCode.EXPIRED_EMAIL_CODE.toException();
 		}
 
 		if (!emailVerification.getCode().equals(code)) {
-			throw ErrorCode.INVALID_EMAIL_CODE.toException();
+			throw UserErrorCode.INVALID_EMAIL_CODE.toException();
 		}
 	}
 

@@ -21,7 +21,7 @@ import com.nuriwoolim.pagebackend.domain.post.util.PostPermissionResolver;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import com.nuriwoolim.pagebackend.domain.user.entity.UserType;
 import com.nuriwoolim.pagebackend.domain.user.service.UserService;
-import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
+import com.nuriwoolim.pagebackend.global.exception.GlobalErrorCode;
 import com.nuriwoolim.pagebackend.global.permission.dto.PermissionDto;
 
 import lombok.RequiredArgsConstructor;
@@ -56,7 +56,7 @@ public class PostService {
 
 	@Transactional(readOnly = true)
 	public Post getPostById(Long postId) { //service layer에서 쓸 함수
-		return postRepository.findById(postId).orElseThrow(ErrorCode.DATA_NOT_FOUND::toException);
+		return postRepository.findById(postId).orElseThrow(GlobalErrorCode.DATA_NOT_FOUND::toException);
 	}
 
 	@Transactional(readOnly = true)
@@ -84,20 +84,20 @@ public class PostService {
 	private void validatePostCreatePermission(Long actorId, BoardType boardType) {
 		if (boardType == BoardType.ANNOUNCEMENT &&
 			!(userService.isAdmin(actorId) || userService.isManager(actorId))) {
-			throw ErrorCode.DATA_FORBIDDEN.toException();
-		} // 공지는 ADMIN만 작성 가능
+			throw GlobalErrorCode.DATA_FORBIDDEN.toException();
+		}
 	}
 
 	private void validatePostDeletePermission(Long actorId, Post post) {
 		if (!post.getWriter().getId().equals(actorId) && !userService.isAdmin(actorId)) {
-			throw ErrorCode.DATA_FORBIDDEN.toException();
-		} // 작성자 & ADMIN은 게시물 삭제 가능
+			throw GlobalErrorCode.DATA_FORBIDDEN.toException();
+		}
 	}
 
 	private void validatePostUpdatePermission(Long actorId, Post post) {
 		if (!post.getWriter().getId().equals(actorId)) {
-			throw ErrorCode.DATA_FORBIDDEN.toException();
-		} // 원 작성자만이 게시물 수정 가능
+			throw GlobalErrorCode.DATA_FORBIDDEN.toException();
+		}
 	}
 
 	private PermissionDto resolvePermission(Post post, Long actorId) {

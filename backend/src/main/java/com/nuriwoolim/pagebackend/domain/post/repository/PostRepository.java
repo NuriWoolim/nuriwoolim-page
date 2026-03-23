@@ -12,4 +12,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
 	@EntityGraph(attributePaths = {"writer", "board"})
 	Page<Post> findByBoardId(Long boardId, Pageable pageable);
+
+	@EntityGraph(attributePaths = {"writer", "board"})
+	Page<Post> findByWriterId(Long writerId, Pageable pageable);
+
+	long countByWriterId(Long writerId);
 }

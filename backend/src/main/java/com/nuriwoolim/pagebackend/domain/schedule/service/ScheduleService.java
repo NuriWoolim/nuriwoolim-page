@@ -8,7 +8,7 @@ import com.nuriwoolim.pagebackend.domain.schedule.entity.Schedule;
 import com.nuriwoolim.pagebackend.domain.schedule.repository.ScheduleRepository;
 import com.nuriwoolim.pagebackend.domain.schedule.util.ScheduleMapper;
 import com.nuriwoolim.pagebackend.domain.user.service.UserService;
-import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
+import com.nuriwoolim.pagebackend.global.exception.GlobalErrorCode;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,7 @@ public class ScheduleService {
 
     @Transactional(readOnly = true)
     public Schedule getCalendarById(Long id) {
-        return scheduleRepository.findById(id).orElseThrow(ErrorCode.DATA_NOT_FOUND::toException);
+        return scheduleRepository.findById(id).orElseThrow(GlobalErrorCode.DATA_NOT_FOUND::toException);
     }
 
     @Transactional(readOnly = true)
@@ -55,7 +55,7 @@ public class ScheduleService {
 
     private void validatePermission(Long actorId) {
         if (!userService.isManager(actorId)) {
-            throw ErrorCode.DATA_FORBIDDEN.toException();
+            throw GlobalErrorCode.DATA_FORBIDDEN.toException();
         }
     }
 

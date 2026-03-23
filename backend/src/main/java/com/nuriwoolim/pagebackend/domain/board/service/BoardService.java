@@ -17,7 +17,8 @@ import com.nuriwoolim.pagebackend.domain.board.repository.BoardRepository;
 import com.nuriwoolim.pagebackend.domain.board.util.BoardMapper;
 import com.nuriwoolim.pagebackend.domain.user.entity.UserType;
 import com.nuriwoolim.pagebackend.domain.user.service.UserService;
-import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
+import com.nuriwoolim.pagebackend.domain.board.exception.BoardErrorCode;
+import com.nuriwoolim.pagebackend.global.exception.GlobalErrorCode;
 import com.nuriwoolim.pagebackend.global.permission.dto.PermissionDto;
 
 import lombok.RequiredArgsConstructor;
@@ -33,7 +34,7 @@ public class BoardService {
 	public BoardResponse create(BoardCreateRequest request, Long actorId) { //actorId는 권한 verify 용도
 		validatePermission(actorId); //admin인가?
 		if (boardRepository.existsByTitle(request.title())) {
-			throw ErrorCode.BOARD_TITLE_CONFLICT.toException();
+			throw BoardErrorCode.BOARD_TITLE_CONFLICT.toException();
 		}  //이미 있는 title?
 		Board board = BoardMapper.fromBoardCreateRequest(request);
 		Board savedBoard = boardRepository.save(board); //try-catch 필요없음, GlobalExceptionHandler덕분
@@ -50,8 +51,8 @@ public class BoardService {
 	}
 
 	@Transactional(readOnly = true)
-	public Board getBoardById(Long boardId) { //service layer에서 쓸 함수 (특히 updateById)
-		return boardRepository.findById(boardId).orElseThrow(ErrorCode.DATA_NOT_FOUND::toException);
+	public Board getBoardById(Long id) { //service layer에서 쓸 함수 (특히 updateById)
+		return boardRepository.findById(id).orElseThrow(GlobalErrorCode.DATA_NOT_FOUND::toException);
 	}
 
 	@Transactional(readOnly = true)
@@ -77,7 +78,7 @@ public class BoardService {
 
 	private void validatePermission(Long actorId) {
 		if (!userService.isAdmin(actorId)) {
-			throw ErrorCode.DATA_FORBIDDEN.toException();
+			throw GlobalErrorCode.DATA_FORBIDDEN.toException();
 		}
 	}
 
