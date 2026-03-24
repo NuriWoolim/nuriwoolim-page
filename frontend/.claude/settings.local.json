@@ -1,7 +1,21 @@
 {
   "permissions": {
+    "defaultMode": "bypassPermissions",
     "allow": [
-      "Bash(ls:*)"
+      "Bash(*)",
+      "Read",
+      "Edit",
+      "MultiEdit",
+      "Write",
+      "WebFetch",
+      "WebSearch",
+      "Glob",
+      "Grep",
+      "LS",
+      "Task",
+      "TodoRead",
+      "TodoWrite",
+      "mcp__*"
     ]
   }
 }
