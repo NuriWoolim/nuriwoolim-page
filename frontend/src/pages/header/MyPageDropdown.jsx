@@ -104,11 +104,9 @@ const MyPageDropdown = () => {
     setVisible(false);
   };
 
-  const handleLogout = () => {
-    logout();
-    localStorage.removeItem("accessToken");
-    navigate("/");
+  const handleLogout = async () => {
     setVisible(false);
+    await logout();
   };
 
   // 외부 클릭 시 닫기
