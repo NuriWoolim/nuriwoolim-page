@@ -1,4 +1,4 @@
-package com.nuriwoolim.pagebackend.domain.board.permission;
+package com.nuriwoolim.pagebackend.domain.board.dto;
 
 import com.nuriwoolim.pagebackend.domain.board.entity.Board;
 

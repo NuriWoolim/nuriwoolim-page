@@ -28,8 +28,8 @@ public class PostPermissionResolver {
 
 	public PermissionDto resolve(UserType role, PostPermissionContext context) {
 		return PermissionDto.forPost(
-			PostPermissionResolver.CAN_EDIT.evaluate(role, context),
-			PostPermissionResolver.CAN_DELETE.evaluate(role, context)
+			CAN_EDIT.evaluate(role, context),
+			CAN_DELETE.evaluate(role, context)
 		);
 	}
 }
