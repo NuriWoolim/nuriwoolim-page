@@ -1,6 +1,7 @@
 package com.nuriwoolim.pagebackend.domain.comment.util;
 
 import java.util.List;
+import java.util.function.Function;
 
 import org.springframework.data.domain.Page;
 
@@ -10,6 +11,7 @@ import com.nuriwoolim.pagebackend.domain.comment.dto.CommentResponse;
 import com.nuriwoolim.pagebackend.domain.comment.entity.Comment;
 import com.nuriwoolim.pagebackend.domain.post.entity.Post;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
+import com.nuriwoolim.pagebackend.global.permission.dto.PermissionDto;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -17,7 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommentMapper {
 
-	public static CommentResponse toCommentResponse(Comment comment) {
+	public static CommentResponse toCommentResponse(Comment comment, PermissionDto permission) {
 		return CommentResponse.builder()
 			.id(comment.getId())
 			.content(comment.getContent())
@@ -25,6 +27,7 @@ public class CommentMapper {
 			.writerName(comment.getWriter().getName())
 			.postId(comment.getPost().getId())
 			.postTitle(comment.getPost().getTitle())
+			.permission(permission)
 			.build();
 	}
 
@@ -36,9 +39,10 @@ public class CommentMapper {
 			.build();
 	}
 
-	public static CommentListResponse toCommentListResponse(Page<Comment> commentPage) {
+	public static CommentListResponse toCommentListResponse(Page<Comment> commentPage,
+		Function<Comment, PermissionDto> permissionResolver) {
 		List<CommentResponse> data = commentPage.getContent().stream()
-			.map(CommentMapper::toCommentResponse)
+			.map(comment -> toCommentResponse(comment, permissionResolver.apply(comment)))
 			.toList();
 
 		return CommentListResponse.builder()
@@ -49,4 +53,3 @@ public class CommentMapper {
 			.build();
 	}
 }
-
