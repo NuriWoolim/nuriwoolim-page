@@ -1,8 +1,9 @@
-import { React, useState, useEffect } from "react";
+import { React, useState, useEffect, useMemo } from "react";
 import ReactDOM from "react-dom";
 import styled from "styled-components";
 import DateCell from "./calendar/DateCell";
 import DetailedDate from "./calendar/DetailedDate";
+import WeeklyTimeTable from "./calendar/WeeklyTimeTable";
 import { TimeTableAPI, ScheduleAPI } from "../apis/common";
 import { createDate } from "../tools/DateTool";
 /* Calendar 섹션의 전체 배경 */
@@ -242,6 +243,22 @@ const createCalendarData = (startDate) => {
   };
 };
 
+const getWeekStartMonday = (date) => {
+  const start = new Date(date);
+  const day = (start.getDay() + 6) % 7;
+  start.setDate(start.getDate() - day);
+  start.setHours(0, 0, 0, 0);
+  return start;
+};
+
+const isSameDate = (a, b) => {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+};
+
 const Calendar = () => {
   const row = 6;
   const col = 7;
@@ -261,6 +278,15 @@ const Calendar = () => {
     "Dec",
   ];
   const curDate = new Date();
+
+  const weekDates = useMemo(() => {
+    const monday = getWeekStartMonday(curDate);
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+      return d;
+    });
+  }, []);
 
   const [calendarState, setCalendarState] = useState(() => {
     const today = new Date();
@@ -313,9 +339,48 @@ const Calendar = () => {
   const [monthTT, setMonthTT] = useState(() =>
     Array.from({ length: 42 }, () => [])
   );
+  const [weekTT, setWeekTT] = useState(() =>
+    Array.from({ length: 7 }, () => [])
+  );
   const [monthSchedules, setMonthSchedules] = useState(() =>
     Array.from({ length: 42 }, () => [])
   );
+
+  const getWeekTimeTables = async () => {
+    try {
+      const fromDate = new Date(weekDates[0]);
+      fromDate.setHours(0, 0, 0, 0);
+
+      const toDate = new Date(weekDates[6]);
+      toDate.setHours(23, 59, 0, 0);
+
+      setWeekTT(() => Array.from({ length: 7 }, () => []));
+      const result = await TimeTableAPI.getTimeTable(
+        toLocalISOString(fromDate),
+        toLocalISOString(toDate)
+      );
+      const timetables = result?.data?.data ?? [];
+
+      const newWeekTT = Array.from({ length: 7 }, () => []);
+      weekDates.forEach((dayDate, dayIndex) => {
+        timetables.forEach((timetable) => {
+          const start = createDate(timetable.start);
+          const end = createDate(timetable.end);
+
+          if (isSameDate(start, dayDate)) {
+            newWeekTT[dayIndex].push(timetable);
+          } else if (!isSameDate(start, end) && isSameDate(end, dayDate)) {
+            newWeekTT[dayIndex].push(timetable);
+          }
+        });
+      });
+
+      setWeekTT(newWeekTT);
+    } catch (error) {
+      console.log("getWeekTimeTable error ", error);
+      setWeekTT(Array.from({ length: 7 }, () => []));
+    }
+  };
 
   const getSchedules = async () => {
     try {
@@ -372,11 +437,26 @@ const Calendar = () => {
     getSchedules();
   }, [calendarState]);
 
+  useEffect(() => {
+    getWeekTimeTables();
+  }, [weekDates]);
+
+  const refreshAllTimeTables = () => {
+    getTimeTables();
+    getWeekTimeTables();
+  };
+
   return (
     <CalendarSection>
       <h1 className="calendarTitle">CALENDAR</h1>
       <CalendarWrapper>
         <LeftPart style={{ alignItems: "center" }}>
+          <WeeklyTimeTable
+            weekDates={weekDates}
+            weekTT={weekTT}
+            onOpenDetailedDate={openDetailedDate}
+          />
+
           <MonthYearContainer>
             <button onClick={() => onMonthChange(-1)}>
               <img src="/assets/rightarrow_blue.svg" className="down" />
@@ -419,7 +499,7 @@ const Calendar = () => {
             <ModalContainer onPointerDown={(e) => e.stopPropagation()}>
               <DetailedDate
                 dateObj={selectedDateObj}
-                getMonthTimeTables={getTimeTables}
+                getMonthTimeTables={refreshAllTimeTables}
                 onClose={() => setSelectedDateObj(null)}
               />
             </ModalContainer>

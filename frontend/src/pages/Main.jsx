@@ -1,7 +1,6 @@
 import React from "react";
 import Notice from "./Notice";
 import Archive from "./Archive";
-import HowToUse from "./HowToUse";
 import Calendar from "./Calendar";
 import styled from "styled-components";
 
@@ -66,9 +65,8 @@ const Main = () => {
       </ImgContainer>
 
       <Notice />
-      <Archive />
-      <HowToUse />
       <Calendar />
+      <Archive />
     </MainContainer>
   );
 };

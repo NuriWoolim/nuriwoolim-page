@@ -10,6 +10,9 @@ import FindMyPw from "./pages/accounts/FindMyPw";
 import SignupTerms from "./pages/accounts/SignupTerms";
 import Boards from "./pages/boards/Boards";
 import ArticleEditor from "./pages/boards/ArticleEditor";
+import MyPage from "./pages/accounts/MyPage";
+import ChangePassword from "./pages/accounts/ChangePassword";
+import PostDetail from "./pages/boards/PostDetail";
 
 const App = () => {
   return (
@@ -18,16 +21,19 @@ const App = () => {
         {/* 별도 페이지 (레이아웃 제외) */}
         <Route path="/login" element={<Login />} />
         <Route path="/findMyPw" element={<FindMyPw />} />
-        <Route path="findMyId" element={<FindMyId />} />
+        <Route path="/findMyId" element={<FindMyId />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/signup-terms" element={<SignupTerms />} />
-        <Route path="notice/:id" element={<NoticeDetail />} />
+        <Route path="/notice/:id" element={<NoticeDetail />} />
 
         {/* 공통 레이아웃 안에 포함되는 Routes */}
         <Route element={<Layout />}>
           <Route path="/" element={<Main />} />
           <Route path="/boards" element={<Boards />} />
           <Route path="/boards/editor" element={<ArticleEditor />} />
+          <Route path="/boards/:boardId/posts/:postId" element={<PostDetail />} />
+          <Route path="/mypage" element={<MyPage />} />
+          <Route path="/change-password" element={<ChangePassword />} />
         </Route>
       </Routes>
     </BrowserRouter>

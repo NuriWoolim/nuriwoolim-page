@@ -1,47 +1,32 @@
-const baseURL = import.meta.env.VITE_API_URL ?? "";
+import { TimeTablesAPI } from "./timetables";
+import { SchedulesAPI } from "./schedules";
 
-import axios from "axios";
-import { getAuthAxios } from "./authAxios";
-
-const api = getAuthAxios();
+const asAxiosLike = async (promise) => ({
+  data: await promise,
+});
 
 export const TimeTableAPI = {
   createTimeTable: async ({ title, description, team, color, start, end }) => {
-    const result = await api.post(
-      `${baseURL}/api/timetables`,
-      {
+    return asAxiosLike(
+      TimeTablesAPI.create({
         title,
         description,
         team,
         color,
         start,
         end,
-      }
-      //   {
-      //     // headers: {
-      //     //   Authorization: `Bearer ${accessToken}`,
-      //     // },
-      //     // withCredentials: true,
-      //   }
+      })
     );
-
-    return result;
   },
   getTimeTable: async (from, to) => {
-    // get은 토큰 필요 없어서 auth 아닌 일반 axious로
-    const result = await axios.get(`${baseURL}/api/timetables`, {
-      params: {
+    return asAxiosLike(
+      TimeTablesAPI.list({
         from,
         to,
-      },
-      withCredentials: true,
-    });
-    return result;
+      })
+    );
   },
-  deleteTimeTable: async (id) => {
-    const result = await api.delete(`${baseURL}/api/timetables/${id}`);
-    return result;
-  },
+  deleteTimeTable: async (id) => asAxiosLike(TimeTablesAPI.remove(id)),
   updateTimeTable: async ({
     title,
     description,
@@ -51,63 +36,56 @@ export const TimeTableAPI = {
     end,
     id,
   }) => {
-    const result = await api.patch(`${baseURL}/api/timetables/${id}`, {
-      title,
-      description,
-      team,
-      color,
-      start,
-      end,
-    });
-    return result;
+    return asAxiosLike(
+      TimeTablesAPI.update(id, {
+        title,
+        description,
+        team,
+        color,
+        start,
+        end,
+      })
+    );
   },
 };
 
 export const ScheduleAPI = {
-  getSchedule: async (from, to) => {
-    const result = await axios.get(`${baseURL}/api/schedules`, {
-      params: { from, to },
-      withCredentials: true,
-    });
-    return result;
-  },
+  getSchedule: async (from, to) =>
+    asAxiosLike(
+      SchedulesAPI.list({
+        from,
+        to,
+      })
+    ),
 };
 
 export const TimeLineAPI = {
   createTimeLine: async ({ title, description, color, start, end }) => {
-    const result = await api.post(`${baseURL}/api/schedules`, {
-      title,
-      description,
-      color,
-      start,
-      end,
-    });
-
-    return result;
+    return asAxiosLike(
+      SchedulesAPI.create({
+        title,
+        description,
+        color,
+        start,
+      })
+    );
   },
   getTimeLine: async (from, to) => {
-    // get은 토큰 필요 없어서 auth 아닌 일반 axious로
-    const result = await axios.get(`${baseURL}/api/schedules`, {
-      params: {
+    return asAxiosLike(
+      SchedulesAPI.listForTimeline({
         from,
         to,
-      },
-      withCredentials: true,
-    });
-    return result;
+      })
+    );
   },
-  deleteTimeLine: async (id) => {
-    const result = await api.delete(`${baseURL}/api/schedules/${id}`);
-    return result;
-  },
-  updateTimeLine: async ({ title, description, color, start, end, id }) => {
-    const result = await api.patch(`${baseURL}/api/schedules/${id}`, {
-      title,
-      description,
-      color,
-      start,
-      end,
-    });
-    return result;
-  },
+  deleteTimeLine: async (id) => asAxiosLike(SchedulesAPI.remove(id)),
+  updateTimeLine: async ({ title, description, color, start, end, id }) =>
+    asAxiosLike(
+      SchedulesAPI.update(id, {
+        title,
+        description,
+        color,
+        start,
+      })
+    ),
 };

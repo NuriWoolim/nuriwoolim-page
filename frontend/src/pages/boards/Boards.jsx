@@ -1,106 +1,213 @@
 import styled from "styled-components";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import ArticlesList from "./ArticlesList";
-import Button from "../../components/ui";
-const BoardsSection = styled.div`
-  min-height: 28.8rem;
+import { BoardsAPI } from "../../apis/boards";
+import { PostsAPI } from "../../apis/posts";
 
-  background: linear-gradient(
-      rgba(255, 255, 255, 0.8),
-      rgba(255, 255, 255, 0.8)
-    ),
-    linear-gradient(
-      91deg,
-      rgba(143, 203, 231, 0.33) 5.18%,
-      rgba(255, 184, 4, 0.33) 84.71%
-    );
-
-  h1 {
-    color: #033148;
-    text-align: center;
-    -webkit-text-stroke-width: 1px;
-    -webkit-text-stroke-color: rgba(255, 184, 4, 0.6);
-    font-family: Pretendard;
-    font-size: 5.625rem;
-    font-style: normal;
-    font-weight: 900;
-    line-height: 90%; /* 5.0625rem */
-    letter-spacing: -0.16875rem;
-
-    box-sizing: border-box;
-    display: flex;
-    height: 8.5625rem;
-    flex-direction: column;
-    justify-content: center;
-
-    margin: 0 0 0 0;
-    margin-top: 5.6rem;
-  }
-
-  h2 {
-    color: #000;
-    text-align: center;
-    font-family: Pretendard;
-    font-size: 2.8125rem;
-    font-style: normal;
-    font-weight: 900;
-    line-height: 90%; /* 2.53125rem */
-    letter-spacing: -0.08438rem;
-  }
-
-  h3 {
-    color: rgba(0, 0, 0, 0.8);
-    text-align: center;
-    font-family: Pretendard;
-    font-size: 1.5625rem;
-    font-style: normal;
-    font-weight: 800;
-    line-height: 90%; /* 1.40625rem */
-    letter-spacing: -0.04688rem;
-    margin: 0;
-  }
+/* ── 전체 배경 ── */
+const Section = styled.div`
+  min-height: calc(100vh - 85px - 440px);
+  background: #f2f2ef;
 `;
-const BoardsWrapper = styled.div`
+
+const Wrapper = styled.div`
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+`;
+
+/* ── BOARD 타이틀 ── */
+const Title = styled.h1`
+  text-align: center;
+  font-family: Pretendard;
+  font-size: 8rem;
+  font-weight: 900;
+  color: #3b5377;
+  letter-spacing: -0.14rem;
+  line-height: 1;
+  margin: 0;
+  padding-top: 4.6rem;
+`;
+
+/* ── 게시판 선택 버튼 그룹 ── */
+const TabGroup = styled.div`
   display: flex;
-  flex-direction: column;
+  gap: 2rem;
+  margin: 2.6rem auto 0;
+  flex-wrap: wrap;
+  justify-content: center;
 `;
 
-const BSBContainer = styled.div`
+const Tab = styled.button`
+  min-width: 9.8rem;
+  height: 3.2rem;
+  padding: 0 1.2rem;
+  border: 1px solid #637ea4;
+  background: ${({ $active }) => ($active ? "#354b6d" : "#f0da83")};
+  cursor: pointer;
+  font-family: Pretendard;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: ${({ $active }) => ($active ? "#f7f8fa" : "#2e405f")};
+
+  &:hover {
+    background: ${({ $active }) => ($active ? "#3e5a82" : "#efd67a")};
+  }
+`;
+
+/* ── 글쓰기 버튼 ── */
+const Toolbar = styled.div`
   display: flex;
-  gap: 3.12rem;
-  margin: auto;
-
-  margin-top: 2.87rem;
-`;
-const BoardSelectButton = styled(Button)`
-  width: 12.5rem;
-  height: 3.4375rem;
+  justify-content: flex-end;
+  margin-top: 1.9rem;
+  margin-bottom: 0.9rem;
 `;
 
-const StyledArticleList = styled(ArticlesList)`
-  margin: 0 15.38rem;
-  margin-top: 2.6rem;
+const WriteBtn = styled.button`
+  min-width: 7rem;
+  height: 2.1rem;
+  padding: 0.2rem 1.2rem;
+  border: 1px solid #637ea4;
+  background: #f2f2ef;
+  color: #2f3f57;
+  font-family: Pretendard;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    background: #e9ecef;
+  }
 `;
-const Boards = ({ boardId = 0 }) => {
+
+const Error = styled.div`
+  margin-top: 1rem;
+  color: #c0392b;
+  text-align: center;
+  font-family: Pretendard;
+`;
+
+/* ── 컴포넌트 ── */
+const Boards = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const [boards, setBoards] = useState([]);
+  const [selectedBoard, setSelectedBoard] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const qBoardId = Number(searchParams.get("boardId") || 0);
+  const qPage = Number(searchParams.get("page") || 0);
+
+  /* 게시판 목록 */
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await BoardsAPI.list({ page: 0, size: 20 });
+        const list = res?.data ?? [];
+        setBoards(list);
+
+        const match = list.find((b) => b.id === qBoardId) ?? list[0];
+        if (match) {
+          setSelectedBoard(match);
+          if (!qBoardId) {
+            setSearchParams({ boardId: String(match.id), page: "0" });
+          }
+        }
+      } catch (e) {
+        setError(e.response?.data?.message || "게시판 목록을 불러오지 못했습니다.");
+      }
+    })();
+  }, []);
+
+  /* boardId 변경 시 선택 동기화 */
+  useEffect(() => {
+    if (!boards.length) return;
+    const match = boards.find((b) => b.id === qBoardId) ?? boards[0];
+    setSelectedBoard(match ?? null);
+  }, [boards, qBoardId]);
+
+  /* 게시글 목록 */
+  useEffect(() => {
+    if (!selectedBoard?.id) return;
+
+    (async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const res = await PostsAPI.list({
+          boardId: selectedBoard.id,
+          page: qPage,
+          size: 10,
+        });
+        setPosts(res?.data ?? []);
+        setCurrentPage(res?.currentPage ?? qPage);
+        setTotalPages(res?.totalPages ?? 1);
+      } catch (e) {
+        setError(e.response?.data?.message || "게시글 목록을 불러오지 못했습니다.");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [selectedBoard?.id, qPage]);
+
+  const selectBoard = (board) => {
+    setSearchParams({ boardId: String(board.id), page: "0" });
+  };
+
+  const changePage = (page) => {
+    if (!selectedBoard) return;
+    setSearchParams({ boardId: String(selectedBoard.id), page: String(page) });
+  };
+
   return (
-    <BoardsSection>
-      <BoardsWrapper>
-        <h1>BOARD</h1>
-        <BSBContainer>
-          <BoardSelectButton className={boardId === 0 ? "selected" : null}>
-            <h3>기본 공지</h3>
-          </BoardSelectButton>
+    <Section>
+      <Wrapper>
+        <Title>BOARD</Title>
 
-          <BoardSelectButton className={boardId === 1 ? "selected" : null}>
-            <h3>자유 게시판</h3>
-          </BoardSelectButton>
+        <TabGroup>
+          {boards.map((b) => (
+            <Tab
+              key={b.id}
+              $active={selectedBoard?.id === b.id}
+              onClick={() => selectBoard(b)}
+            >
+              {b.title}
+            </Tab>
+          ))}
+        </TabGroup>
 
-          <BoardSelectButton className={boardId === 2 ? "selected" : null}>
-            <h3>구인구직 게시판</h3>
-          </BoardSelectButton>
-        </BSBContainer>
-        <StyledArticleList pageNumber={6} />
-      </BoardsWrapper>
-    </BoardsSection>
+        <Toolbar>
+          {selectedBoard && (
+            <WriteBtn
+              onClick={() =>
+                navigate(`/boards/editor?boardId=${selectedBoard.id}`)
+              }
+            >
+              글쓰기
+            </WriteBtn>
+          )}
+        </Toolbar>
+
+        {error && <Error>{error}</Error>}
+
+        <ArticlesList
+          articles={posts}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={changePage}
+          onSelectArticle={(article) =>
+            navigate(`/boards/${selectedBoard?.id}/posts/${article.id}`)
+          }
+          loading={loading}
+        />
+      </Wrapper>
+    </Section>
   );
 };
 
