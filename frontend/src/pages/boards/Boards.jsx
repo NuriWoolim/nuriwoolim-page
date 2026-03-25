@@ -109,7 +109,7 @@ const Boards = () => {
     (async () => {
       try {
         const res = await BoardsAPI.list({ page: 0, size: 20 });
-        const list = res?.data ?? [];
+        const list = Array.isArray(res) ? res : (res?.data ?? res?.content ?? []);
         setBoards(list);
 
         const match = list.find((b) => b.id === qBoardId) ?? list[0];
@@ -145,9 +145,15 @@ const Boards = () => {
           page: qPage,
           size: 10,
         });
-        setPosts(res?.data ?? []);
-        setCurrentPage(res?.currentPage ?? qPage);
-        setTotalPages(res?.totalPages ?? 1);
+        // API 응답: { data: [...], currentPage, totalPages } 또는 배열 직접
+        const items = Array.isArray(res) ? res : (res?.data ?? res?.content ?? []);
+        const cur = res?.currentPage ?? res?.number ?? qPage;
+        const total = res?.totalPages ?? res?.totalElements != null
+          ? Math.ceil(res.totalElements / 10)
+          : 1;
+        setPosts(items);
+        setCurrentPage(cur);
+        setTotalPages(total);
       } catch (e) {
         setError(e.response?.data?.message || "게시글 목록을 불러오지 못했습니다.");
       } finally {

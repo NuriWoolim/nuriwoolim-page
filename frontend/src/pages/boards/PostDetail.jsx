@@ -277,10 +277,9 @@ const PostDetail = () => {
             </Meta>
 
             {/* 본문 */}
-            <Content>
-              {post.content}
-              <div className="image-placeholder" />
-            </Content>
+            <Content
+              dangerouslySetInnerHTML={{ __html: post.content ?? "" }}
+            />
 
             {/* 하단 이전/다음 */}
             <BottomNav>

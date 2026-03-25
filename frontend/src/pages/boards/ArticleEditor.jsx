@@ -297,7 +297,7 @@ const ArticleEditor = () => {
     (async () => {
       try {
         const res = await BoardsAPI.list({ page: 0, size: 20 });
-        const list = res?.data ?? [];
+        const list = Array.isArray(res) ? res : (res?.data ?? res?.content ?? []);
         setBoards(list);
       } catch (e) {
         setError(e.response?.data?.message || "게시판 목록을 불러오지 못했습니다.");
