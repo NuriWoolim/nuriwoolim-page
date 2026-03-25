@@ -146,7 +146,8 @@ const Boards = () => {
           size: 10,
         });
         // API 응답: { data: [...], currentPage, totalPages } 또는 배열 직접
-        const items = Array.isArray(res) ? res : (res?.data ?? res?.content ?? []);
+        const raw = Array.isArray(res) ? res : (res?.data ?? res?.content ?? []);
+        const items = [...raw].sort((a, b) => b.id - a.id);
         const cur = res?.currentPage ?? res?.number ?? qPage;
         const total = res?.totalPages ?? res?.totalElements != null
           ? Math.ceil(res.totalElements / 10)
