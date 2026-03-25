@@ -1,8 +1,21 @@
 {
   "permissions": {
+    "defaultMode": "bypassPermissions",
     "allow": [
-      "Bash(ls:*)",
-      "Bash(GIT_EDITOR=true git rebase --continue)"
+      "Bash(*)",
+      "Read",
+      "Edit",
+      "MultiEdit",
+      "Write",
+      "WebFetch",
+      "WebSearch",
+      "Glob",
+      "Grep",
+      "LS",
+      "Task",
+      "TodoRead",
+      "TodoWrite",
+      "mcp__*"
     ]
   }
 }
