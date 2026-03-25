@@ -6,12 +6,18 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
+import java.util.Arrays;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 @Configuration
+@RequiredArgsConstructor
 public class SwaggerConfig {
+
+    private final Environment environment;
 
     @Bean
     public OpenAPI openAPI() {
@@ -26,6 +32,11 @@ public class SwaggerConfig {
         // 보안 요구사항 추가
         SecurityRequirement securityRequirement = new SecurityRequirement().addList("bearerAuth");
 
+        boolean isProd = Arrays.asList(environment.getActiveProfiles()).contains("prod");
+        List<Server> servers = isProd
+            ? List.of(new Server().url("/api"), new Server().url("/"))
+            : List.of(new Server().url("/"), new Server().url("/api"));
+
         return new OpenAPI()
             .info(new Info()
                 .title("Nuriwoolim API")
@@ -34,6 +45,6 @@ public class SwaggerConfig {
             .components(new Components()
                 .addSecuritySchemes("bearerAuth", securityScheme))
             .addSecurityItem(securityRequirement)
-            .servers(List.of(new Server().url("/api"), new Server().url("/")));
+            .servers(servers);
     }
 }

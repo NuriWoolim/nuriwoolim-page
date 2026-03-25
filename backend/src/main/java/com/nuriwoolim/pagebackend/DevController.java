@@ -2,6 +2,7 @@ package com.nuriwoolim.pagebackend;
 
 import com.nuriwoolim.pagebackend.domain.user.entity.UserType;
 import com.nuriwoolim.pagebackend.domain.user.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/dev")
+@Tag(name = "Dev", description = "개발/운영 보조 기능 API")
 public class DevController {
 
     private final UserService userService;

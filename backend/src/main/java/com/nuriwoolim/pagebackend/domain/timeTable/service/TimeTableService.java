@@ -9,7 +9,7 @@ import com.nuriwoolim.pagebackend.domain.timeTable.repository.TimeTableRepositor
 import com.nuriwoolim.pagebackend.domain.timeTable.util.TimeTableMapper;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import com.nuriwoolim.pagebackend.domain.user.service.UserService;
-import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
+import com.nuriwoolim.pagebackend.global.exception.GlobalErrorCode;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -40,36 +40,36 @@ public class TimeTableService {
         LocalDateTime end = timeTable.getEnd();
         //시작시간과 종료시간의 순서가 맞지 않는 경우
         if (!start.isBefore(end)) {
-            throw ErrorCode.BAD_REQUEST.toException("시간이 잘못되었습니다.");
+            throw GlobalErrorCode.BAD_REQUEST.toException("시간이 잘못되었습니다.");
         }
         // 분 이하 단위가 있는 경우
-        if (start.getMinute() % 30 != 0 ||
+        if (start.getMinute() != 0 ||
             start.getSecond() != 0 ||
             start.getNano() != 0 ||
-            end.getMinute() % 30 != 0 ||
+            end.getMinute() != 0 ||
             end.getSecond() != 0 ||
             end.getNano() != 0) {
-            throw ErrorCode.BAD_REQUEST.toException("시간이 잘못되었습니다.");
+            throw GlobalErrorCode.BAD_REQUEST.toException("시간이 잘못되었습니다. - Hour 단위 미만의 데이터는 0이어야 합니다.");
         }
         // 22시~익일9시 사이일경우
         if (start.toLocalTime().isBefore(LocalTime.of(9, 0)) || end.toLocalTime()
             .isAfter(LocalTime.of(22, 0))) {
-            throw ErrorCode.BAD_REQUEST.toException("시간이 잘못되었습니다.");
+            throw GlobalErrorCode.BAD_REQUEST.toException("시간이 잘못되었습니다. - 타임 테이블은 9~22시에만 등록 가능합니다.");
         }
         // 운영자가 아닌데 2시간 이상을 잡을경우
         long minutes = Duration.between(timeTable.getStart(), timeTable.getEnd()).toMinutes();
         if (minutes > 120 && !userService.isManager(actorId)) {
-            throw ErrorCode.BAD_REQUEST.toException("타임테이블이 너무 깁니다.");
+            throw GlobalErrorCode.BAD_REQUEST.toException("타임테이블은 최대 2시간 등록 가능합니다.");
         }
         // 다른 정보와 겹칠경우
         if (timeTableRepository.existsTimeTableBetweenExcludingId(timeTable.getId(), start, end)) {
-            throw ErrorCode.DATA_CONFLICT.toException("다른 정보와 충돌합니다.");
+            throw GlobalErrorCode.DATA_CONFLICT.toException("다른 타임테이블이 있습니다.");
         }
     }
 
     @Transactional(readOnly = true)
     public TimeTable getTimeTableById(Long id) {
-        return timeTableRepository.findById(id).orElseThrow(ErrorCode.DATA_NOT_FOUND::toException);
+        return timeTableRepository.findById(id).orElseThrow(GlobalErrorCode.DATA_NOT_FOUND::toException);
     }
 
     @Transactional(readOnly = true)
@@ -91,7 +91,7 @@ public class TimeTableService {
 
     private void validatePermission(TimeTable timeTable, Long actorId) {
         if (!timeTable.getUser().getId().equals(actorId) && !userService.isManager(actorId)) {
-            throw ErrorCode.DATA_FORBIDDEN.toException();
+            throw GlobalErrorCode.DATA_FORBIDDEN.toException();
         }
     }
 

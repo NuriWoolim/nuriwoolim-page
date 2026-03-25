@@ -18,4 +18,18 @@ public class CodeGenerator {
         }
         return code.toString();
     }
+
+    public static String generateTemporaryPassword() {
+        StringBuilder tempPassword = new StringBuilder();
+
+        // 비밀번호 정책(영문+숫자 포함)을 만족하도록 최소 1개씩 강제 포함
+        tempPassword.append((char) ('A' + random.nextInt(26)));
+        tempPassword.append((char) ('0' + random.nextInt(10)));
+
+        for (int i = 0; i < 10; i++) {
+            tempPassword.append(ALPHANUMERIC.charAt(random.nextInt(ALPHANUMERIC.length())));
+        }
+
+        return tempPassword.toString();
+    }
 }

@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
         final AccessDeniedException e) {
         log.debug("handleAccessDeniedException: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
-            .body(new ErrorResponse(ErrorCode.AUTHORITY_FORBIDDEN.toException()));
+            .body(new ErrorResponse(GlobalErrorCode.AUTHORITY_FORBIDDEN.toException()));
     }
 
     // 인증 자체가 실패한 경우 (로그인 안 됨, 토큰 만료 등)
@@ -64,7 +64,7 @@ public class GlobalExceptionHandler {
         final AuthenticationException e) {
         log.debug("handleAuthenticationException: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-            .body(new ErrorResponse(ErrorCode.UNAUTHORIZED.toException()));
+            .body(new ErrorResponse(GlobalErrorCode.UNAUTHORIZED.toException()));
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
@@ -73,7 +73,7 @@ public class GlobalExceptionHandler {
         log.debug("handleDataIntegrityViolationException: {}", e.getCause().getMessage());
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(
-            new ErrorResponse(ErrorCode.DATA_CONFLICT.toException()));
+            new ErrorResponse(GlobalErrorCode.DATA_CONFLICT.toException()));
     }
 
 
@@ -84,8 +84,8 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleNoHandlerFoundException(final Exception e) {
         log.trace("handleNoHandlerFoundException: {}", e.getMessage());
         return ResponseEntity
-            .status(ErrorCode.API_NOT_FOUND.getStatus())
-            .body(new ErrorResponse(ErrorCode.API_NOT_FOUND.toException()));
+            .status(GlobalErrorCode.API_NOT_FOUND.getStatus())
+            .body(new ErrorResponse(GlobalErrorCode.API_NOT_FOUND.toException()));
     }
 
     /*
@@ -95,8 +95,8 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleMissingParameterException(final Exception e) {
         log.trace("handleMissingParameterException: {}", e.getMessage());
         return ResponseEntity
-            .status(ErrorCode.BAD_REQUEST.getStatus())
-            .body(new ErrorResponse(ErrorCode.BAD_REQUEST.toException(e.getMessage())));
+            .status(GlobalErrorCode.BAD_REQUEST.getStatus())
+            .body(new ErrorResponse(GlobalErrorCode.BAD_REQUEST.toException(e.getMessage())));
     }
 
     /*
@@ -106,8 +106,8 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleTypeMismatchException(final Exception e) {
         log.trace("handleTypeMismatchException: {}", e.getMessage());
         return ResponseEntity
-            .status(ErrorCode.BAD_REQUEST.getStatus())
-            .body(new ErrorResponse(ErrorCode.BAD_REQUEST.toException("타입이 올바르지 않습니다.")));
+            .status(GlobalErrorCode.BAD_REQUEST.getStatus())
+            .body(new ErrorResponse(GlobalErrorCode.BAD_REQUEST.toException("타입이 올바르지 않습니다.")));
     }
 
     /*
@@ -117,7 +117,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleException(final Exception e) {
         log.error("handleException: {}", e.getMessage());
         return ResponseEntity
-            .status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
-            .body(new ErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR.toException()));
+            .status(GlobalErrorCode.INTERNAL_SERVER_ERROR.getStatus())
+            .body(new ErrorResponse(GlobalErrorCode.INTERNAL_SERVER_ERROR.toException()));
     }
 }

@@ -10,7 +10,7 @@ export const PostsAPI = {
       })
     ),
 
-  get: async (postId) => unwrap(await publicApi.get(`/api/posts/${postId}`)),
+  get: async (postId) => unwrap(await privateApi.get(`/api/posts/${postId}`)),
 
   create: async ({ boardId, title, content, type }) =>
     unwrap(

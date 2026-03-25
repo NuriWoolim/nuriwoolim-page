@@ -37,10 +37,7 @@ public class EmailVerification extends BaseEntity {
     @Column(nullable = false)
     private String code;
 
-    @Builder.Default
-    private Integer sendCount = 1;
-
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     private EmailVerificationType type;
 
@@ -54,9 +51,12 @@ public class EmailVerification extends BaseEntity {
         expiresAt = LocalDateTime.now().plusMinutes(minutes);
     }
 
-    public void countResend(String code) {
+    public void updateCode(String code) {
         this.code = code;
-        sendCount++;
+    }
+
+    public void changeType(EmailVerificationType type) {
+        this.type = type;
     }
 }
 
