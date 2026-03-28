@@ -49,7 +49,15 @@ public class PostService {
 	@Transactional(readOnly = true)
 	public PostListResponse findPostList(Long boardId, Integer page, Integer size) {
 		Pageable pageable = PageRequest.of(page, size);
-		Page<Post> postPage = postRepository.findAll(pageable);
+		Page<Post> postPage = postRepository.findByBoardId(boardId, pageable);
+
+		return PostMapper.toPostListResponse(postPage);
+	}
+
+	@Transactional(readOnly = true)
+	public PostListResponse findPostsByWriterId(Long writerId, int page, int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		Page<Post> postPage = postRepository.findByWriterId(writerId, pageable);
 
 		return PostMapper.toPostListResponse(postPage);
 	}
