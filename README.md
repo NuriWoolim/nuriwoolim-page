@@ -1,3 +1,0 @@
-<<<<<<< HEAD
-# nuriwoolim-page
->>>>>>> develop

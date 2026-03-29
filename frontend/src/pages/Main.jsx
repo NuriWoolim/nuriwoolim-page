@@ -38,10 +38,10 @@ const ImgBackground = styled.img`
   position: absolute;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   object-fit: cover;
-  z-index: 0;
+  z-index: -1;
 `;
 
 const ImgContainer = styled.div`
@@ -65,8 +65,8 @@ const Main = () => {
       </ImgContainer>
 
       <Notice />
-      <Archive />
       <Calendar />
+      <Archive />
     </MainContainer>
   );
 };

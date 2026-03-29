@@ -1,79 +1,92 @@
-import axios from "axios";
-import { getAuthAxios } from "./authAxios";
 import { store, userDataState } from "../atoms";
 import { RESET } from "jotai/utils";
-const baseURL = import.meta.env.VITE_API_URL;
+import { AuthAPI } from "./auth";
+import { UsersAPI } from "./users";
+import { clearAccessToken } from "./client";
 
-export const signup = async (username, email, password, nickname) => {
-  const result = await axios.post(`${baseURL}/api/auth/signup`, {
-    username,
-    email,
-    password,
-    nickname,
-  });
-  return result;
+const syncUserState = (userData) => {
+  store.set(userDataState, userData);
+  return userData;
 };
 
-export const login = async (email, password) => {
-  const result = await axios.post(
-    `${baseURL}/api/auth/login`,
-    {
-      email,
-      password,
-    },
-    {
-      withCredentials: true,
-    }
-  );
+export const signup = async (name, email, password, code) =>
+  AuthAPI.signup({
+    name,
+    email,
+    password,
+    code,
+  });
 
-  const accessToken = result.headers["authorization"]?.split("Bearer ")[1]; // 응답 형식 : Authorization: Bearer abc.def.jhi
-  if (accessToken) localStorage.setItem("accessToken", accessToken);
-  store.set(userDataState, result.data);
-  return result.data;
+export const sendVerification = async (email) =>
+  AuthAPI.sendSignupVerification({
+    email,
+  });
+
+export const verifyEmail = async (email, code) =>
+  AuthAPI.verifySignupEmail({
+    email,
+    code,
+  });
+
+export const checkEmail = async (email) =>
+  AuthAPI.checkEmail({
+    email,
+  });
+
+export const sendPasswordResetVerification = async (email) =>
+  AuthAPI.sendPasswordResetVerification({
+    email,
+  });
+
+export const resetPassword = async (email, code) =>
+  AuthAPI.resetPassword({
+    email,
+    code,
+  });
+
+export const login = async (email, password) => {
+  const userData = await AuthAPI.login({
+    email,
+    password,
+  });
+
+  return syncUserState(userData);
 };
 
 export const logout = async () => {
   store.set(userDataState, RESET);
   try {
-    await axios.post(
-      `${baseURL}/api/auth/logout`,
-      {},
-      {
-        withCredentials: true,
-      }
-    );
+    await AuthAPI.logout();
   } catch (error) {
     console.error("로그아웃 요청 실패", error);
   } finally {
-    localStorage.removeItem("accessToken");
+    clearAccessToken();
     window.location.href = "/login";
   }
 };
 
-export const getMyPage = async (token) => {
-  const authAxios = getAuthAxios(token);
-  const result = authAxios.get("/accounts/mypage");
-  return result;
+export const getMyPage = async () => {
+  const userData = await UsersAPI.getMe();
+  return syncUserState(userData);
 };
 
 export const getNewRefreshToken = async () => {
   try {
-    const accessToken = localStorage.getItem("accessToken");
-
-    const result = await axios.post(
-      `${baseURL}/api/auth/refresh`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        withCredentials: true,
-      }
-    );
-    return result.data;
+    return await AuthAPI.refresh();
   } catch (error) {
     alert("토큰이 만료되었습니다. 다시 로그인해주세요.");
-    localStorage.removeItem("accessToken");
+    clearAccessToken();
     window.location.href = "/"; // 강제 이동!
   }
 };
+
+export const changePassword = async ({
+  currentPassword,
+  newPassword,
+  newPasswordConfirm,
+}) =>
+  UsersAPI.changePassword({
+    currentPassword,
+    newPassword,
+    newPasswordConfirm,
+  });

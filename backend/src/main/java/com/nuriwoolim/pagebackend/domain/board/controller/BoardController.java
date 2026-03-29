@@ -19,6 +19,7 @@ import com.nuriwoolim.pagebackend.domain.board.dto.BoardListResponse;
 import com.nuriwoolim.pagebackend.domain.board.dto.BoardResponse;
 import com.nuriwoolim.pagebackend.domain.board.dto.BoardUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.board.service.BoardService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/boards")
+@Tag(name = "Board", description = "게시판 관리 API")
 public class BoardController {
 
 	private final BoardService boardService;
@@ -47,8 +49,10 @@ public class BoardController {
 	}
 
 	@GetMapping("/{boardId}")
-	public ResponseEntity<BoardResponse> getById(@PathVariable Long boardId) {
-		return ResponseEntity.ok(boardService.findById(boardId));
+	public ResponseEntity<BoardResponse> getById(
+		@PathVariable Long boardId,
+		@AuthenticationPrincipal JwtPrincipal jwtPrincipal) {
+		return ResponseEntity.ok(boardService.findById(boardId, jwtPrincipal.getId()));
 	}
 
 	@DeleteMapping("/{boardId}")

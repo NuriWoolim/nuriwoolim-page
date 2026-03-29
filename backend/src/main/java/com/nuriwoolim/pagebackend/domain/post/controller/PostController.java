@@ -17,9 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nuriwoolim.pagebackend.core.jwt.dto.JwtPrincipal;
 import com.nuriwoolim.pagebackend.domain.post.dto.PostCreateRequest;
+import com.nuriwoolim.pagebackend.domain.post.dto.PostListResponse;
 import com.nuriwoolim.pagebackend.domain.post.dto.PostResponse;
 import com.nuriwoolim.pagebackend.domain.post.dto.PostUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.post.service.PostService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/posts")
+@Tag(name = "Post", description = "게시글 관리 API")
 public class PostController {
 
 	private final PostService postService;
@@ -41,7 +44,7 @@ public class PostController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<PostResponse>> getPosts(
+	public ResponseEntity<PostListResponse> getPosts(
 		@RequestParam Long boardId,
 		@RequestParam(defaultValue = "0") int page,
 		@RequestParam(defaultValue = "10") int size
@@ -51,8 +54,9 @@ public class PostController {
 
 	@GetMapping("/{postId}")
 	public ResponseEntity<PostResponse> getById(
-		@PathVariable Long postId) {
-		return ResponseEntity.ok(postService.getById(postId));
+		@PathVariable Long postId,
+		@AuthenticationPrincipal JwtPrincipal jwtPrincipal) {
+		return ResponseEntity.ok(postService.getById(postId, jwtPrincipal.getId()));
 	}
 
 	@DeleteMapping("/{postId}")

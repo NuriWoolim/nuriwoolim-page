@@ -3,13 +3,13 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { fadeIn } from "../../style/fadeIn";
 import MyPageDropdown from "./MyPageDropdown";
-import { logout } from "../../apis/user";
+
 
 const HeaderContainer = styled.header`
-  /* position: relative; */
+  position: relative;
   width: 100%;
   height: 85px;
-  overflow: hidden;
+  z-index: 1000;
   animation: ${fadeIn} 2s ease-out forwards;
 `;
 
@@ -23,10 +23,11 @@ const NavBar = styled.nav`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  z-index: 10;
+  overflow: visible;
 
-  background-image: url("/assets/backgroundcolor.png");
-  background-color: white;
+  background-image: url("/assets/navigator.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
 `;
 
 const Logo = styled.div`
@@ -84,26 +85,20 @@ const Header = () => {
   const navigate = useNavigate();
   const isLoggedIn = !!localStorage.getItem("accessToken");
 
-  const handleLogout = () => {
-    logout();
-    localStorage.removeItem("accessToken");
-    navigate("/");
-  };
-
   return (
     <>
       <HeaderContainer>
         <NavBar>
           <Logo>
-            <a href="#Home">
+            <a href="/">
               <img src="/assets/mainlogo.png" alt="누리울림 로고" />
             </a>
           </Logo>
 
           <RightGroup>
             <NavLinks>
-              <a href="#Home">Home</a>
-              <a href="boards">Boards</a>
+              <a href="/">Home</a>
+              <a href="/boards">Boards</a>
               <a href="#Archive">Archive</a>
               <a href="#Equipment">Equipment</a>
               <a href="#Calendar">Calendar</a>
@@ -112,13 +107,7 @@ const Header = () => {
             </NavLinks>
 
             {isLoggedIn ? (
-              <>
-                <button onClick={handleLogout} style={{ all: "unset" }}>
-                  Log out
-                </button>{" "}
-                <MyPageDropdown />
-                <LoginButton onClick={handleLogout}>Log out</LoginButton>
-              </>
+              <MyPageDropdown />
             ) : (
               <LoginButton onClick={() => navigate("/login")}>
                 Log In

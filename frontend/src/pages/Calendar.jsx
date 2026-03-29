@@ -1,9 +1,11 @@
-import { React, useState, useEffect } from "react";
+import { React, useState, useEffect, useMemo } from "react";
+import ReactDOM from "react-dom";
 import styled from "styled-components";
 import DateCell from "./calendar/DateCell";
-import { TimeTableAPI } from "../apis/common";
+import DetailedDate from "./calendar/DetailedDate";
+import WeeklyTimeTable from "./calendar/WeeklyTimeTable";
+import { TimeTableAPI, ScheduleAPI } from "../apis/common";
 import { createDate } from "../tools/DateTool";
-import TimeLine from "./calendar/TimeLine";
 /* Calendar 섹션의 전체 배경 */
 const CalendarSection = styled.section`
   h1 {
@@ -55,14 +57,17 @@ const CalendarSection = styled.section`
   }
 
   background-color: #fefaef;
-  border: 4px solid #033148;
-  padding-bottom: 7rem;
-  background-color: #ffffff;
-  margin: 2rem 2rem;
+  padding: 80px 0 7rem 0;
 
   .calendarTitle {
-    color: #033148;
+    font-family: Pretendard;
+    font-weight: 800;
+    font-size: 56px;
+    line-height: 219%;
+    letter-spacing: -0.05em;
     text-align: center;
+    text-transform: uppercase;
+    color: #033148;
     margin-bottom: 0;
   }
 `;
@@ -83,9 +88,9 @@ const LeftPart = styled.div`
 // 전체 테이블
 const GridContainer = styled.div`
   display: grid;
-  width: 63rem;
-  grid-template-columns: repeat(7, 9rem);
-  grid-template-rows: 2.7rem repeat(6, 8.5rem);
+  width: 105rem;
+  grid-template-columns: repeat(7, 15rem);
+  grid-template-rows: 4.5rem repeat(6, 14.2rem);
 
   border-top: 1px solid #033148;
   border-left: 1px solid #033148;
@@ -107,7 +112,7 @@ const WeekDayCell = styled.div`
 // 현재 년월 라벨과 버튼들을 감싸는 컨테이너
 const MonthYearContainer = styled.div`
   display: flex;
-  width: 63rem;
+  width: 105rem;
   align-items: center;
   padding: 1.2rem 0 1.2rem 0;
 
@@ -150,6 +155,22 @@ const MonthYearContainer = styled.div`
   }
 `;
 
+const ModalBackdrop = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ModalContainer = styled.div`
+  background: white;
+  box-shadow: 4px 4px 18px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+`;
+
 function toLocalISOString(date) {
   const pad = (n) => String(n).padStart(2, "0");
 
@@ -160,6 +181,12 @@ function toLocalISOString(date) {
   const minutes = pad(date.getMinutes());
 
   return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+// YYYY-MM-DD 형식 (string($date) 타입 API용)
+function toLocalDateString(date) {
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
 // 현재 달의 날짜들을 찾고 올바른 위치를 찾아주는 함수
@@ -216,6 +243,22 @@ const createCalendarData = (startDate) => {
   };
 };
 
+const getWeekStartMonday = (date) => {
+  const start = new Date(date);
+  const day = (start.getDay() + 6) % 7;
+  start.setDate(start.getDate() - day);
+  start.setHours(0, 0, 0, 0);
+  return start;
+};
+
+const isSameDate = (a, b) => {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+};
+
 const Calendar = () => {
   const row = 6;
   const col = 7;
@@ -236,11 +279,21 @@ const Calendar = () => {
   ];
   const curDate = new Date();
 
+  const weekDates = useMemo(() => {
+    const monday = getWeekStartMonday(curDate);
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+      return d;
+    });
+  }, []);
+
   const [calendarState, setCalendarState] = useState(() => {
     const today = new Date();
     const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
     return createCalendarData(startDate);
   });
+  const [selectedDateObj, setSelectedDateObj] = useState(null);
 
   const getTimeTables = async () => {
     try {
@@ -251,13 +304,13 @@ const Calendar = () => {
       );
 
       // 응답 딜레이 시 잔상 안남기도록 제거
-      setMonthTT(() => Array.from({ length: 30 }, () => []));
+      setMonthTT(() => Array.from({ length: 42 }, () => []));
       const result = await TimeTableAPI.getTimeTable(from, to);
-      const resultdata = result.data;
+      const timetables = result?.data?.data ?? [];
 
       const newMonthTT = Array.from({ length: 42 }, () => []);
       calendarState.dates.map((date, i) => {
-        resultdata.data.map((timetable) => {
+        timetables.map((timetable) => {
           const start = createDate(timetable.start);
           const end = createDate(timetable.end);
 
@@ -280,11 +333,87 @@ const Calendar = () => {
       setMonthTT(newMonthTT);
     } catch (error) {
       console.log("getTimeTable error ", error);
+      setMonthTT(Array.from({ length: 42 }, () => []));
     }
   };
   const [monthTT, setMonthTT] = useState(() =>
-    Array.from({ length: 30 }, () => [])
+    Array.from({ length: 42 }, () => [])
   );
+  const [weekTT, setWeekTT] = useState(() =>
+    Array.from({ length: 7 }, () => [])
+  );
+  const [monthSchedules, setMonthSchedules] = useState(() =>
+    Array.from({ length: 42 }, () => [])
+  );
+
+  const getWeekTimeTables = async () => {
+    try {
+      const fromDate = new Date(weekDates[0]);
+      fromDate.setHours(0, 0, 0, 0);
+
+      const toDate = new Date(weekDates[6]);
+      toDate.setHours(23, 59, 0, 0);
+
+      setWeekTT(() => Array.from({ length: 7 }, () => []));
+      const result = await TimeTableAPI.getTimeTable(
+        toLocalISOString(fromDate),
+        toLocalISOString(toDate)
+      );
+      const timetables = result?.data?.data ?? [];
+
+      const newWeekTT = Array.from({ length: 7 }, () => []);
+      weekDates.forEach((dayDate, dayIndex) => {
+        timetables.forEach((timetable) => {
+          const start = createDate(timetable.start);
+          const end = createDate(timetable.end);
+
+          if (isSameDate(start, dayDate)) {
+            newWeekTT[dayIndex].push(timetable);
+          } else if (!isSameDate(start, end) && isSameDate(end, dayDate)) {
+            newWeekTT[dayIndex].push(timetable);
+          }
+        });
+      });
+
+      setWeekTT(newWeekTT);
+    } catch (error) {
+      console.log("getWeekTimeTable error ", error);
+      setWeekTT(Array.from({ length: 7 }, () => []));
+    }
+  };
+
+  const getSchedules = async () => {
+    try {
+      const from = toLocalDateString(calendarState.dates[0]);
+      const to = toLocalDateString(
+        calendarState.dates[calendarState.dates.length - 1]
+      );
+
+      setMonthSchedules(() => Array.from({ length: 42 }, () => []));
+      const result = await ScheduleAPI.getSchedule(from, to);
+      const schedules = result?.data?.data ?? [];
+
+      const newMonthSchedules = Array.from({ length: 42 }, () => []);
+      calendarState.dates.forEach((date, i) => {
+        schedules.forEach((schedule) => {
+          // schedule.date는 "2023-12-25" 형식
+          const [year, month, day] = schedule.date.split("-").map(Number);
+          if (
+            date.getDate() === day &&
+            date.getMonth() === month - 1 &&
+            date.getFullYear() === year
+          ) {
+            newMonthSchedules[i].push(schedule);
+          }
+        });
+      });
+
+      setMonthSchedules(newMonthSchedules);
+    } catch (error) {
+      console.log("getSchedule error ", error);
+      setMonthSchedules(Array.from({ length: 42 }, () => []));
+    }
+  };
 
   const onMonthChange = (direction) => {
     setCalendarState((prevState) => {
@@ -294,15 +423,40 @@ const Calendar = () => {
     });
   };
 
+  const openDetailedDate = (dateObj) => {
+    setSelectedDateObj(dateObj);
+  };
+
+  const closeDetailedDate = (event) => {
+    if (event && event.target !== event.currentTarget) return;
+    setSelectedDateObj(null);
+  };
+
   useEffect(() => {
     getTimeTables();
+    getSchedules();
   }, [calendarState]);
+
+  useEffect(() => {
+    getWeekTimeTables();
+  }, [weekDates]);
+
+  const refreshAllTimeTables = () => {
+    getTimeTables();
+    getWeekTimeTables();
+  };
 
   return (
     <CalendarSection>
       <h1 className="calendarTitle">CALENDAR</h1>
       <CalendarWrapper>
-        <LeftPart>
+        <LeftPart style={{ alignItems: "center" }}>
+          <WeeklyTimeTable
+            weekDates={weekDates}
+            weekTT={weekTT}
+            onOpenDetailedDate={openDetailedDate}
+          />
+
           <MonthYearContainer>
             <button onClick={() => onMonthChange(-1)}>
               <img src="/assets/rightarrow_blue.svg" className="down" />
@@ -326,18 +480,32 @@ const Calendar = () => {
                   key={index}
                   dateObj={calendarState.dates[index]}
                   timetables={monthTT[index]}
+                  schedules={monthSchedules[index]}
                   isSameMonth={
                     calendarState.dates[index].getMonth() ===
                     calendarState.startDate.getMonth()
                   }
-                  getMonthTimeTables={getTimeTables}
+                  isSelected={selectedDateObj === calendarState.dates[index]}
+                  onOpenDetailedDate={openDetailedDate}
                 />
               );
             })}
           </GridContainer>
         </LeftPart>
-        <TimeLine />
       </CalendarWrapper>
+      {selectedDateObj &&
+        ReactDOM.createPortal(
+          <ModalBackdrop onPointerDown={closeDetailedDate}>
+            <ModalContainer onPointerDown={(e) => e.stopPropagation()}>
+              <DetailedDate
+                dateObj={selectedDateObj}
+                getMonthTimeTables={refreshAllTimeTables}
+                onClose={() => setSelectedDateObj(null)}
+              />
+            </ModalContainer>
+          </ModalBackdrop>,
+          document.body
+        )}
     </CalendarSection>
   );
 };

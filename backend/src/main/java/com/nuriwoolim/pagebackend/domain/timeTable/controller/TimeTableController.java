@@ -22,12 +22,14 @@ import com.nuriwoolim.pagebackend.domain.timeTable.dto.TimeTableResponse;
 import com.nuriwoolim.pagebackend.domain.timeTable.dto.TimeTableUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.timeTable.service.TimeTableService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/timetables")
+@Tag(name = "TimeTable", description = "시간표 관리 API")
 public class TimeTableController {
 
 	private final TimeTableService timeTableService;

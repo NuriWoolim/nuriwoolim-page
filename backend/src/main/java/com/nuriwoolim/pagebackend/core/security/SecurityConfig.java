@@ -43,8 +43,13 @@ public class SecurityConfig {
 					"/swagger-resources/**",
 					"/webjars/**",
 					"/refresh").permitAll()
-				.requestMatchers("/files/**").hasRole("ADMIN") // 파일 관리 API는 ADMIN만 접근 가능
+				.requestMatchers("/admin/**").hasAnyRole("ADMIN", "MANAGER")
+				.requestMatchers(HttpMethod.GET, "/boards").permitAll() //list only
+				.requestMatchers("/boards/**").hasAnyRole("ADMIN", "MANAGER", "MEMBER") //everything else
+				.requestMatchers("/posts/**").hasAnyRole("ADMIN", "MANAGER", "MEMBER")
+				.requestMatchers("/comments/**").hasAnyRole("ADMIN", "MANAGER", "MEMBER")
 				.requestMatchers(HttpMethod.GET).permitAll()
+				.requestMatchers("/users/**").authenticated()
 				.requestMatchers("/schedules/**").hasAnyRole("MANAGER", "ADMIN")
 				.requestMatchers(HttpMethod.POST).hasAnyRole("ADMIN", "MANAGER", "MEMBER")
 				.requestMatchers(HttpMethod.PATCH).hasAnyRole("ADMIN", "MANAGER", "MEMBER")

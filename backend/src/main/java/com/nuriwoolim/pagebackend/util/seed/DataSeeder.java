@@ -64,7 +64,7 @@ public class DataSeeder implements CommandLineRunner {
 		log.info("=== 데이터 시딩 완료 ===");
 
 		// 시딩 완료 후 애플리케이션 종료
-		shutdownApplication();
+		// shutdownApplication();
 	}
 
 	private void shutdownApplication() {

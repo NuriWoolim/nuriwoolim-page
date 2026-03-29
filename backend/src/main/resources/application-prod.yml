@@ -45,7 +45,6 @@ custom:
       refresh: 259200_000 #3일
     secret-key: ${SECRET_KEY}
   resendTime: 30
-  resendCount: 3
   verificationExpires: 10
   cors:
     origins: ${PRIVATE_ORIGINS}

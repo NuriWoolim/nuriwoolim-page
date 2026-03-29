@@ -1,5 +1,8 @@
 package com.nuriwoolim.pagebackend.domain.comment.dto;
 
+import com.nuriwoolim.pagebackend.domain.post.entity.PostType;
+import com.nuriwoolim.pagebackend.global.permission.dto.PermissionDto;
+
 import lombok.Builder;
 
 @Builder
@@ -9,7 +12,8 @@ public record CommentResponse(
 	Long writerId,
 	String writerName,
 	Long postId,
-	String postTitle
+	String postTitle,
+	PermissionDto permission
 ) {
 }
 

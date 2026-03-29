@@ -20,12 +20,14 @@ import com.nuriwoolim.pagebackend.domain.comment.dto.CommentResponse;
 import com.nuriwoolim.pagebackend.domain.comment.dto.CommentUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.comment.service.CommentService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/comments")
+@Tag(name = "Comment", description = "댓글 관리 API")
 public class CommentController {
 
 	private final CommentService commentService;
@@ -42,14 +44,16 @@ public class CommentController {
 	public ResponseEntity<CommentListResponse> getComments(
 		@RequestParam Long postId,
 		@RequestParam(defaultValue = "0") int page,
-		@RequestParam(defaultValue = "20") int size
-	) {
-		return ResponseEntity.ok(commentService.findCommentList(postId, page, size));
+		@RequestParam(defaultValue = "20") int size,
+		@AuthenticationPrincipal JwtPrincipal jwtPrincipal) {
+		return ResponseEntity.ok(commentService.findCommentList(postId, page, size, jwtPrincipal.getId()));
 	}
 
 	@GetMapping("/{commentId}")
-	public ResponseEntity<CommentResponse> getById(@PathVariable Long commentId) {
-		return ResponseEntity.ok(commentService.getById(commentId));
+	public ResponseEntity<CommentResponse> getById(
+		@PathVariable Long commentId,
+		@AuthenticationPrincipal JwtPrincipal jwtPrincipal) {
+		return ResponseEntity.ok(commentService.getById(commentId, jwtPrincipal.getId()));
 	}
 
 	@DeleteMapping("/{commentId}")
