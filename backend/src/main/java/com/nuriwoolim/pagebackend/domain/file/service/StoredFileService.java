@@ -30,14 +30,17 @@ public class StoredFileService {
 	private final ApplicationEventPublisher eventPublisher;
 
 	/**
-	 * 파일 업로드 (DB 저장 + 트랜잭션 커밋 후 디스크 저장)
+	 * 파일 업로드 (임시 파일 스트리밍 저장 → DB 저장 → 트랜잭션 커밋 후 최종 위치 이동)
+	 * 바이트 배열을 힙에 올리지 않으므로 동시 업로드 시 메모리 사용을 최소화합니다.
 	 */
 	@Transactional
 	public StoredFileResponse upload(MultipartFile file) {
 		String originalFileName = file.getOriginalFilename();
 		String storedFileName = fileStorageService.generateStoredFileName(originalFileName);
 		String filePath = fileStorageService.resolveFilePath(storedFileName);
-		byte[] content = fileStorageService.readBytes(file);
+
+		// 1. MultipartFile → 임시 파일로 스트리밍 저장 (메모리에 바이트 배열을 올리지 않음)
+		fileStorageService.saveToTempFile(file, storedFileName);
 
 		StoredFile storedFile = StoredFile.builder()
 			.originalFileName(originalFileName)
@@ -49,8 +52,8 @@ public class StoredFileService {
 
 		StoredFile saved = storedFileRepository.save(storedFile);
 
-		// 트랜잭션 커밋 후 파일 저장 이벤트 발행 (fileId 포함 - 보상 트랜잭션용)
-		eventPublisher.publishEvent(new FileSaveEvent(saved.getId(), storedFileName, content));
+		// 2. 트랜잭션 커밋 후 임시 파일 → 최종 경로 이동 이벤트 발행 (바이트 배열 없음)
+		eventPublisher.publishEvent(new FileSaveEvent(saved.getId(), storedFileName));
 
 		return StoredFileMapper.toResponse(saved);
 	}

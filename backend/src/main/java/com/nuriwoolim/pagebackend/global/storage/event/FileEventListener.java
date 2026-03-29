@@ -29,18 +29,20 @@ public class FileEventListener {
 	private final OrphanFileLogRepository orphanFileLogRepository;
 
 	/**
-	 * 트랜잭션 커밋 후 파일을 디스크에 비동기 저장합니다.
+	 * 트랜잭션 커밋 후 임시 파일을 최종 경로로 비동기 이동합니다.
 	 * 실패 시 DB 레코드를 삭제(보상 트랜잭션)하여 DB-파일 불일치를 방지합니다.
 	 */
 	@Async
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleFileSave(FileSaveEvent event) {
-		log.info("[Async] 파일 저장 이벤트 수신: {}", event.storedFileName());
+		log.info("[Async] 파일 승격 이벤트 수신: {}", event.storedFileName());
 		try {
-			fileStorageService.saveToFile(event.storedFileName(), event.content());
+			fileStorageService.promoteTempFile(event.storedFileName());
 		} catch (Exception e) {
-			log.error("[보상 트랜잭션] 파일 디스크 저장 실패, DB 레코드 삭제 시도 - storedFileName={}, fileId={}",
+			log.error("[보상 트랜잭션] 파일 승격 실패, DB 레코드 삭제 시도 - storedFileName={}, fileId={}",
 				event.storedFileName(), event.fileId(), e);
+			// 승격 실패 시 임시 파일도 정리
+			fileStorageService.deleteTempFile(event.storedFileName());
 			try {
 				storedFileRepository.deleteById(event.fileId());
 				log.info("[보상 트랜잭션] DB 레코드 삭제 완료 - fileId={}", event.fileId());
@@ -49,6 +51,17 @@ public class FileEventListener {
 					event.fileId(), compensationEx);
 			}
 		}
+	}
+
+	/**
+	 * 트랜잭션 롤백 시 임시 파일을 삭제합니다.
+	 * DB 저장이 롤백되었으므로 디스크의 임시 파일도 정리해야 합니다.
+	 */
+	@Async
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_ROLLBACK)
+	public void handleFileSaveRollback(FileSaveEvent event) {
+		log.warn("[Async] 트랜잭션 롤백 감지, 임시 파일 삭제: {}", event.storedFileName());
+		fileStorageService.deleteTempFile(event.storedFileName());
 	}
 
 	/**

@@ -1,9 +1,11 @@
 package com.nuriwoolim.pagebackend.global.storage;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -29,16 +31,19 @@ public class FileStorageService {
 	private static final Pattern SAFE_EXTENSION_PATTERN = Pattern.compile("^[a-zA-Z0-9]{1,10}$");
 
 	private final Path rootLocation;
+	private final Path tempLocation;
 
 	public FileStorageService(@Value("${file.storage.root-path}") String rootPath) {
 		this.rootLocation = Paths.get(rootPath).toAbsolutePath().normalize();
+		this.tempLocation = this.rootLocation.resolve("tmp").normalize();
 	}
 
 	@PostConstruct
 	public void init() {
 		try {
 			Files.createDirectories(rootLocation);
-			log.info("파일 저장소 초기화 완료: {}", rootLocation);
+			Files.createDirectories(tempLocation);
+			log.info("파일 저장소 초기화 완료: root={}, temp={}", rootLocation, tempLocation);
 		} catch (IOException e) {
 			throw GlobalErrorCode.INTERNAL_SERVER_ERROR.toException("파일 저장소를 초기화할 수 없습니다: " + e.getMessage());
 		}
@@ -54,28 +59,57 @@ public class FileStorageService {
 	}
 
 	/**
-	 * MultipartFile의 내용을 바이트 배열로 읽어옵니다.
+	 * MultipartFile의 내용을 임시 디렉터리에 스트리밍으로 저장합니다.
+	 * 바이트 배열을 힙에 올리지 않으므로 메모리 사용을 최소화합니다.
 	 */
-	public byte[] readBytes(MultipartFile file) {
-		try {
-			return file.getBytes();
+	public void saveToTempFile(MultipartFile file, String storedFileName) {
+		Path tempPath = tempLocation.resolve(storedFileName).normalize();
+		if (!tempPath.startsWith(tempLocation)) {
+			throw GlobalErrorCode.BAD_REQUEST.toException("잘못된 파일 경로입니다: " + storedFileName);
+		}
+		try (InputStream in = file.getInputStream()) {
+			Files.createDirectories(tempPath.getParent());
+			Files.copy(in, tempPath, StandardCopyOption.REPLACE_EXISTING);
+			log.info("임시 파일 저장 완료: {}", tempPath);
 		} catch (IOException e) {
-			throw GlobalErrorCode.INTERNAL_SERVER_ERROR.toException("파일을 읽을 수 없습니다: " + e.getMessage());
+			throw GlobalErrorCode.INTERNAL_SERVER_ERROR.toException("임시 파일을 저장할 수 없습니다: " + e.getMessage());
 		}
 	}
 
 	/**
-	 * storedFileName 기반으로 바이트 배열을 디스크에 저장합니다. (이벤트 리스너에서 호출)
+	 * 임시 파일을 최종 저장 위치로 atomic move 합니다. (이벤트 리스너에서 호출)
+	 * ATOMIC_MOVE를 시도하고, 지원하지 않는 파일시스템이면 일반 이동으로 폴백합니다.
 	 */
-	public void saveToFile(String storedFileName, byte[] content) {
+	public void promoteTempFile(String storedFileName) {
+		Path tempPath = tempLocation.resolve(storedFileName).normalize();
 		Path targetPath = resolveAndValidate(storedFileName);
 		try {
 			Files.createDirectories(targetPath.getParent());
-			Files.write(targetPath, content);
-			log.info("파일 저장 완료: {}", storedFileName);
+			try {
+				Files.move(tempPath, targetPath, StandardCopyOption.ATOMIC_MOVE);
+			} catch (IOException atomicEx) {
+				// ATOMIC_MOVE가 지원되지 않는 경우 일반 이동으로 폴백
+				Files.move(tempPath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+			}
+			log.info("파일 승격 완료: temp → {}", storedFileName);
 		} catch (IOException e) {
-			log.error("파일 저장 실패: {}", storedFileName, e);
-			throw GlobalErrorCode.INTERNAL_SERVER_ERROR.toException("파일을 저장할 수 없습니다: " + e.getMessage());
+			log.error("파일 승격 실패: {}", storedFileName, e);
+			throw GlobalErrorCode.INTERNAL_SERVER_ERROR.toException("파일을 최종 경로로 이동할 수 없습니다: " + e.getMessage());
+		}
+	}
+
+	/**
+	 * 임시 파일을 삭제합니다. (트랜잭션 롤백 시 정리용)
+	 */
+	public void deleteTempFile(String storedFileName) {
+		Path tempPath = tempLocation.resolve(storedFileName).normalize();
+		try {
+			if (Files.exists(tempPath)) {
+				Files.delete(tempPath);
+				log.info("임시 파일 삭제 완료: {}", storedFileName);
+			}
+		} catch (IOException e) {
+			log.warn("임시 파일 삭제 실패 (무시): {}", storedFileName, e);
 		}
 	}
 
