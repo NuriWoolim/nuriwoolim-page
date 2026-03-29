@@ -90,15 +90,15 @@ const Header = () => {
       <HeaderContainer>
         <NavBar>
           <Logo>
-            <a href="#Home">
+            <a href="/">
               <img src="/assets/mainlogo.png" alt="누리울림 로고" />
             </a>
           </Logo>
 
           <RightGroup>
             <NavLinks>
-              <a href="#Home">Home</a>
-              <a href="boards">Boards</a>
+              <a href="/">Home</a>
+              <a href="/boards">Boards</a>
               <a href="#Archive">Archive</a>
               <a href="#Equipment">Equipment</a>
               <a href="#Calendar">Calendar</a>

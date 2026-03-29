@@ -11,10 +11,10 @@ import com.nuriwoolim.pagebackend.domain.board.dto.BoardListResponse;
 import com.nuriwoolim.pagebackend.domain.board.dto.BoardResponse;
 import com.nuriwoolim.pagebackend.domain.board.dto.BoardUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.board.entity.Board;
-import com.nuriwoolim.pagebackend.domain.board.permission.BoardPermissionContext;
-import com.nuriwoolim.pagebackend.domain.board.permission.BoardPermissionEvaluator;
+import com.nuriwoolim.pagebackend.domain.board.dto.BoardPermissionContext;
 import com.nuriwoolim.pagebackend.domain.board.repository.BoardRepository;
 import com.nuriwoolim.pagebackend.domain.board.util.BoardMapper;
+import com.nuriwoolim.pagebackend.domain.board.util.BoardPermissionResolver;
 import com.nuriwoolim.pagebackend.domain.user.entity.UserType;
 import com.nuriwoolim.pagebackend.domain.user.service.UserService;
 import com.nuriwoolim.pagebackend.domain.board.exception.BoardErrorCode;
@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class BoardService {
 	private final BoardRepository boardRepository;
 	private final UserService userService;
-	private final BoardPermissionEvaluator boardPermissionEvaluator;
+	private final BoardPermissionResolver boardPermissionResolver;
 
 	@Transactional
 	public BoardResponse create(BoardCreateRequest request, Long actorId) { //actorId는 권한 verify 용도
@@ -85,6 +85,6 @@ public class BoardService {
 	private PermissionDto resolvePermission(Board board, Long actorId) {
 		UserType role = userService.getUserTypeById(actorId);
 		BoardPermissionContext context = new BoardPermissionContext(board, actorId);
-		return boardPermissionEvaluator.evaluate(role, context);
+		return boardPermissionResolver.resolve(role, context);
 	}
 }
