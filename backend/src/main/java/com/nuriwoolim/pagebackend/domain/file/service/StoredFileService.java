@@ -16,7 +16,7 @@ import com.nuriwoolim.pagebackend.domain.file.event.FileSaveEvent;
 import com.nuriwoolim.pagebackend.domain.file.repository.StoredFileRepository;
 import com.nuriwoolim.pagebackend.domain.file.util.StoredFileMapper;
 import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
-import com.nuriwoolim.pagebackend.shared.storage.FileStorageService;
+import com.nuriwoolim.pagebackend.global.storage.FileStorageService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
