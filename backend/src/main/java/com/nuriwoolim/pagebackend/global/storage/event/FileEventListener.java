@@ -1,10 +1,10 @@
-package com.nuriwoolim.pagebackend.domain.file.event;
+package com.nuriwoolim.pagebackend.global.storage.event;
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import com.nuriwoolim.pagebackend.shared.storage.FileStorageService;
+import com.nuriwoolim.pagebackend.global.storage.FileStorageService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,5 +39,4 @@ public class FileEventListener {
 		fileStorageService.deleteFromDisk(event.filePath());
 	}
 }
-
 

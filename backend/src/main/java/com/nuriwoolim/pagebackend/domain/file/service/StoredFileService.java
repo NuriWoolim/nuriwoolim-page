@@ -11,8 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.nuriwoolim.pagebackend.domain.file.dto.StoredFileResponse;
 import com.nuriwoolim.pagebackend.domain.file.entity.StoredFile;
-import com.nuriwoolim.pagebackend.domain.file.event.FileDeleteEvent;
-import com.nuriwoolim.pagebackend.domain.file.event.FileSaveEvent;
+import com.nuriwoolim.pagebackend.global.storage.event.FileDeleteEvent;
+import com.nuriwoolim.pagebackend.global.storage.event.FileSaveEvent;
 import com.nuriwoolim.pagebackend.domain.file.repository.StoredFileRepository;
 import com.nuriwoolim.pagebackend.domain.file.util.StoredFileMapper;
 import com.nuriwoolim.pagebackend.global.exception.GlobalErrorCode;
