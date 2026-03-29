@@ -59,6 +59,18 @@ public class CommentService {
 	}
 
 	@Transactional(readOnly = true)
+	public CommentListResponse findCommentsByWriterId(Long writerId, int page, int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		Page<Comment> commentPage = commentRepository.findByWriterId(writerId, pageable);
+
+		UserType role = userService.getUserTypeById(writerId);
+
+		return CommentMapper.toCommentListResponse(
+			commentPage,
+			comment -> resolvePermission(comment, writerId, role));
+	}
+
+	@Transactional(readOnly = true)
 	public Comment getCommentById(Long commentId) {
 		return commentRepository.findById(commentId)
 			.orElseThrow(GlobalErrorCode.DATA_NOT_FOUND::toException);

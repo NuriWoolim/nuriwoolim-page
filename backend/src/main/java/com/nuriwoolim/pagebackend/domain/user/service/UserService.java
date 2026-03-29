@@ -1,5 +1,6 @@
 package com.nuriwoolim.pagebackend.domain.user.service;
 
+import com.nuriwoolim.pagebackend.domain.user.dto.ChangeNameRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.ChangePasswordRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
@@ -50,6 +51,12 @@ public class UserService {
 		}
 
 		user.updatePassword(passwordEncoder.encode(request.newPassword()));
+	}
+
+	@Transactional
+	public void changeName(Long userId, ChangeNameRequest request) {
+		User user = getUserById(userId);
+		user.updateName(request.name());
 	}
 
 	@Transactional

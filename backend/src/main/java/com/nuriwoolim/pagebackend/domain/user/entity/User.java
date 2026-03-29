@@ -95,6 +95,10 @@ public class User extends BaseEntity {
 	@Setter
 	private RefreshToken refreshToken;
 
+	public void updateName(String name) {
+		this.name = name;
+	}
+
 	public void updatePassword(String password) {
 		this.password = password;
 	}
