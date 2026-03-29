@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.nuriwoolim.pagebackend.global.storage.FileStorageService;
 import com.nuriwoolim.pagebackend.global.storage.entity.OrphanFileLog;
@@ -31,6 +32,7 @@ public class OrphanFileCleanupScheduler {
 	 * - 삭제 실패 → PENDING 유지, 다음 주기에 재시도
 	 */
 	@Scheduled(cron = "0 0 3 ? * MON")
+	@Transactional
 	public void retryOrphanFileDeletion() {
 		List<OrphanFileLog> pendingLogs = orphanFileLogRepository.findByStatus(OrphanFileStatus.PENDING);
 
@@ -48,7 +50,6 @@ public class OrphanFileCleanupScheduler {
 			try {
 				fileStorageService.deleteFromDisk(orphanLog.getStoredFileName());
 				orphanLog.markResolved();
-				orphanFileLogRepository.save(orphanLog);
 				successCount++;
 				log.info("[고아 파일 정리] 삭제 성공 - storedFileName={}", orphanLog.getStoredFileName());
 			} catch (Exception e) {
