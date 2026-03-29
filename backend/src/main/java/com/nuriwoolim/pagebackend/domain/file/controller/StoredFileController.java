@@ -29,11 +29,13 @@ import com.nuriwoolim.pagebackend.domain.file.validation.ValidFile;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/files")
 @Validated
+@PreAuthorize("hasRole('ADMIN')")
 @Tag(name = "파일 관리", description = "파일 업로드, 다운로드, 조회, 삭제 API (ADMIN 권한 필요)")
 public class StoredFileController {
 
@@ -63,6 +65,7 @@ public class StoredFileController {
 	}
 
 	@Operation(summary = "파일 다운로드", description = "특정 파일을 다운로드합니다. 원본 파일명으로 다운로드됩니다.")
+	@PreAuthorize("permitAll()")
 	@GetMapping("/{storedFileName}/download")
 	public ResponseEntity<Resource> download(@PathVariable String storedFileName) {
 		Resource resource = storedFileService.loadFileAsResource(storedFileName);
