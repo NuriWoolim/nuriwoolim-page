@@ -15,7 +15,7 @@ import com.nuriwoolim.pagebackend.domain.file.event.FileDeleteEvent;
 import com.nuriwoolim.pagebackend.domain.file.event.FileSaveEvent;
 import com.nuriwoolim.pagebackend.domain.file.repository.StoredFileRepository;
 import com.nuriwoolim.pagebackend.domain.file.util.StoredFileMapper;
-import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
+import com.nuriwoolim.pagebackend.global.exception.GlobalErrorCode;
 import com.nuriwoolim.pagebackend.global.storage.FileStorageService;
 
 import lombok.RequiredArgsConstructor;
@@ -111,7 +111,7 @@ public class StoredFileService {
 	 */
 	public StoredFile getStoredFileById(Long fileId) {
 		return storedFileRepository.findById(fileId)
-			.orElseThrow(ErrorCode.FILE_NOT_FOUND::toException);
+			.orElseThrow(GlobalErrorCode.DATA_NOT_FOUND::toException);
 	}
 }
 

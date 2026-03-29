@@ -11,7 +11,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.nuriwoolim.pagebackend.global.exception.ErrorCode;
+import com.nuriwoolim.pagebackend.global.exception.GlobalErrorCode;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,7 @@ public class FileStorageService {
 			Files.createDirectories(rootLocation);
 			log.info("파일 저장소 초기화 완료: {}", rootLocation);
 		} catch (IOException e) {
-			throw ErrorCode.FILE_STORAGE_ERROR.toException("파일 저장소를 초기화할 수 없습니다: " + e.getMessage());
+			throw GlobalErrorCode.INTERNAL_SERVER_ERROR.toException("파일 저장소를 초기화할 수 없습니다: " + e.getMessage());
 		}
 	}
 
@@ -54,7 +54,7 @@ public class FileStorageService {
 		try {
 			return file.getBytes();
 		} catch (IOException e) {
-			throw ErrorCode.FILE_STORAGE_ERROR.toException("파일을 읽을 수 없습니다: " + e.getMessage());
+			throw GlobalErrorCode.INTERNAL_SERVER_ERROR.toException("파일을 읽을 수 없습니다: " + e.getMessage());
 		}
 	}
 
@@ -69,7 +69,7 @@ public class FileStorageService {
 			log.info("파일 저장 완료: {}", targetPath);
 		} catch (IOException e) {
 			log.error("파일 저장 실패: {}", filePath, e);
-			throw ErrorCode.FILE_STORAGE_ERROR.toException("파일을 저장할 수 없습니다: " + e.getMessage());
+			throw GlobalErrorCode.INTERNAL_SERVER_ERROR.toException("파일을 저장할 수 없습니다: " + e.getMessage());
 		}
 	}
 
@@ -96,11 +96,11 @@ public class FileStorageService {
 			Path path = Paths.get(filePath);
 			Resource resource = new UrlResource(path.toUri());
 			if (!resource.exists() || !resource.isReadable()) {
-				throw ErrorCode.FILE_NOT_FOUND.toException("파일을 찾을 수 없습니다: " + filePath);
+				throw GlobalErrorCode.DATA_NOT_FOUND.toException("파일을 찾을 수 없습니다: " + filePath);
 			}
 			return resource;
 		} catch (IOException e) {
-			throw ErrorCode.FILE_NOT_FOUND.toException("파일을 로드할 수 없습니다: " + e.getMessage());
+			throw GlobalErrorCode.DATA_NOT_FOUND.toException("파일을 로드할 수 없습니다: " + e.getMessage());
 		}
 	}
 
@@ -118,6 +118,4 @@ public class FileStorageService {
 		return fileName.substring(fileName.lastIndexOf(".") + 1);
 	}
 }
-
-
 
