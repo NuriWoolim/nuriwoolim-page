@@ -20,6 +20,7 @@ public class WebConfig implements WebMvcConfigurer {
             "http://localhost:8080",
             "http://localhost:5500",
             "http://localhost:5173",
+            "http://localhost:5174",
             "https://nuriwoolimtest.netlify.app",
             "https://nuriwoolimdevelop.netlify.app",
             "https://nuriwoolim.n-e.kr"));
