@@ -9,6 +9,9 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: true
+file:
+  storage:
+    root-path: ${java.io.tmpdir}/nurim-file-test
 custom:
   jwt:
     expire:

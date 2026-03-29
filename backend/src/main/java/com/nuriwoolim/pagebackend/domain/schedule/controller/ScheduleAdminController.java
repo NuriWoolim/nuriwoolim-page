@@ -18,6 +18,8 @@ import com.nuriwoolim.pagebackend.domain.schedule.dto.ScheduleResponse;
 import com.nuriwoolim.pagebackend.domain.schedule.dto.ScheduleUpdateRequest;
 import com.nuriwoolim.pagebackend.domain.schedule.service.ScheduleService;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -26,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin/schedules")
+@PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
 @Tag(name = "Admin - Schedule", description = "관리자 일정 관리 API")
 public class ScheduleAdminController {
 

@@ -33,6 +33,10 @@ springdoc:
   swagger-ui:
     with-credentials: true
 
+file:
+  storage:
+    root-path: ${user.home}/nurim-file
+
 custom:
   jwt:
     expire:
