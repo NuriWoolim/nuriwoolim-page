@@ -24,6 +24,8 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+	private final CustomEntryPoint customEntryPoint;
+	private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -33,6 +35,9 @@ public class SecurityConfig {
 			.httpBasic(AbstractHttpConfigurer::disable)
 			.csrf(AbstractHttpConfigurer::disable)
 			.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+			.exceptionHandling(e -> e
+				.authenticationEntryPoint(customEntryPoint)
+				.accessDeniedHandler(customAccessDeniedHandler))
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(HttpMethod.OPTIONS).permitAll()
 				.requestMatchers("/dev/**").permitAll() // TODO: 개발 전용 API 이므로 추후 삭제
@@ -48,13 +53,14 @@ public class SecurityConfig {
 				.requestMatchers("/boards/**").hasAnyRole("ADMIN", "MANAGER", "MEMBER") //everything else
 				.requestMatchers("/posts/**").hasAnyRole("ADMIN", "MANAGER", "MEMBER")
 				.requestMatchers("/comments/**").hasAnyRole("ADMIN", "MANAGER", "MEMBER")
-				.requestMatchers(HttpMethod.GET).permitAll()
 				.requestMatchers("/users/**").authenticated()
+				.requestMatchers("/files/{storedFileName}/download").permitAll()
+				.requestMatchers("/files/**").hasAnyRole("ADMIN")
 				.requestMatchers("/schedules/**").hasAnyRole("MANAGER", "ADMIN")
 				.requestMatchers(HttpMethod.POST).hasAnyRole("ADMIN", "MANAGER", "MEMBER")
 				.requestMatchers(HttpMethod.PATCH).hasAnyRole("ADMIN", "MANAGER", "MEMBER")
 				.requestMatchers(HttpMethod.DELETE).hasAnyRole("ADMIN", "MANAGER", "MEMBER")
-				.anyRequest().authenticated());
+				.anyRequest().hasAnyRole("ADMIN", "MANAGER", "MEMBER"));
 		return http.build();
 	}
 

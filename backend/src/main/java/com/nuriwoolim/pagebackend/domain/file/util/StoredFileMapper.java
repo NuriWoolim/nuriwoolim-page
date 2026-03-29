@@ -12,11 +12,10 @@ public class StoredFileMapper {
 	public static StoredFileResponse toResponse(StoredFile file) {
 		return StoredFileResponse.builder()
 			.id(file.getId())
-			.path(file.getFilePath())
+			.storedFileName(file.getStoredFileName())
+			.downloadUrl("/files/" + file.getStoredFileName() + "/download")
 			.contentType(file.getContentType())
 			.fileSize(file.getFileSize())
 			.build();
 	}
 }
-
-

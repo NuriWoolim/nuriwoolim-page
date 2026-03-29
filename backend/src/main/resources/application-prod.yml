@@ -32,6 +32,10 @@ springdoc:
     url: /api/v3/api-docs
     config-url: /api/v3/api-docs/swagger-config
 
+file:
+  storage:
+    root-path: /app/data/nurim-file
+
 custom:
   jwt:
     expire:

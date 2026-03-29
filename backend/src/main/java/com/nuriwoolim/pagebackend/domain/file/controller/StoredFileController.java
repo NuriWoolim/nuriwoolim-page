@@ -2,9 +2,12 @@ package com.nuriwoolim.pagebackend.domain.file.controller;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -46,10 +49,11 @@ public class StoredFileController {
 			.body(storedFileService.upload(file));
 	}
 
-	@Operation(summary = "파일 목록 조회", description = "업로드된 모든 파일의 목록을 조회합니다.")
+	@Operation(summary = "파일 목록 조회 (페이징)", description = "업로드된 파일의 목록을 페이징으로 조회합니다.")
 	@GetMapping
-	public ResponseEntity<List<StoredFileResponse>> getAll() {
-		return ResponseEntity.ok(storedFileService.getAll());
+	public ResponseEntity<Page<StoredFileResponse>> getAll(
+		@PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+		return ResponseEntity.ok(storedFileService.getAll(pageable));
 	}
 
 	@Operation(summary = "파일 정보 조회", description = "특정 파일의 메타데이터를 조회합니다.")
@@ -59,10 +63,10 @@ public class StoredFileController {
 	}
 
 	@Operation(summary = "파일 다운로드", description = "특정 파일을 다운로드합니다. 원본 파일명으로 다운로드됩니다.")
-	@GetMapping("/{fileId}/download")
-	public ResponseEntity<Resource> download(@PathVariable Long fileId) {
-		Resource resource = storedFileService.loadFileAsResource(fileId);
-		String originalFileName = storedFileService.getOriginalFileName(fileId);
+	@GetMapping("/{storedFileName}/download")
+	public ResponseEntity<Resource> download(@PathVariable String storedFileName) {
+		Resource resource = storedFileService.loadFileAsResource(storedFileName);
+		String originalFileName = storedFileService.getOriginalFileName(storedFileName);
 		String encodedFileName = URLEncoder.encode(originalFileName, StandardCharsets.UTF_8)
 			.replace("+", "%20");
 

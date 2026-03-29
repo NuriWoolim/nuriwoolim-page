@@ -1,10 +1,9 @@
 package com.nuriwoolim.pagebackend.domain.file.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,8 +49,8 @@ public class StoredFileService {
 
 		StoredFile saved = storedFileRepository.save(storedFile);
 
-		// 트랜잭션 커밋 후 파일 저장 이벤트 발행
-		eventPublisher.publishEvent(new FileSaveEvent(storedFileName, content, filePath));
+		// 트랜잭션 커밋 후 파일 저장 이벤트 발행 (fileId 포함 - 보상 트랜잭션용)
+		eventPublisher.publishEvent(new FileSaveEvent(saved.getId(), storedFileName, content));
 
 		return StoredFileMapper.toResponse(saved);
 	}
@@ -66,30 +65,29 @@ public class StoredFileService {
 	}
 
 	/**
-	 * 파일 전체 목록 조회
+	 * 파일 목록 조회 (페이징)
 	 */
 	@Transactional(readOnly = true)
-	public List<StoredFileResponse> getAll() {
-		return storedFileRepository.findAll().stream()
-			.map(StoredFileMapper::toResponse)
-			.collect(Collectors.toList());
+	public Page<StoredFileResponse> getAll(Pageable pageable) {
+		return storedFileRepository.findAll(pageable)
+			.map(StoredFileMapper::toResponse);
 	}
 
 	/**
-	 * 파일 다운로드 리소스 로드
+	 * 파일 다운로드 리소스 로드 (storedFileName 기반)
 	 */
 	@Transactional(readOnly = true)
-	public Resource loadFileAsResource(Long fileId) {
-		StoredFile file = getStoredFileById(fileId);
-		return fileStorageService.loadAsResource(file.getFilePath());
+	public Resource loadFileAsResource(String storedFileName) {
+		getStoredFileByStoredFileName(storedFileName); // 존재 여부 검증
+		return fileStorageService.loadAsResource(storedFileName);
 	}
 
 	/**
-	 * 파일 다운로드 시 원본 파일명 조회
+	 * 파일 다운로드 시 원본 파일명 조회 (storedFileName 기반)
 	 */
 	@Transactional(readOnly = true)
-	public String getOriginalFileName(Long fileId) {
-		return getStoredFileById(fileId).getOriginalFileName();
+	public String getOriginalFileName(String storedFileName) {
+		return getStoredFileByStoredFileName(storedFileName).getOriginalFileName();
 	}
 
 	/**
@@ -98,23 +96,27 @@ public class StoredFileService {
 	@Transactional
 	public void delete(Long fileId) {
 		StoredFile file = getStoredFileById(fileId);
-		String filePath = file.getFilePath();
+		String storedFileName = file.getStoredFileName();
 
 		storedFileRepository.delete(file);
 
-		// 트랜잭션 커밋 후 파일 삭제 이벤트 발행
-		eventPublisher.publishEvent(new FileDeleteEvent(filePath));
+		// 트랜잭션 커밋 후 파일 삭제 이벤트 발행 (storedFileName 기반)
+		eventPublisher.publishEvent(new FileDeleteEvent(storedFileName));
 	}
 
 	/**
-	 * 내부 조회용 (서비스 레이어)
+	 * 내부 조회용 - fileId 기반 (서비스 레이어)
 	 */
 	public StoredFile getStoredFileById(Long fileId) {
 		return storedFileRepository.findById(fileId)
 			.orElseThrow(GlobalErrorCode.DATA_NOT_FOUND::toException);
 	}
+
+	/**
+	 * 내부 조회용 - storedFileName 기반 (서비스 레이어)
+	 */
+	public StoredFile getStoredFileByStoredFileName(String storedFileName) {
+		return storedFileRepository.findByStoredFileName(storedFileName)
+			.orElseThrow(GlobalErrorCode.DATA_NOT_FOUND::toException);
+	}
 }
-
-
-
-
