@@ -24,6 +24,11 @@ const Row = styled.div`
   padding: 0 0.55rem;
   min-height: 2.5rem;
   background-color: ${(p) => (p.$selected ? "#FFF7E2" : "#fff")};
+
+  @media (max-width: 768px) {
+    min-height: 1.8rem;
+    padding: 0 0.3rem;
+  }
 `;
 
 const HourLabel = styled.span`
@@ -32,6 +37,11 @@ const HourLabel = styled.span`
   font-weight: 700;
   width: 2.2rem;
   flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    font-size: 0.65rem;
+    width: 1.5rem;
+  }
 `;
 
 /* Timetable block — absolutely positioned */

@@ -8,6 +8,10 @@ const HowToUseContainer = styled.div`
   flex-direction: column;
   align-items: center;
   position: relative;
+
+  @media (max-width: 768px) {
+    padding: 0 20px 60px 20px;
+  }
 `;
 
 const IconWrapper = styled.div`
@@ -49,6 +53,10 @@ const IconWrapper = styled.div`
     bottom: 650px;
     right: -5%;
   }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const Title = styled.h2`
@@ -64,6 +72,12 @@ const Title = styled.h2`
   margin-bottom: 60px;
   position: relative;
   z-index: 1;
+
+  @media (max-width: 768px) {
+    font-size: 36px;
+    margin-top: 24px;
+    margin-bottom: 32px;
+  }
 `;
 
 const GridContainer = styled.div`
@@ -75,6 +89,16 @@ const GridContainer = styled.div`
   margin-bottom: 30px;
   position: relative;
   z-index: 1;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    max-width: 400px;
+  }
 `;
 
 const ImageCard = styled.div`
@@ -93,6 +117,12 @@ const ImageCard = styled.div`
     height: 100%;
     object-fit: cover;
   }
+
+  @media (max-width: 768px) {
+    &:hover {
+      transform: none;
+    }
+  }
 `;
 
 const BottomGridContainer = styled.div`
@@ -103,6 +133,12 @@ const BottomGridContainer = styled.div`
   max-width: 1200px;
   position: relative;
   z-index: 1;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
 `;
 
 const MockupCard = styled.div`
@@ -110,6 +146,15 @@ const MockupCard = styled.div`
   aspect-ratio: 16 / 13;
   width: calc((1200px - 40px) / 3);
   flex-shrink: 0;
+
+  @media (max-width: 1024px) {
+    width: calc(50% - 10px);
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    max-width: 400px;
+  }
 `;
 
 const HowToUse = () => {

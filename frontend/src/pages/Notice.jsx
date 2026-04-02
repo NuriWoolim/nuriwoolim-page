@@ -1,7 +1,8 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { CATEGORY_COLORS, Notices } from "../data/NoticeData";
+import { BoardsAPI } from "../apis/boards";
+import { PostsAPI } from "../apis/posts";
 
 /* Notice 섹션의 전체 배경 */
 const NoticeSection = styled.section`
@@ -10,7 +11,6 @@ const NoticeSection = styled.section`
 `;
 
 /* Notice 섹션의 컨테이너 박스 */
-
 const NoticeWrapper = styled.div`
   width: 100%;
   padding: 0px 80px 60px;
@@ -41,6 +41,16 @@ const NoticeWrapper = styled.div`
     position: relative;
     z-index: 1;
   }
+
+  @media (max-width: 768px) {
+    padding: 0 20px 40px;
+
+    h2 {
+      font-size: 36px;
+      margin-top: 24px;
+      margin-bottom: 12px;
+    }
+  }
 `;
 
 const LogoOpacity = styled.div`
@@ -64,10 +74,7 @@ const LogoOpacity = styled.div`
     height: 60%;
     top: -93px;
     left: -13%;
-    
   }
-
- 
 
   /* 왼쪽 하단 로고 */
   &.logo-bottom-left {
@@ -75,6 +82,10 @@ const LogoOpacity = styled.div`
     height: 130%;
     bottom: -230px;
     left: 10%;
+  }
+
+  @media (max-width: 768px) {
+    display: none;
   }
 `;
 
@@ -95,31 +106,78 @@ const Item = styled.li`
     }
 
     span.category {
-      color: ${({ $category }) => CATEGORY_COLORS[$category] || "#555"};
+      color: #1a6fa0;
       margin-right: 10px;
       font-weight: 700;
+    }
+  }
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+    margin-left: 0;
+    margin-bottom: 16px;
+
+    a span.category {
+      display: block;
+      margin-bottom: 2px;
+      font-size: 13px;
     }
   }
 `;
 
 const Notice = () => {
+  const [posts, setPosts] = useState([]);
+  const [noticeBoard, setNoticeBoard] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const boardsRes = await BoardsAPI.list({ page: 0, size: 20 });
+        const boardList = Array.isArray(boardsRes)
+          ? boardsRes
+          : (boardsRes?.data ?? boardsRes?.content ?? []);
+
+        // "공지" 게시판 찾기 (첫 번째 게시판을 fallback)
+        const board =
+          boardList.find((b) => b.title?.includes("공지")) ?? boardList[0];
+        if (!board) return;
+
+        setNoticeBoard(board);
+
+        const postsRes = await PostsAPI.list({
+          boardId: board.id,
+          page: 0,
+          size: 6,
+        });
+        const postList = Array.isArray(postsRes)
+          ? postsRes
+          : (postsRes?.data ?? postsRes?.content ?? []);
+        setPosts([...postList].sort((a, b) => b.id - a.id));
+      } catch {
+        // API 실패 시 빈 목록 유지
+      }
+    })();
+  }, []);
+
   return (
     <NoticeSection>
       <NoticeWrapper>
         <LogoOpacity className="logo-top-left">
           <img src="/assets/logoopacity2.png" alt="누리울림 로고" />
         </LogoOpacity>
-  
+
         <LogoOpacity className="logo-bottom-left">
           <img src="/assets/logoopacity.png" alt="누리울림 로고" />
         </LogoOpacity>
         <h2>NOTICE</h2>
         <ul>
-          {Notices.map((notice) => (
-            <Item key={notice.id} $category={notice.category}>
-              <Link to={`/notice/${notice.id}`}>
-                <span className="category">[{notice.category}]</span>
-                {notice.title}
+          {posts.map((post) => (
+            <Item key={post.id}>
+              <Link to={`/boards/${noticeBoard?.id}/posts/${post.id}`}>
+                <span className="category">
+                  [{noticeBoard?.title ?? "공지"}]
+                </span>
+                {post.title}
               </Link>
             </Item>
           ))}

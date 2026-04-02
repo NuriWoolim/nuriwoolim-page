@@ -49,6 +49,19 @@ const OverlayText = styled.div`
     font-size: 40px;
     color: #fefaef;
   }
+
+  @media (max-width: 768px) {
+    margin-left: 20px;
+    margin-top: 10px;
+
+    h2 {
+      font-size: 22px;
+    }
+    p {
+      font-size: 22px;
+      margin-bottom: 4px;
+    }
+  }
 `;
 
 const ImageContainer = styled.div`
@@ -56,6 +69,10 @@ const ImageContainer = styled.div`
   width: 100%;
   height: 100vh;
   overflow: hidden;
+
+  @media (max-width: 768px) {
+    height: 50vh;
+  }
 `;
 
 const Image = styled.img`
@@ -84,6 +101,14 @@ const Arrow = styled.button`
 
   &:hover img {
     transform: scale(1.1);
+  }
+
+  @media (max-width: 768px) {
+    ${(props) => (props.$right ? "right: 12px" : "left: 12px")};
+
+    img {
+      width: 32px;
+    }
   }
 `;
 

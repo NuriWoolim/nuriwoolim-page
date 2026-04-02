@@ -28,10 +28,12 @@ const Logo = styled.div`
 
 const Wrapper = styled.div`
   width: 380px;
+  max-width: calc(100% - 40px);
   border: 2px solid #033148;
   padding: 32px 28px 28px;
   background: radial-gradient(circle at top left, #fff2ce 17%, #daf0f6 70%);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
 `;
 
 const Title = styled.h2`

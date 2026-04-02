@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { useAtom } from "jotai";
+import { userDataState } from "../../atoms";
 import { fadeIn } from "../../style/fadeIn";
 import MyPageDropdown from "./MyPageDropdown";
-
 
 const HeaderContainer = styled.header`
   position: relative;
@@ -11,6 +12,10 @@ const HeaderContainer = styled.header`
   height: 85px;
   z-index: 1000;
   animation: ${fadeIn} 2s ease-out forwards;
+
+  @media (max-width: 768px) {
+    height: 60px;
+  }
 `;
 
 const NavBar = styled.nav`
@@ -28,6 +33,12 @@ const NavBar = styled.nav`
   background-image: url("/assets/navigator.png");
   background-size: 100% 100%;
   background-repeat: no-repeat;
+
+  @media (max-width: 768px) {
+    height: 60px;
+    padding: 0 8px;
+    background-size: cover;
+  }
 `;
 
 const Logo = styled.div`
@@ -40,6 +51,13 @@ const Logo = styled.div`
     width: 120px;
     height: 120px;
   }
+
+  @media (max-width: 768px) {
+    img {
+      width: 80px;
+      height: 80px;
+    }
+  }
 `;
 
 const RightGroup = styled.div`
@@ -47,7 +65,17 @@ const RightGroup = styled.div`
   align-items: center;
   gap: 40px;
   transform: translateX(-50px);
+
+  @media (max-width: 1024px) {
+    gap: 20px;
+    transform: translateX(-20px);
+  }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
+
 const NavLinks = styled.div`
   display: flex;
   gap: 45px;
@@ -59,6 +87,13 @@ const NavLinks = styled.div`
     font-size: 16px;
     font-weight: 500;
     letter-spacing: -0.5px;
+  }
+
+  @media (max-width: 1024px) {
+    gap: 20px;
+    a {
+      font-size: 14px;
+    }
   }
 `;
 
@@ -81,9 +116,76 @@ const LoginButton = styled.button`
   }
 `;
 
+/* ── 모바일 햄버거 ── */
+const Hamburger = styled.button`
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 1100;
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-right: 12px;
+  }
+`;
+
+const HamburgerLine = styled.span`
+  display: block;
+  width: 24px;
+  height: 3px;
+  background: #023349;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+
+  &:nth-child(1) {
+    transform: ${({ $open }) => ($open ? "rotate(45deg) translate(5px, 6px)" : "none")};
+  }
+  &:nth-child(2) {
+    opacity: ${({ $open }) => ($open ? 0 : 1)};
+  }
+  &:nth-child(3) {
+    transform: ${({ $open }) => ($open ? "rotate(-45deg) translate(5px, -6px)" : "none")};
+  }
+`;
+
+const MobileMenu = styled.div`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: ${({ $open }) => ($open ? "flex" : "none")};
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(254, 250, 239, 0.97);
+    flex-direction: column;
+    align-items: center;
+    padding-top: 40px;
+    gap: 28px;
+    z-index: 999;
+
+    a {
+      text-decoration: none;
+      color: #023349;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+    }
+  }
+`;
+
 const Header = () => {
   const navigate = useNavigate();
-  const isLoggedIn = !!localStorage.getItem("accessToken");
+  const [userData] = useAtom(userDataState);
+  const isLoggedIn = !!localStorage.getItem("accessToken") && !!userData?.id;
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const closeMenu = () => setMenuOpen(false);
 
   return (
     <>
@@ -102,7 +204,6 @@ const Header = () => {
               <a href="#Archive">Archive</a>
               <a href="#Equipment">Equipment</a>
               <a href="#Calendar">Calendar</a>
-
               <a href="#Wiki">Wiki</a>
             </NavLinks>
 
@@ -114,8 +215,30 @@ const Header = () => {
               </LoginButton>
             )}
           </RightGroup>
+
+          <Hamburger onClick={() => setMenuOpen(!menuOpen)}>
+            <HamburgerLine $open={menuOpen} />
+            <HamburgerLine $open={menuOpen} />
+            <HamburgerLine $open={menuOpen} />
+          </Hamburger>
         </NavBar>
       </HeaderContainer>
+
+      <MobileMenu $open={menuOpen}>
+        <a href="/" onClick={closeMenu}>Home</a>
+        <a href="/boards" onClick={closeMenu}>Boards</a>
+        <a href="#Archive" onClick={closeMenu}>Archive</a>
+        <a href="#Equipment" onClick={closeMenu}>Equipment</a>
+        <a href="#Calendar" onClick={closeMenu}>Calendar</a>
+        <a href="#Wiki" onClick={closeMenu}>Wiki</a>
+        {isLoggedIn ? (
+          <MyPageDropdown />
+        ) : (
+          <LoginButton onClick={() => { closeMenu(); navigate("/login"); }}>
+            Log In
+          </LoginButton>
+        )}
+      </MobileMenu>
     </>
   );
 };

@@ -8,7 +8,6 @@ const RootDiv = styled.div`
   width: 100%;
   max-width: 100vw;
   overflow-x: hidden;
-  min-width: 500px;
 `;
 const Layout = () => {
   return (

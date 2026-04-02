@@ -26,6 +26,11 @@ const TopBar = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
 `;
 
 const Btn = styled.button`
@@ -103,6 +108,11 @@ const TitleInput = styled.input`
   &::placeholder {
     color: #ccc;
     font-style: normal;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1.4rem;
+    padding: 1rem 0;
   }
 `;
 

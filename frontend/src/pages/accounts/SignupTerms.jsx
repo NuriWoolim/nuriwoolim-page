@@ -16,11 +16,19 @@ const Logo = styled.div`
     width: 242px;
     height: 242px;
   }
+
+  @media (max-width: 768px) {
+    img {
+      width: 150px;
+      height: 150px;
+    }
+  }
 `;
 
 const Wrapper = styled.div`
   width: 452px;
-  height: 480px;
+  max-width: calc(100% - 40px);
+  height: auto;
   border: 2px solid #033148;
   padding: 40px 25px;
   background: radial-gradient(circle at top left, #fff2ce 17%, #daf0f6 70%);
@@ -32,6 +40,12 @@ const Wrapper = styled.div`
   align-items: center;
   font-family: "Pretendard";
   letter-spacing: -1px;
+  box-sizing: border-box;
+
+  @media (max-width: 768px) {
+    padding: 28px 20px;
+    margin: -10px auto;
+  }
 `;
 
 const Title = styled.h2`
@@ -42,6 +56,10 @@ const Title = styled.h2`
   margin-bottom: 0px;
   letter-spacing: -4px;
   color: #0f2230;
+
+  @media (max-width: 768px) {
+    font-size: 52px;
+  }
 `;
 
 const RowWrapper = styled.div`
@@ -98,14 +116,16 @@ const Subtitle = styled.div`
 `;
 
 const TermBox = styled.div`
-  width: 370px;
-  height: 152px;
+  width: 100%;
+  max-width: 370px;
+  height: auto;
   background-color: white;
   border: 1px solid;
   padding: 30px 20px;
   display: flex;
   flex-direction: column;
   gap: 15px;
+  box-sizing: border-box;
 `;
 
 const TermBoxText = styled.p`

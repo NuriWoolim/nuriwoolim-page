@@ -16,6 +16,12 @@ const Container = styled.div`
     box-sizing: border-box;
     font-family: "Pretendard", sans-serif;
   }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+  }
 `;
 
 const LeftPanel = styled.div`
@@ -31,6 +37,11 @@ const RightPanel = styled.div`
   flex-direction: column;
   border-left: 1px solid #333;
   min-width: 0;
+
+  @media (max-width: 768px) {
+    border-left: none;
+    border-top: 1px solid #333;
+  }
 `;
 
 /* ── Header Bars ── */
@@ -41,6 +52,11 @@ const HeaderBar = styled.div`
   align-items: center;
   padding: 0 1.1rem;
   flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    height: 2.8rem;
+    padding: 0 0.8rem;
+  }
 `;
 
 const LeftHeader = styled(HeaderBar)`
@@ -58,6 +74,10 @@ const HeaderTitle = styled.h2`
   font-weight: 900;
   margin: 0;
   letter-spacing: -0.02em;
+
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+  }
 `;
 
 const CloseButton = styled.button`
@@ -85,6 +105,10 @@ const FormContainer = styled.div`
   flex-direction: column;
   padding: 2.25rem 1.6rem 1.9rem;
   overflow-y: auto;
+
+  @media (max-width: 768px) {
+    padding: 1.2rem 1rem 1.2rem;
+  }
 `;
 
 const SectionTitle = styled.h3`

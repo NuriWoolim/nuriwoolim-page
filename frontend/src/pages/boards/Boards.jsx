@@ -28,6 +28,11 @@ const Title = styled.h1`
   line-height: 1;
   margin: 0;
   padding-top: 4.6rem;
+
+  @media (max-width: 768px) {
+    font-size: 4rem;
+    padding-top: 2.5rem;
+  }
 `;
 
 /* ── 게시판 선택 버튼 그룹 ── */
@@ -37,6 +42,11 @@ const TabGroup = styled.div`
   margin: 2.6rem auto 0;
   flex-wrap: wrap;
   justify-content: center;
+
+  @media (max-width: 768px) {
+    gap: 0.8rem;
+    margin: 1.5rem auto 0;
+  }
 `;
 
 const Tab = styled.button`
@@ -53,6 +63,13 @@ const Tab = styled.button`
 
   &:hover {
     background: ${({ $active }) => ($active ? "#3e5a82" : "#efd67a")};
+  }
+
+  @media (max-width: 768px) {
+    min-width: auto;
+    height: 2.6rem;
+    padding: 0 0.8rem;
+    font-size: 0.9rem;
   }
 `;
 
