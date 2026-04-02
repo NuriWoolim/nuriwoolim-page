@@ -48,8 +48,8 @@ public class SecurityConfig {
 				.requestMatchers("/v3/api-docs/**", "/swagger-ui.html",
 					"/swagger-ui/**", "/swagger-resources/**", "/webjars/**").permitAll()
 				.requestMatchers(HttpMethod.GET,
-					"/boards", "/schedules", "/timetables").permitAll()
-				.requestMatchers(HttpMethod.GET,"/files/{storedFileName}/download").permitAll()
+					"/boards", "/schedules", "/timetables", "/posts").permitAll()
+				.requestMatchers(HttpMethod.GET, "/files/{storedFileName}/download").permitAll()
 
 				// ── 인증만 필요 (역할 무관, NONMEMBER 포함) ──
 				.requestMatchers("/users/**").authenticated()
