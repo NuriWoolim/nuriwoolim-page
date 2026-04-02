@@ -10,7 +10,6 @@ import { createDate } from "../tools/DateTool";
 const CalendarSection = styled.section`
   h1 {
     font-weight: 800;
-    /* color: #033148; */
     font-size: 3rem;
     letter-spacing: -1.8px;
     margin: 2.1rem 0 2.1rem 0;
@@ -19,7 +18,6 @@ const CalendarSection = styled.section`
   h2 {
     font-family: Pretendard;
     font-weight: 900;
-    /* color: #fff; */
     font-size: 2rem;
     margin-top: 0;
     margin-bottom: 0;
@@ -70,14 +68,28 @@ const CalendarSection = styled.section`
     color: #033148;
     margin-bottom: 0;
   }
+
+  @media (max-width: 768px) {
+    padding: 40px 0 3rem 0;
+
+    .calendarTitle {
+      font-size: 36px;
+    }
+  }
 `;
 
 /* Calendar 섹션의 컨테이너 박스 */
 const CalendarWrapper = styled.div`
   display: flex;
   justify-content: center;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 16px;
 
-  /* padding: 0px 3rem; */
+  @media (max-width: 768px) {
+    overflow-x: hidden;
+    padding: 0 8px;
+  }
 `;
 const LeftPart = styled.div`
   display: flex;
@@ -94,6 +106,18 @@ const GridContainer = styled.div`
 
   border-top: 1px solid #033148;
   border-left: 1px solid #033148;
+
+  @media (max-width: 1024px) {
+    width: 100%;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: 3.5rem repeat(6, 10rem);
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: 2.2rem repeat(6, 5rem);
+  }
 `;
 
 // Days of Weeks의 셀 한 칸.
@@ -107,6 +131,14 @@ const WeekDayCell = styled.div`
   font-family: Pretendard;
   font-size: 1.1rem;
   font-weight: 800;
+
+  @media (max-width: 768px) {
+    padding: 0.2rem;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 `;
 
 // 현재 년월 라벨과 버튼들을 감싸는 컨테이너
@@ -116,7 +148,6 @@ const MonthYearContainer = styled.div`
   align-items: center;
   padding: 1.2rem 0 1.2rem 0;
 
-  /* margin: 0 10px; */
   p {
     color: #486284;
     font-family: Pretendard;
@@ -125,11 +156,11 @@ const MonthYearContainer = styled.div`
     padding: 0 15px;
   }
   button {
-    background: none; /* 배경 제거 */
+    background: none;
     width: 2rem;
-    border: none; /* 보더 제거 */
-    padding: 0; /* 기본 패딩 제거 */
-    cursor: pointer; /* 포인터 커서 */
+    border: none;
+    padding: 0;
+    cursor: pointer;
   }
 
   button:focus {
@@ -139,19 +170,26 @@ const MonthYearContainer = styled.div`
   button img {
     height: 1.5rem;
     margin-top: 5px;
-    /* padding-inline: 10px; */
-    /* margin-left: 10px; */
-    /* margin-right: 10px; */
   }
   button:hover img {
-    filter: brightness(0.8); /* 밝게 */
+    filter: brightness(0.8);
   }
   button:active img {
-    filter: brightness(0.6); /* 어둡게 */
+    filter: brightness(0.6);
   }
 
   .down {
     transform: scaleX(-1);
+  }
+
+  @media (max-width: 1024px) {
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    p {
+      font-size: 1.4rem;
+    }
   }
 `;
 
@@ -169,6 +207,12 @@ const ModalContainer = styled.div`
   background: white;
   box-shadow: 4px 4px 18px rgba(0, 0, 0, 0.6);
   overflow: hidden;
+
+  @media (max-width: 768px) {
+    width: calc(100vw - 24px);
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
+  }
 `;
 
 function toLocalISOString(date) {

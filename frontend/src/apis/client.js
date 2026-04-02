@@ -68,7 +68,10 @@ const syncAccessToken = (response) => {
   return response;
 };
 
-publicApi.interceptors.response.use(syncAccessToken);
+// publicApi에는 syncAccessToken을 걸지 않는다.
+// 로그인/리프레시는 AuthAPI에서 명시적으로 토큰을 저장한다.
+// publicApi에 걸면 공개 API 호출 시에도 쿠키 기반으로 토큰이
+// 자동 저장되어 비로그인 상태에서도 로그인된 것처럼 보이는 버그가 발생한다.
 
 privateApi.interceptors.response.use(syncAccessToken, async (error) => {
   const originalRequest = error.config;

@@ -19,6 +19,15 @@ const DateCellContainer = styled.div`
   p {
     margin-bottom: 0.2rem;
   }
+
+  @media (max-width: 768px) {
+    padding: 0.15rem;
+
+    p {
+      font-size: 0.7rem;
+      margin-bottom: 0;
+    }
+  }
 `;
 
 /* 스케줄 아이템 (일정 텍스트) */
@@ -43,6 +52,10 @@ const ScheduleItem = styled.div`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 /* 타임테이블 태그 (칸 형식) */
@@ -95,6 +108,10 @@ const TimeTableTag = styled.div`
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const TodayBadge = styled.span`
@@ -106,6 +123,12 @@ const TodayBadge = styled.span`
   border-radius: 50%;
   background-color: #F8C61E;
   font-weight: 700;
+
+  @media (max-width: 768px) {
+    width: 1.1rem;
+    height: 1.1rem;
+    font-size: 0.65rem;
+  }
 `;
 
 const OverflowText = styled.div`
@@ -149,6 +172,10 @@ const ScheduleMoreText = styled.div`
   letter-spacing: -0.05em;
   padding: 0 0.3rem;
   line-height: 1.4;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 // 각 항목의 실제 픽셀 높이 (CSS 고정값 기준)

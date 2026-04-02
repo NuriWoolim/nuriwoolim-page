@@ -4,6 +4,10 @@ import styled from "styled-components";
 const Grid = styled.div`
   display: grid;
   grid-template-columns: 200px 1fr 100px 100px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 50px 1fr 70px;
+  }
 `;
 
 const HeaderCell = styled.div`
@@ -17,6 +21,17 @@ const HeaderCell = styled.div`
   font-size: 1.1rem;
   font-weight: 700;
   color: #2f2f2f;
+
+  &:nth-child(4) {
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.85rem;
+    min-height: 2.8rem;
+  }
 `;
 
 const BodyRow = styled.button`
@@ -41,6 +56,18 @@ const BodyCell = styled.div`
   font-size: 1rem;
   font-weight: 500;
   color: #2f2f2f;
+
+  &:nth-child(4) {
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.5rem;
+    min-height: 2.4rem;
+  }
 `;
 
 const Empty = styled.div`
@@ -94,6 +121,11 @@ const MoveBtn = styled.button`
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+
+  @media (max-width: 768px) {
+    width: 5rem;
+    font-size: 0.85rem;
   }
 `;
 

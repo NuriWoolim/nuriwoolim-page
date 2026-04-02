@@ -24,6 +24,11 @@ const TopBar = styled.div`
   justify-content: space-between;
   align-items: flex-start;
   min-height: 2.2rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 1rem;
+  }
 `;
 
 const Btn = styled.button`
@@ -55,6 +60,13 @@ const Center = styled.div`
   transform: translateX(-50%);
   text-align: center;
   pointer-events: none;
+
+  @media (max-width: 768px) {
+    position: static;
+    transform: none;
+    text-align: left;
+    width: 100%;
+  }
 `;
 
 const BoardName = styled.p`
@@ -72,6 +84,10 @@ const PostTitle = styled.h1`
   color: #1a1a1a;
   margin: 0;
   line-height: 1.3;
+
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
 `;
 
 /* ── 구분선 ── */
@@ -111,6 +127,7 @@ const Content = styled.div`
 
   .image-placeholder {
     width: 460px;
+    max-width: 100%;
     height: 230px;
     background: #d9d9d9;
     margin: 1.5rem auto;
@@ -124,6 +141,10 @@ const BottomNav = styled.div`
   align-items: center;
   gap: 1.2rem;
   margin-top: 3rem;
+
+  @media (max-width: 768px) {
+    gap: 0.6rem;
+  }
 `;
 
 const NavLabel = styled.span`
@@ -134,6 +155,10 @@ const NavLabel = styled.span`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const NavBtn = styled.button`

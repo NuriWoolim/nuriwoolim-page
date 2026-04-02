@@ -2,7 +2,6 @@ import React from "react";
 import styled from "styled-components";
 
 const SSibalContainer = styled.div`
-  /* position: relative; */
   background: linear-gradient(
     to left,
     rgb(33, 129, 173, 0.53) 0%,
@@ -25,14 +24,24 @@ const SSibalContainer = styled.div`
     font-weight: 600;
     margin-bottom: 5px;
   }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    padding: 40px 24px;
+    gap: 32px;
+  }
 `;
+
 const FooterContainer = styled.footer`
   background: #c3b794;
   width: 100%;
-  height: 440px;
 
   display: flex;
   flex-direction: row;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 
 const Logo = styled.div`
@@ -44,13 +53,19 @@ const Logo = styled.div`
     width: 173px;
     height: 76px;
   }
+
+  @media (max-width: 768px) {
+    justify-content: flex-start;
+    img {
+      width: 130px;
+      height: auto;
+    }
+  }
 `;
 
 const LeftPart = styled.div`
   height: 100%;
   width: 500px;
-
-  /* border: 1px solid black; */
 
   display: flex;
   flex-direction: column;
@@ -58,6 +73,10 @@ const LeftPart = styled.div`
 
   p {
     margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
   }
 `;
 
@@ -87,6 +106,16 @@ const Portal = styled.div`
   .linktree {
     width: 27px;
   }
+
+  @media (max-width: 768px) {
+    margin-top: 20px;
+    width: 60px;
+    height: 60px;
+
+    .yt { width: 36px; }
+    .inst { width: 26px; }
+    .linktree { width: 20px; }
+  }
 `;
 
 const PortalContainer = styled.div`
@@ -94,6 +123,13 @@ const PortalContainer = styled.div`
   display: flex;
   justify-content: space-between;
   padding-right: 200px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    padding-right: 0;
+    gap: 16px;
+    justify-content: flex-start;
+  }
 `;
 
 const RightPart = styled.div`
@@ -106,6 +142,11 @@ const RightPart = styled.div`
   p {
     font-weight: 400;
   }
+
+  @media (max-width: 768px) {
+    h2 { font-size: 18px; }
+    p { font-size: 14px; }
+  }
 `;
 
 const Footer = () => {
@@ -117,7 +158,7 @@ const Footer = () => {
             <img src="/assets/logo_crop.png" />
           </Logo>
           <h2>누리울림 공식 홈페이지입니다.</h2>
-          <p>©2025 Nuriwoolimhompageteam. All rights reserved</p>
+          <p>&copy;2025 Nuriwoolimhompageteam. All rights reserved</p>
 
           <PortalContainer>
             <Portal>

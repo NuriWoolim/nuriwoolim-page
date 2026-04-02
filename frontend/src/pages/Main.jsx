@@ -9,7 +9,6 @@ const MainContainer = styled.div``;
 const OverlayText = styled.div`
   position: absolute;
   bottom: 100px;
-  /* width: 100%; */
   color: #fefaef;
   z-index: 2;
   margin-left: 73px;
@@ -32,6 +31,35 @@ const OverlayText = styled.div`
     text-transform: uppercase;
     margin-left: 12px;
   }
+
+  @media (max-width: 1024px) {
+    margin-left: 40px;
+    bottom: 80px;
+
+    h1 {
+      font-size: 120px;
+      letter-spacing: -8px;
+    }
+    p {
+      font-size: 18px;
+      letter-spacing: 40px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    margin-left: 20px;
+    bottom: 60px;
+
+    h1 {
+      font-size: 56px;
+      letter-spacing: -3px;
+    }
+    p {
+      font-size: 11px;
+      letter-spacing: 18px;
+      margin-left: 6px;
+    }
+  }
 `;
 
 const ImgBackground = styled.img`
@@ -51,6 +79,10 @@ const ImgContainer = styled.div`
 
   width: 100%;
   height: 90vh;
+
+  @media (max-width: 768px) {
+    height: 60vh;
+  }
 `;
 
 const Main = () => {

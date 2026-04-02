@@ -19,11 +19,19 @@ const Logo = styled.div`
     width: 242px;
     height: 242px;
   }
+
+  @media (max-width: 768px) {
+    img {
+      width: 150px;
+      height: 150px;
+    }
+  }
 `;
 
 const Wrapper = styled.div`
   width: 452px;
-  height: 458px;
+  max-width: calc(100% - 40px);
+  height: auto;
   border: 2px solid #033148;
   padding: 40px 25px;
   background: radial-gradient(circle at top left, #fff2ce 17%, #daf0f6 70%);
@@ -33,6 +41,12 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  box-sizing: border-box;
+
+  @media (max-width: 768px) {
+    padding: 28px 20px;
+    margin: -10px auto;
+  }
 `;
 
 const Title = styled.h2`
@@ -43,6 +57,10 @@ const Title = styled.h2`
   margin-bottom: 0px;
   letter-spacing: -4px;
   color: #0f2230;
+
+  @media (max-width: 768px) {
+    font-size: 52px;
+  }
 `;
 
 const TextWrap = styled.div`
@@ -107,8 +125,10 @@ const Inputs = styled.div`
   input {
     font-size: 14px;
     height: 12px;
-    width: 324px;
+    width: 100%;
+    max-width: 324px;
     border: 1px solid #888;
+    box-sizing: border-box;
     padding: 10px;
 
     &::placeholder {

@@ -7,8 +7,18 @@ const HOUR_START = 9;
 
 /* ── 전체 래퍼 ── */
 const Wrapper = styled.div`
+  --cell-h: 2.5rem;
   width: 105rem;
   margin-bottom: 2.3rem;
+
+  @media (max-width: 1024px) {
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    --cell-h: 1.5rem;
+    margin-bottom: 1rem;
+  }
 `;
 
 const Title = styled.h2`
@@ -17,6 +27,11 @@ const Title = styled.h2`
   font-size: 2.1rem;
   font-weight: 900;
   margin: 0 0 0.9rem 0;
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+    margin: 0 0 0.5rem 0;
+  }
 `;
 
 /* ── 테이블 컨테이너 ── */
@@ -24,6 +39,10 @@ const Table = styled.div`
   display: grid;
   grid-template-columns: 2.75rem repeat(7, 1fr);
   border: 1px solid #333;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1.6rem repeat(7, 1fr);
+  }
 `;
 
 /* ── 헤더 ── */
@@ -53,6 +72,11 @@ const DayHeader = styled.button`
   &:hover {
     filter: brightness(0.96);
   }
+
+  @media (max-width: 768px) {
+    font-size: 0.7rem;
+    min-height: 1.8rem;
+  }
 `;
 
 /* ── 바디 ── */
@@ -77,6 +101,11 @@ const HourCell = styled.div`
   font-family: Pretendard;
   font-size: 0.82rem;
   font-weight: 700;
+
+  @media (max-width: 768px) {
+    min-height: 1.5rem;
+    font-size: 0.55rem;
+  }
 `;
 
 /* 요일 칸 — DraggableTable과 동일한 배경/보더 */
@@ -96,6 +125,10 @@ const DayCell = styled.button`
 
   &:hover {
     background: #fffdf8;
+  }
+
+  @media (max-width: 768px) {
+    min-height: 1.5rem;
   }
 `;
 
@@ -121,6 +154,15 @@ const TTBlock = styled.div`
     overflow: hidden;
     text-overflow: ellipsis;
     padding: 0 0.3rem;
+  }
+
+  @media (max-width: 768px) {
+    border-radius: 3px;
+
+    span {
+      font-size: 0.5rem;
+      padding: 0 0.1rem;
+    }
   }
 `;
 
@@ -222,7 +264,7 @@ const WeeklyTimeTable = ({ weekDates, weekTT, onOpenDetailedDate }) => {
                       $isLast={isLast}
                       style={{
                         gridRow: `span ${SLOT_COUNT}`,
-                        minHeight: `calc(2.5rem * ${SLOT_COUNT})`,
+                        minHeight: `calc(var(--cell-h) * ${SLOT_COUNT})`,
                       }}
                       onClick={() => onOpenDetailedDate(dateObj)}
                     >
@@ -231,7 +273,7 @@ const WeeklyTimeTable = ({ weekDates, weekTT, onOpenDetailedDate }) => {
                         <div
                           key={`guide-${i}`}
                           style={{
-                            height: "2.5rem",
+                            height: "var(--cell-h)",
                             borderBottom:
                               i < SLOT_COUNT - 1
                                 ? "0.6px solid #d4d8e0"
