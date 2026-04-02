@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Layout from "./layout/Layout";
 import NoticeDetail from "./pages/NoticeDetail";
@@ -13,8 +13,26 @@ import ArticleEditor from "./pages/boards/ArticleEditor";
 import MyPage from "./pages/accounts/MyPage";
 import ChangePassword from "./pages/accounts/ChangePassword";
 import PostDetail from "./pages/boards/PostDetail";
+import { getAccessToken, clearAccessToken } from "./apis/client";
+import { store, userDataState } from "./atoms";
+import { RESET } from "jotai/utils";
+import { getMyPage } from "./apis/user";
 
 const App = () => {
+  useEffect(() => {
+    const token = getAccessToken();
+    if (!token) {
+      // accessToken이 없으면 저장된 사용자 데이터도 초기화
+      store.set(userDataState, RESET);
+      return;
+    }
+    // accessToken이 있으면 서버에서 유효성 검증
+    getMyPage().catch(() => {
+      clearAccessToken();
+      store.set(userDataState, RESET);
+    });
+  }, []);
+
   return (
     <BrowserRouter>
       <Routes>
