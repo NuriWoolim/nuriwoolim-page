@@ -11,6 +11,7 @@ public record AdminUserSummaryResponse(
     String email,
     UserType type,
     Integer year,
+    String studentNumber,
     LocalDateTime createdAt
 ) {
 }

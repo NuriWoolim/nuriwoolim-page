@@ -17,6 +17,9 @@ public class UserMapper {
             .name(userSignupRequest.name())
             .email(userSignupRequest.email())
             .password(encodedPassword)
+            .studentNumber(userSignupRequest.studentNumber())
+            .college(userSignupRequest.college())
+            .major(userSignupRequest.major())
             .build();
     }
 
@@ -27,6 +30,9 @@ public class UserMapper {
             .email(user.getEmail())
             .type(user.getType())
             .year(user.getYear())
+            .studentNumber(user.getStudentNumber())
+            .college(user.getCollege())
+            .major(user.getMajor())
             .createdDate(user.getCreatedAt())
             .build();
     }

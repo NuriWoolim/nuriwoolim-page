@@ -21,7 +21,13 @@ public record UserSignupRequest(
     String password,
 
     @NotBlank
-    String code
+    String code,
+
+    String studentNumber,
+
+    String college,
+
+    String major
 ) {
 
 }

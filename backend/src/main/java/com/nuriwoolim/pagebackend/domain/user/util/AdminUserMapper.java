@@ -20,6 +20,7 @@ public class AdminUserMapper {
             .email(user.getEmail())
             .type(user.getType())
             .year(user.getYear())
+            .studentNumber(user.getStudentNumber())
             .createdAt(user.getCreatedAt())
             .build();
     }
@@ -31,6 +32,9 @@ public class AdminUserMapper {
             .email(user.getEmail())
             .type(user.getType())
             .year(user.getYear())
+            .studentNumber(user.getStudentNumber())
+            .college(user.getCollege())
+            .major(user.getMajor())
             .postCount(postCount)
             .commentCount(commentCount)
             .createdAt(user.getCreatedAt())
