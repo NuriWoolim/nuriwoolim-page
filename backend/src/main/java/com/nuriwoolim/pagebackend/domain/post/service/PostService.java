@@ -3,6 +3,7 @@ package com.nuriwoolim.pagebackend.domain.post.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,8 +49,8 @@ public class PostService {
 
 	@Transactional(readOnly = true)
 	public PostListResponse findPostList(Long boardId, Integer page, Integer size) {
-		Pageable pageable = PageRequest.of(page, size);
-		Page<Post> postPage = postRepository.findAll(pageable);
+		Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+		Page<Post> postPage = postRepository.findByBoardId(boardId, pageable);
 
 		return PostMapper.toPostListResponse(postPage);
 	}
