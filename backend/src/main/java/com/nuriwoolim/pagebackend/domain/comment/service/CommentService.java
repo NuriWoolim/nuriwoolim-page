@@ -3,6 +3,7 @@ package com.nuriwoolim.pagebackend.domain.comment.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,7 +49,7 @@ public class CommentService {
 
 	@Transactional(readOnly = true)
 	public CommentListResponse findCommentList(Long postId, int page, int size, Long actorId) {
-		Pageable pageable = PageRequest.of(page, size);
+		Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 		Page<Comment> commentPage = commentRepository.findByPostId(postId, pageable);
 
 		UserType role = userService.getUserTypeById(actorId);
