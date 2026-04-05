@@ -2,6 +2,7 @@ package com.nuriwoolim.pagebackend.domain.user.service;
 
 import com.nuriwoolim.pagebackend.domain.user.dto.ChangeNameRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.ChangePasswordRequest;
+import com.nuriwoolim.pagebackend.domain.user.dto.MyPageResponse;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import com.nuriwoolim.pagebackend.domain.user.entity.UserType;
@@ -26,6 +27,12 @@ public class UserService {
 	public UserResponse findById(Long userId) {
 		User user = getUserById(userId);
 		return UserMapper.toUserResponse(user);
+	}
+
+	@Transactional(readOnly = true)
+	public MyPageResponse getMyPage(Long userId) {
+		User user = getUserById(userId);
+		return UserMapper.toMyPageResponse(user);
 	}
 
 	/**

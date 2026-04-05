@@ -16,7 +16,7 @@ import com.nuriwoolim.pagebackend.domain.post.dto.PostListResponse;
 import com.nuriwoolim.pagebackend.domain.post.service.PostService;
 import com.nuriwoolim.pagebackend.domain.user.dto.ChangeNameRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.ChangePasswordRequest;
-import com.nuriwoolim.pagebackend.domain.user.entity.User;
+import com.nuriwoolim.pagebackend.domain.user.dto.MyPageResponse;
 import com.nuriwoolim.pagebackend.domain.user.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,18 +51,10 @@ public class MyPageController {
 		return ResponseEntity.ok(commentService.findCommentsByWriterId(principal.getId(), page, size));
 	}
 
-	@Operation(summary = "내 이메일 조회", description = "내 이메일을 조회합니다.")
-	@GetMapping("/email")
-	public ResponseEntity<String> getMyEmail(@AuthenticationPrincipal JwtPrincipal principal) {
-		User user = userService.getUserById(principal.getId());
-		return ResponseEntity.ok(user.getEmail());
-	}
-
-	@Operation(summary = "내 이름 조회", description = "내 이름을 조회합니다.")
-	@GetMapping("/name")
-	public ResponseEntity<String> getMyName(@AuthenticationPrincipal JwtPrincipal principal) {
-		User user = userService.getUserById(principal.getId());
-		return ResponseEntity.ok(user.getName());
+	@Operation(summary = "내 정보 조회", description = "마이페이지에 필요한 로그인 사용자 정보를 반환합니다.")
+	@GetMapping
+	public ResponseEntity<MyPageResponse> getMyPage(@AuthenticationPrincipal JwtPrincipal principal) {
+		return ResponseEntity.ok(userService.getMyPage(principal.getId()));
 	}
 
 	@Operation(summary = "이름 변경", description = "내 이름을 변경합니다.")

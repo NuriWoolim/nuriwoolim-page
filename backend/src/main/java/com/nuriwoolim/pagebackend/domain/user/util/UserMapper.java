@@ -1,5 +1,6 @@
 package com.nuriwoolim.pagebackend.domain.user.util;
 
+import com.nuriwoolim.pagebackend.domain.user.dto.MyPageResponse;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserSignupRequest;
 import com.nuriwoolim.pagebackend.domain.user.entity.EmailVerification;
@@ -34,6 +35,18 @@ public class UserMapper {
             .college(user.getCollege())
             .major(user.getMajor())
             .createdDate(user.getCreatedAt())
+            .build();
+    }
+
+    public static MyPageResponse toMyPageResponse(final User user) {
+        return MyPageResponse.builder()
+            .name(user.getName())
+            .email(user.getEmail())
+            .type(user.getType())
+            .year(user.getYear())
+            .studentNumber(user.getStudentNumber())
+            .college(user.getCollege())
+            .major(user.getMajor())
             .build();
     }
 
