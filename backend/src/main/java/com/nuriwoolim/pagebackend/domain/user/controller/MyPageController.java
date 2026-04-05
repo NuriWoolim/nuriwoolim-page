@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/mypage")
+@RequestMapping("/users/me")
 @Tag(name = "MyPage", description = "마이페이지 관리 API")
 public class MyPageController {
 	private final PostService postService;
