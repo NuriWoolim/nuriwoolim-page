@@ -60,6 +60,15 @@ public class User extends BaseEntity {
 	@Column
 	private String password;
 
+	@Column(length = 10)
+	private String studentNumber;
+
+	@Column
+	private String college;
+
+	@Column
+	private String major;
+
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	@Builder.Default
@@ -94,6 +103,10 @@ public class User extends BaseEntity {
 	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Setter
 	private RefreshToken refreshToken;
+
+	public void updateName(String name) {
+		this.name = name;
+	}
 
 	public void updatePassword(String password) {
 		this.password = password;

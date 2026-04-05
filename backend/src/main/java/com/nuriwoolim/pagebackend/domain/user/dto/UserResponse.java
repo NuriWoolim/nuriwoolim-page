@@ -11,6 +11,9 @@ public record UserResponse(
     String email,
     UserType type,
     Integer year,
+    String studentNumber,
+    String college,
+    String major,
     LocalDateTime createdDate
 ) {
 

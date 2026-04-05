@@ -1,6 +1,8 @@
 package com.nuriwoolim.pagebackend.domain.user.service;
 
+import com.nuriwoolim.pagebackend.domain.user.dto.ChangeNameRequest;
 import com.nuriwoolim.pagebackend.domain.user.dto.ChangePasswordRequest;
+import com.nuriwoolim.pagebackend.domain.user.dto.MyPageResponse;
 import com.nuriwoolim.pagebackend.domain.user.dto.UserResponse;
 import com.nuriwoolim.pagebackend.domain.user.entity.User;
 import com.nuriwoolim.pagebackend.domain.user.entity.UserType;
@@ -27,6 +29,12 @@ public class UserService {
 		return UserMapper.toUserResponse(user);
 	}
 
+	@Transactional(readOnly = true)
+	public MyPageResponse getMyPage(Long userId) {
+		User user = getUserById(userId);
+		return UserMapper.toMyPageResponse(user);
+	}
+
 	/**
 	 * 현재 비밀번호를 확인한 뒤 새 비밀번호로 변경한다.
 	 *
@@ -50,6 +58,12 @@ public class UserService {
 		}
 
 		user.updatePassword(passwordEncoder.encode(request.newPassword()));
+	}
+
+	@Transactional
+	public void changeName(Long userId, ChangeNameRequest request) {
+		User user = getUserById(userId);
+		user.updateName(request.name());
 	}
 
 	@Transactional
